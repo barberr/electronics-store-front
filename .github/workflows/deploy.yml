@@ -14,6 +14,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Debug directory structure
+        run: |
+          pwd
+          ls -la
+          ls -la frontend/ || echo "frontend/ not found!"
+          find . -name "package*.json" -type f || echo "No package.json found!"
+          find . -name "nuxt.config*" -type f || echo "No nuxt config found!"
+
       - name: Use Node.js 20 with cache
         uses: actions/setup-node@v4
         with:
