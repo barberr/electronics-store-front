@@ -14,28 +14,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Debug directory structure
-        run: |
-          pwd
-          ls -la
-          ls -la frontend/ || echo "frontend/ not found!"
-          find . -name "package*.json" -type f || echo "No package.json found!"
-          find . -name "nuxt.config*" -type f || echo "No nuxt config found!"
-
-      - name: Use Node.js 20 with cache
+      - name: Use Node.js 20 with pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'                          # включаем кеш npm
-          cache-dependency-path: package-lock.json
+          cache: 'pnpm'                          # pnpm вместо npm!
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Install deps
-        working-directory: ./frontend
-        run: npm ci
+        run: pnpm install --frozen-lockfile     # pnpm ci аналог
 
-      - name: Build (SSR)
-        working-directory: ./frontend
-        run: npm run build
+      - name: Build
+        run: pnpm run build                     # без working-directory!
 
       - name: Upload app via SCP
         uses: appleboy/scp-action@v1
@@ -44,7 +37,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "./frontend/*"
+          source: ".output/* package.json pnpm-lock.yaml"  # только нужное
           target: "/var/www/electronics-store-front"
           rm: true
 
