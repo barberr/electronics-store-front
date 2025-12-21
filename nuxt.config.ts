@@ -5,7 +5,7 @@ export default defineNuxtConfig({
         port: 3000, // порт, который вы выбрали
     },
 
-    modules: ['@nuxt/eslint', '@nuxt/ui'],
+    modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image'],
 
     devtools: {
         enabled: true,
@@ -16,6 +16,20 @@ export default defineNuxtConfig({
     },
 
     css: ['~/assets/css/main.css'],
+
+    image: {
+        // Разрешите внешние домены вашего API
+        domains: ['94.241.171.81'],
+        // Используйте IPX для обработки изображений
+        provider: 'ipx',
+        // Опции для IPX
+        ipx: {
+            modifiers: {
+                format: 'webp',
+                quality: 80,
+            },
+        },
+    },
 
     routeRules: {
         '/': { prerender: true },
