@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://94.241.171.81:8000/api/v1/', // ← твой DRF API
+    baseURL: 'http://94.241.171.81/api/v1/', // ← твой DRF API
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
