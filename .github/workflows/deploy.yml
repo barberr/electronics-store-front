@@ -30,6 +30,14 @@ jobs:
       - name: Build
         run: pnpm run build                     # без working-directory!
 
+      - name: Debug build output
+        run: |
+          echo "=== Contents after build ==="
+          ls -la .output/ || echo ".output/ not found!"
+          ls -la .output/server/ || echo ".output/server/ not found!"
+          find . -name "*.mjs" -type f || echo "No .mjs files!"
+          find . -name "index.mjs" -type f || echo "No index.mjs!"
+
       - name: Upload app via SCP
         uses: appleboy/scp-action@v1
         with:
