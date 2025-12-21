@@ -36,12 +36,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: 22
-          source: |
-            .output
-            package.json
-            pnpm-lock.yaml
-            nitro.json  # тоже нужен для Nitro
+          source: ".output,package.json,pnpm-lock.yaml,nitro.json"
           target: "/var/www/electronics-store-front"
           rm: true
 
