@@ -134,7 +134,7 @@ const fetchCategories = async () => {
 
 const loadProducts = async (categoryId: number) => {
     try {
-        const res = await $fetch(`/api/categories/${categoryId}/products/`);
+        const res = await $fetch(`/api/v1/categories/${categoryId}/products/`);
         // или через axios:
         // const res = await axios.get(`/api/categories/${categoryId}/products/`)
         categories.value = categories.value.map((cat) =>
