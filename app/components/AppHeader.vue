@@ -1,74 +1,87 @@
 <template>
+    <!-- Основной хедер -->
     <header class="header">
-        <div class="w-full flex">
-            <div class="header__logo min-w-64 px-4">
-                <NuxtLink to="/">
-                    <h1>Техника от Боряна</h1>
+        <div
+            class="container mx-auto px-4 flex items-center justify-between h-16"
+        >
+            <!-- Логотип -->
+            <div class="header__logo min-w-[160px]">
+                <NuxtLink to="/" class="block">
+                    <h1 class="text-xl font-bold">Техника от Боряна</h1>
                 </NuxtLink>
             </div>
 
-            <div class="flex items-center justify-center w-full">
-                <div class="flex items-center justify-center gap-x-8">
-                    <div class="nav-item">
-                        <UInputTags size="xl" placeholder="Поиск..." />
-                    </div>
-                    <div class="nav-item">
-                        <NuxtLink to="/" class="nav-link"
-                            >Адрес головного офиса...</NuxtLink
-                        >
-                    </div>
-                    <div class="nav-item">
-                        <a href="tel:+74951234567"
-                            >Позвонить: +7 (495) 123-45-67</a
-                        >
-                    </div>
-                    <ul class="header__social flex">
-                        <li>
-                            <TelegramIconLink
-                                href="https://t.me/vuejs_ru"
-                                size="xs"
-                            />
-                        </li>
-                    </ul>
-                    <div class="header__controls flex gap-x-2">
-                        <!-- <button to="/" class="nav-link">
-                            <font-awesome-icon
-                                icon="bookmark"
-                                class="inline-block w-5 h-5 align-middle"
-                            />
-                            Избранное
-                        </button> -->
-                        <UButton
-                            size="xl"
-                            icon="i-lucide-bookmark"
-                            color="neutral"
-                            variant="ghost"
-                            >Избранное</UButton
-                        >
+            <!-- Мобильное меню -->
+            <div class="md:hidden">
+                <UButton
+                    color="white"
+                    variant="ghost"
+                    icon="i-heroicons-bars-3"
+                    square
+                    @click="mobileMenu.open = true"
+                />
+            </div>
 
-                        <UButton
-                            size="xl"
-                            icon="i-lucide-user"
-                            color="neutral"
-                            variant="ghost"
-                            >Войти</UButton
-                        >
-                        <!-- <font-awesome-icon
-                                icon="user"
-                                class="inline-block w-5 h-5 align-middle"
-                            /> -->
-                    </div>
-                    <UDropdownMenu
-                        size="md"
-                        :items="items"
-                        :ui="{
-                            content: 'w-48',
-                        }"
+            <!-- Десктоп навигация (скрыта на мобильных) -->
+            <div
+                class="hidden md:flex items-center justify-center w-full gap-6"
+            >
+                <!-- Поиск -->
+                <UInputTags
+                    size="lg"
+                    placeholder="Поиск..."
+                    class="w-64 max-w-sm"
+                />
+
+                <!-- Контакты -->
+                <div class="flex items-center gap-4 text-sm">
+                    <NuxtLink
+                        to="/"
+                        class="text-white/90 hover:text-white transition-colors"
                     >
+                        Адрес офиса
+                    </NuxtLink>
+                    <a
+                        href="tel:+74951234567"
+                        class="text-white/90 hover:text-white transition-colors"
+                    >
+                        +7 (495) 123-45-67
+                    </a>
+                </div>
+
+                <!-- Соцсети -->
+                <ul class="header__social flex items-center gap-2">
+                    <li>
+                        <TelegramIconLink
+                            href="https://t.me/vuejs_ru"
+                            size="sm"
+                        />
+                    </li>
+                </ul>
+
+                <!-- Кнопки -->
+                <div class="flex items-center gap-2">
+                    <UButton
+                        size="lg"
+                        icon="i-lucide-bookmark"
+                        color="white-alpha"
+                        variant="ghost"
+                    >
+                        Избранное
+                    </UButton>
+                    <UButton
+                        size="lg"
+                        icon="i-lucide-user"
+                        color="white-alpha"
+                        variant="ghost"
+                    >
+                        Войти
+                    </UButton>
+                    <UDropdownMenu :items="items">
                         <UButton
-                            size="xl"
-                            icon="i-lucide-pen"
-                            color="neutral"
+                            size="lg"
+                            icon="i-lucide-menu"
+                            color="white-alpha"
                             variant="outline"
                         />
                     </UDropdownMenu>
@@ -76,9 +89,11 @@
             </div>
         </div>
     </header>
+
+    <!-- Категории (только десктоп) -->
     <UHeader
         title="Категории товаров"
-        class="container hidden md:flex items-center space-x-1 relative"
+        class="container mx-auto px-4 hidden lg:flex items-center space-x-1 relative"
     >
         <div
             v-for="category in categories"
@@ -87,7 +102,6 @@
             @mouseenter="openDropdown(category.id)"
             @mouseleave="closeDropdown"
         >
-            <!-- Кнопка категории -->
             <UButton
                 variant="ghost"
                 class="px-4 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50"
@@ -96,29 +110,124 @@
                 <UIcon
                     name="i-mdi-chevron-down"
                     class="ml-1 h-4 w-4 transition-transform duration-200"
-                    :class="{
-                        'rotate-180': activeDropdown === category.id,
-                    }"
+                    :class="{ 'rotate-180': activeDropdown === category.id }"
                 />
             </UButton>
         </div>
     </UHeader>
+
+    <!-- Мобильное боковое меню -->
+    <USlideover v-model="mobileMenu.open" side="right" class="md:hidden">
+        <template #default>
+            <div class="p-6 space-y-6">
+                <!-- Поиск -->
+                <UInputTags
+                    v-model="searchQuery"
+                    size="lg"
+                    placeholder="Поиск товаров..."
+                    class="w-full"
+                />
+
+                <!-- Категории -->
+                <UCollapsibleGroup class="space-y-2">
+                    <UCollapsible
+                        v-for="category in categories"
+                        :key="category.id"
+                        :open="mobileMenu.activeCategory === category.id"
+                        @open-change="
+                            (isOpen) =>
+                                (mobileMenu.activeCategory = isOpen
+                                    ? category.id
+                                    : null)
+                        "
+                    >
+                        <template #trigger="{ open }">
+                            <div
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50"
+                            >
+                                <span class="font-medium">{{
+                                    category.name
+                                }}</span>
+                                <UIcon
+                                    :name="
+                                        open
+                                            ? 'i-heroicons-minus'
+                                            : 'i-heroicons-plus'
+                                    "
+                                    class="w-5 h-5"
+                                />
+                            </div>
+                        </template>
+                        <div class="pt-2 space-y-2">
+                            <NuxtLink
+                                v-for="product in category.products"
+                                :key="product.id"
+                                :to="`/products/${product.slug}`"
+                                class="block p-3 text-sm rounded-lg hover:bg-gray-100"
+                            >
+                                {{ product.name }}
+                            </NuxtLink>
+                        </div>
+                    </UCollapsible>
+                </UCollapsibleGroup>
+
+                <!-- Контакты и кнопки -->
+                <div class="pt-4 border-t space-y-4">
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <NuxtLink to="/" class="block hover:text-primary"
+                            >Адрес офиса</NuxtLink
+                        >
+                        <a
+                            href="tel:+74951234567"
+                            class="block hover:text-primary"
+                        >
+                            +7 (495) 123-45-67
+                        </a>
+                    </div>
+
+                    <div class="flex gap-2 pt-4">
+                        <UButton
+                            block
+                            size="lg"
+                            color="primary"
+                            icon="i-lucide-shopping-cart"
+                        >
+                            Корзина
+                        </UButton>
+                        <UButton block size="lg" color="gray" variant="ghost">
+                            Войти
+                        </UButton>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </USlideover>
 </template>
 
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui';
-import useApi from '~/composables/useApi';
-
 const categories = ref<any[]>([]);
-const pending = ref<boolean>(true);
-const error = ref<Error | null>(null);
-
 const activeDropdown = ref<number | null>(null);
+const searchQuery = ref('');
+const api = useApi();
 
-// Функция загрузки
+// Мобильное меню
+const mobileMenu = ref({
+    open: false,
+    activeCategory: null as number | null,
+});
+
+const openDropdown = async (id: number) => {
+    if (!categories.value.find((c) => c.id === id)?.products) {
+        await loadProducts(id);
+    }
+    activeDropdown.value = id;
+};
+
+const closeDropdown = () => {
+    activeDropdown.value = null;
+};
 
 const fetchCategories = async () => {
-    const api = useApi();
     try {
         const response = await api.get('/categories/');
         console.log('response -', response);
@@ -134,9 +243,10 @@ const fetchCategories = async () => {
 
 const loadProducts = async (categoryId: number) => {
     try {
-        const res = await $fetch(`/api/v1/categories/${categoryId}/products/`);
+        // const res = await $fetch(`/api/v1/categories/${categoryId}/products/`);
         // или через axios:
-        // const res = await axios.get(`/api/categories/${categoryId}/products/`)
+
+        const res = await api.get(`/categories/${categoryId}/products/`);
         categories.value = categories.value.map((cat) =>
             cat.id === categoryId ? { ...cat, products: res } : cat,
         );
@@ -146,12 +256,12 @@ const loadProducts = async (categoryId: number) => {
 };
 
 // в openDropdown
-const openDropdown = async (id: number) => {
-    if (!categories.value.find((c) => c.id === id)?.products) {
-        await loadProducts(id);
-    }
-    activeDropdown.value = id;
-};
+// const openDropdown = async (id: number) => {
+//     if (!categories.value.find((c) => c.id === id)?.products) {
+//         await loadProducts(id);
+//     }
+//     activeDropdown.value = id;
+// };
 
 onMounted(() => {
     fetchCategories();
