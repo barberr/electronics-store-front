@@ -30,14 +30,6 @@ jobs:
       - name: Build
         run: pnpm run build                     # без working-directory!
 
-      - name: Debug build output
-        run: |
-          echo "=== Contents after build ==="
-          ls -la .output/ || echo ".output/ not found!"
-          ls -la .output/server/ || echo ".output/server/ not found!"
-          find . -name "*.mjs" -type f || echo "No .mjs files!"
-          find . -name "index.mjs" -type f || echo "No index.mjs!"
-
       - name: Upload app via SCP
         uses: appleboy/scp-action@v1
         with:
@@ -45,7 +37,11 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: ".output/* package.json pnpm-lock.yaml"  # только нужное
+          source: |
+            .output
+            package.json
+            pnpm-lock.yaml
+            nitro.json  # тоже нужен для Nitro
           target: "/var/www/electronics-store-front"
           rm: true
 
