@@ -36,9 +36,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: ".output"
+          source: ".output,package.json,pnpm-lock.yaml,nitro.json"
           target: "/tmp/electronics-store-front-deploy"
           rm: true
+
 
       - name: Deploy from temp
         uses: appleboy/ssh-action@v1
@@ -47,14 +48,14 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            set -e
             sudo rm -rf /var/www/electronics-store-front/.output
-            sudo mv /tmp/electronics-store-front-deploy /var/www/electronics-store-front/.output
+            sudo mv /tmp/electronics-store-front-deploy/.output /var/www/electronics-store-front/.output
+            sudo mv /tmp/electronics-store-front-deploy/package.json /var/www/electronics-store-front/package.json || true
+            sudo mv /tmp/electronics-store-front-deploy/pnpm-lock.yaml /var/www/electronics-store-front/pnpm-lock.yaml || true
+            sudo mv /tmp/electronics-store-front-deploy/nitro.json /var/www/electronics-store-front/nitro.json || true
             sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/electronics-store-front
-            corepack enable pnpm
-            cd /var/www/electronics-store-front
-            pnpm install --prod --frozen-lockfile
-            sudo systemctl daemon-reload
-            sudo systemctl restart electronics-store-front.service
+
 
       - name: Restart frontend service
         uses: appleboy/ssh-action@v1
