@@ -43,7 +43,7 @@
 
         <UPageSection
             id="features"
-            title="Everything you need to build modern Nuxt apps111"
+            title="Everything you need to build modern Nuxt apps222"
             description="Start with a solid foundation. This template includes all the essentials for building production-ready applications with Nuxt UI's powerful component system."
             :features="[
                 {
