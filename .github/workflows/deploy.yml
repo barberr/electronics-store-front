@@ -1,0 +1,53 @@
+name: Deploy frontend SSR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: actions-deploy
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20 with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'                          # включаем кеш npm
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install deps
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build (SSR)
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Upload app via SCP
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: "./frontend/*"
+          target: "/var/www/electronics-store-front"
+          rm: true
+
+      - name: Restart frontend service
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/electronics-store-front
+            sudo systemctl daemon-reload
+            sudo systemctl restart ${{ secrets.FRONT_SERVICE_NAME }}
