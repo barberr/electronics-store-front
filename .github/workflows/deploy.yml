@@ -49,7 +49,7 @@ jobs:
           script: |
             sudo rm -rf /var/www/electronics-store-front/.output
             sudo mv /tmp/electronics-store-front-deploy /var/www/electronics-store-front/.output
-            sudo chown -R www-data:www-data /var/www/electronics-store-front
+            sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/electronics-store-front
             corepack enable pnpm
             cd /var/www/electronics-store-front
             pnpm install --prod --frozen-lockfile
