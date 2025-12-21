@@ -41,7 +41,7 @@
                         <UButton
                             size="xl"
                             icon="i-lucide-bookmark"
-                            color="primary"
+                            color="neutral"
                             variant="ghost"
                             >Избранное</UButton
                         >
@@ -49,7 +49,7 @@
                         <UButton
                             size="xl"
                             icon="i-lucide-user"
-                            color="primary"
+                            color="neutral"
                             variant="ghost"
                             >Войти</UButton
                         >
@@ -113,6 +113,8 @@ const categories = ref<any[]>([]);
 const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
 
+const activeDropdown = ref<number | null>(null);
+
 // Функция загрузки
 
 const fetchCategories = async () => {
@@ -128,6 +130,27 @@ const fetchCategories = async () => {
         console.log('prod-', categories.value);
         pending.value = false;
     }
+};
+
+const loadProducts = async (categoryId: number) => {
+    try {
+        const res = await $fetch(`/api/categories/${categoryId}/products/`);
+        // или через axios:
+        // const res = await axios.get(`/api/categories/${categoryId}/products/`)
+        categories.value = categories.value.map((cat) =>
+            cat.id === categoryId ? { ...cat, products: res } : cat,
+        );
+    } catch (err) {
+        console.error('Failed to load products', err);
+    }
+};
+
+// в openDropdown
+const openDropdown = async (id: number) => {
+    if (!categories.value.find((c) => c.id === id)?.products) {
+        await loadProducts(id);
+    }
+    activeDropdown.value = id;
 };
 
 onMounted(() => {
