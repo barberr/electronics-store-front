@@ -156,6 +156,7 @@
                                             variant="link"
                                             class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full"
                                             :to="`/category/${group.slug}`"
+                                            @click="close"
                                         >
                                             <UIcon
                                                 :name="
@@ -176,6 +177,7 @@
                                                 )"
                                                 :key="product.id"
                                                 :to="`/products/${product.slug}`"
+                                                @click="close"
                                                 class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                             >
                                                 <div
@@ -215,6 +217,7 @@
                                                 size="xs"
                                                 class="px-2 py-1 mt-0.5 text-xs"
                                                 :to="`/category/${group.slug}`"
+                                                @click="close"
                                             >
                                                 Показать все ({{
                                                     group.products.length
@@ -242,6 +245,7 @@
                                             )"
                                             :key="brand.id"
                                             :to="`/brand/${brand.slug}`"
+                                            @click="close"
                                             class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
                                         >
                                             <UAvatar
