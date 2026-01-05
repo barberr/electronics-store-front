@@ -1,124 +1,306 @@
 <template>
-    <header class="es-header">
-        <!-- Верхняя полоса -->
-        <div class="es-header__top">
-            <div class="es-container es-header__top-inner">
-                <!-- Логотип + слоган -->
-                <NuxtLink to="/" class="es-logo">
+    <header class="es-header border-b border-gray-200 bg-white">
+        <!-- Основной ряд: mobile first -->
+        <div class="es-container flex items-center justify-between h-14">
+            <!-- Левая зона: бургер + логотип -->
+            <div class="flex items-center gap-3">
+                <!-- Бургер только на мобильных -->
+                <UButton
+                    class="md:hidden"
+                    icon="i-heroicons-bars-3"
+                    color="gray"
+                    variant="ghost"
+                    square
+                    @click="mobileMenu.open = true"
+                />
+
+                <!-- Логотип + текст -->
+                <NuxtLink to="/" class="flex items-center gap-2">
                     <img
                         src="/logo-electronics-store.svg"
                         alt="Electronics Store"
-                        class="es-logo__img"
+                        class="es-logo__img w-8 h-8"
                     />
-                    <div class="es-logo__text">
-                        <span class="es-logo__title">Electronics-Store</span>
-                        <span class="es-logo__subtitle"
-                            >МИРОВЫЕ БРЕНДЫ И КАЧЕСТВО</span
-                        >
-                    </div>
+                    <span
+                        class="es-logo__title text-sm font-semibold tracking-wide uppercase"
+                    >
+                        electronics store
+                    </span>
                 </NuxtLink>
-
-                <!-- Поиск (десктоп) -->
-                <div class="es-search hidden lg:flex">
-                    <UInput
-                        v-model="searchQuery"
-                        size="lg"
-                        icon="i-heroicons-magnifying-glass-20-solid"
-                        placeholder="Поиск по каталогу"
-                        class="es-search__input"
-                    />
-                </div>
-
-                <!-- Контакты и иконки -->
-                <div class="es-header__right">
-                    <div class="es-contacts hidden md:flex">
-                        <a href="tel:+78129426246" class="es-contacts__phone"
-                            >+7 (812) 111-11-11</a
-                        >
-                        <a href="tel:+78129359083" class="es-contacts__phone"
-                            >+7 (812) 222-22-22</a
-                        >
-                    </div>
-
-                    <div class="es-icons">
-                        <UButton
-                            icon="i-lucide-heart"
-                            variant="ghost"
-                            color="gray"
-                            class="es-icon-btn"
-                        />
-                        <UButton
-                            icon="i-lucide-git-compare"
-                            variant="ghost"
-                            color="gray"
-                            class="es-icon-btn"
-                        />
-                        <UButton
-                            icon="i-lucide-user"
-                            variant="ghost"
-                            color="gray"
-                            class="es-icon-btn hidden md:inline-flex"
-                        >
-                            Личный кабинет
-                        </UButton>
-                        <!-- Мобильное меню -->
-                        <UButton
-                            class="md:hidden es-icon-btn"
-                            icon="i-heroicons-bars-3"
-                            variant="ghost"
-                            color="gray"
-                            @click="mobileMenu.open = true"
-                        />
-                    </div>
-                </div>
             </div>
-        </div>
 
-        <!-- Нижняя полоса с меню -->
-        <div class="es-header__bottom">
-            <div class="es-container es-header__bottom-inner">
-                <!-- Кнопка каталога -->
+            <!-- Центральная зона: поиск (по умолчанию только иконка) -->
+            <div class="flex items-center justify-center flex-1 px-2 md:px-4">
+                <!-- Иконка поиска на мобильных -->
                 <UButton
-                    color="primary"
-                    icon="i-heroicons-bars-3"
-                    class="es-catalog-btn"
-                >
-                    Каталог
-                </UButton>
+                    class="md:hidden"
+                    icon="i-heroicons-magnifying-glass-20-solid"
+                    color="gray"
+                    variant="ghost"
+                    square
+                    @click="mobileMenu.searchOpen = true"
+                />
 
-                <!-- Поиск на планшетах/мобилках -->
-                <div class="es-search flex lg:hidden">
+                <!-- Поле поиска на md+ -->
+                <div class="hidden md:flex w-full max-w-md">
                     <UInput
                         v-model="searchQuery"
                         size="md"
                         icon="i-heroicons-magnifying-glass-20-solid"
                         placeholder="Поиск по каталогу"
-                        class="es-search__input"
+                        class="w-full"
                     />
                 </div>
+            </div>
 
-                <!-- Горизонтальное меню категорий (десктоп) -->
-                <nav class="es-categories hidden lg:flex">
+            <!-- Правая зона: иконки -->
+            <div class="flex items-center gap-1">
+                <UButton
+                    icon="i-lucide-heart"
+                    variant="ghost"
+                    color="gray"
+                    square
+                />
+                <UButton
+                    icon="i-lucide-git-compare"
+                    variant="ghost"
+                    color="gray"
+                    square
+                    class="hidden sm:inline-flex"
+                />
+                <!-- Телефоны только на lg+ -->
+                <div class="hidden lg:flex flex-col items-end mr-3">
+                    <a href="tel:+78129426246" class="text-xs font-medium">
+                        +7 (812) 111-11-11
+                    </a>
+                    <a href="tel:+78129359083" class="text-xs text-gray-500">
+                        +7 (812) 222-22-22
+                    </a>
+                </div>
+                <UButton
+                    icon="i-lucide-user"
+                    variant="ghost"
+                    color="gray"
+                    class="hidden md:inline-flex"
+                >
+                    Личный кабинет
+                </UButton>
+            </div>
+        </div>
+
+        <!-- Нижняя полоса меню: появляется с md -->
+        <div
+            class="hidden es-header__bottom py-2 md:block md:mt-2 text-slate-50"
+        >
+            <div class="es-container flex items-center gap-4 py-2">
+                <UPopover
+                    v-model:open="catalogOpen"
+                    :content="{
+                        align: 'start',
+                        side: 'bottom',
+                        sideOffset: 8,
+                    }"
+                    :ui="{
+                        content:
+                            'w-full max-w-6xl p-0 shadow-2xl border-0 bg-white rounded-lg overflow-hidden',
+                    }"
+                >
+                    <!-- Триггер -->
+                    <UButton
+                        color="primary"
+                        icon="i-heroicons-bars-3"
+                        class="es-catalog-btn min-w-[150px]"
+                    >
+                        Каталог
+                        <UIcon
+                            name="i-heroicons-chevron-down-20-solid"
+                            class="w-4 h-4 ml-1"
+                        />
+                    </UButton>
+
+                    <!-- Контент каталога -->
+                    <template #content="{ close }">
+                        <ClientOnly>
+                            <div
+                                class="p-3 max-w-[768px] w-full max-h-[60vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800"
+                            >
+                                <!-- Загрузка -->
+                                <div
+                                    v-if="pending"
+                                    class="flex items-center justify-center py-8"
+                                >
+                                    <USkeleton class="h-4 w-32 mx-auto" />
+                                </div>
+
+                                <!-- Ошибка -->
+                                <UAlert
+                                    v-else-if="error"
+                                    type="error"
+                                    class="mb-3"
+                                >
+                                    Не удалось загрузить каталог
+                                </UAlert>
+
+                                <!-- Контент -->
+                                <div
+                                    v-else
+                                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                                >
+                                    <div
+                                        v-for="group in data?.catalog || []"
+                                        :key="group.slug"
+                                        class="min-w-0"
+                                    >
+                                        <!-- Заголовок категории -->
+                                        <UButton
+                                            variant="link"
+                                            class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full"
+                                            :to="`/category/${group.slug}`"
+                                        >
+                                            <UIcon
+                                                :name="
+                                                    getCategoryIcon(group.slug)
+                                                "
+                                                class="mr-2 text-gray-500 dark:text-gray-400"
+                                                size="16"
+                                            />
+                                            {{ group.name }}
+                                        </UButton>
+
+                                        <!-- Список товаров -->
+                                        <div class="mt-1 space-y-1">
+                                            <NuxtLink
+                                                v-for="product in group.products.slice(
+                                                    0,
+                                                    4,
+                                                )"
+                                                :key="product.id"
+                                                :to="`/product/${product.slug}`"
+                                                class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                            >
+                                                <div
+                                                    class="flex justify-between items-start"
+                                                >
+                                                    <span class="truncate">{{
+                                                        product.name
+                                                    }}</span>
+                                                    <span
+                                                        class="font-medium whitespace-nowrap ml-2"
+                                                        :class="{
+                                                            'text-green-600 dark:text-green-400':
+                                                                product.is_available,
+                                                            'text-gray-400 line-through':
+                                                                !product.is_available,
+                                                        }"
+                                                    >
+                                                        {{
+                                                            formatPrice(
+                                                                product.price,
+                                                            )
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    v-if="product.brand?.name"
+                                                    class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                                                >
+                                                    {{ product.brand.name }}
+                                                </div>
+                                            </NuxtLink>
+
+                                            <!-- "Показать все" если товаров >4 -->
+                                            <UButton
+                                                v-if="group.products.length > 4"
+                                                variant="link"
+                                                size="xs"
+                                                class="px-2 py-1 mt-0.5 text-xs"
+                                                :to="`/category/${group.slug}`"
+                                            >
+                                                Показать все ({{
+                                                    group.products.length
+                                                }})
+                                            </UButton>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Бренды (опционально внизу) -->
+                                <div
+                                    v-if="data?.brands && data.brands.length"
+                                    class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800"
+                                >
+                                    <h4
+                                        class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2"
+                                    >
+                                        Популярные бренды
+                                    </h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        <NuxtLink
+                                            v-for="brand in data.brands.slice(
+                                                0,
+                                                6,
+                                            )"
+                                            :key="brand.id"
+                                            :to="`/brand/${brand.slug}`"
+                                            class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                        >
+                                            <UAvatar
+                                                v-if="brand.logo"
+                                                :src="brand.logo"
+                                                :alt="brand.name"
+                                                size="xs"
+                                                class="mr-1.5"
+                                            />
+                                            <span>{{ brand.name }}</span>
+                                        </NuxtLink>
+                                    </div>
+                                </div>
+                            </div>
+                            <template #fallback>
+                                <div class="p-4 w-64">
+                                    <USkeleton class="h-5 w-24 mb-3" />
+                                    <div class="space-y-2">
+                                        <USkeleton
+                                            class="h-3 w-32"
+                                            v-for="i in 4"
+                                            :key="i"
+                                        />
+                                    </div>
+                                </div>
+                            </template>
+                        </ClientOnly>
+                    </template>
+                </UPopover>
+                <!-- Горизонтальное меню категорий -->
+                <nav
+                    class="es-categories flex-1 flex items-center gap-4 overflow-x-auto"
+                >
                     <button
                         v-for="category in categories"
                         :key="category.id"
-                        class="es-categories__item"
-                        @mouseenter="openDropdown(category.id)"
-                        @mouseleave="closeDropdown"
+                        class="es-categories__item whitespace-nowrap text-sm"
                     >
-                        <!-- можно выводить иконку категории, если есть -->
-                        <span class="es-categories__label">{{
-                            category.name
-                        }}</span>
+                        {{ category.name }}
                     </button>
                 </nav>
             </div>
         </div>
 
-        <!-- Мобильное боковое меню -->
-        <USlideover v-model="mobileMenu.open" side="left" class="md:hidden">
+        <!-- Мобильное боковое меню (каталог + категории) -->
+        <!-- <USlideover v-model="mobileMenu.open" side="left" class="md:hidden">
             <template #default>
                 <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-base font-semibold">Каталог</span>
+                        <UButton
+                            icon="i-heroicons-x-mark-20-solid"
+                            variant="ghost"
+                            color="gray"
+                            square
+                            @click="mobileMenu.open = false"
+                        />
+                    </div>
+
                     <UInput
                         v-model="searchQuery"
                         size="lg"
@@ -143,9 +325,9 @@
                                 <div
                                     class="flex items-center justify-between p-3 rounded hover:bg-gray-50"
                                 >
-                                    <span class="font-medium">{{
-                                        category.name
-                                    }}</span>
+                                    <span class="font-medium text-sm">
+                                        {{ category.name }}
+                                    </span>
                                     <UIcon
                                         :name="
                                             open
@@ -156,12 +338,13 @@
                                     />
                                 </div>
                             </template>
+
                             <div class="pt-1 space-y-1">
                                 <NuxtLink
                                     v-for="product in category.products"
                                     :key="product.id"
                                     :to="`/products/${product.slug}`"
-                                    class="block px-3 py-2 text-sm rounded hover:bg-gray-100"
+                                    class="block px-3 py-2 text-xs rounded hover:bg-gray-100"
                                 >
                                     {{ product.name }}
                                 </NuxtLink>
@@ -171,26 +354,97 @@
 
                     <div class="pt-4 border-t space-y-2 text-sm">
                         <a href="tel:+78129426246" class="block"
-                            >+7 (812) 942-62-46</a
+                            >+7 (812) 111-11-11</a
                         >
-                        <a href="tel:+78129359083" class="block"
-                            >+7 (812) 935-90-83</a
-                        >
+                        <a href="tel:+78129359083" class="block text-gray-600">
+                            +7 (812) 222-22-22
+                        </a>
                     </div>
                 </div>
             </template>
-        </USlideover>
+        </USlideover> -->
+
+        <!-- Отдельный mobile‑поиск (если хочешь полноэкранный поиск) -->
+        <!-- <USlideover
+            v-model="mobileMenu.searchOpen"
+            side="top"
+            class="md:hidden"
+        >
+            <template #default>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-base font-semibold">Поиск</span>
+                        <UButton
+                            icon="i-heroicons-x-mark-20-solid"
+                            variant="ghost"
+                            color="gray"
+                            square
+                            @click="mobileMenu.searchOpen = false"
+                        />
+                    </div>
+                    <UInput
+                        v-model="searchQuery"
+                        size="lg"
+                        icon="i-heroicons-magnifying-glass-20-solid"
+                        placeholder="Что вы ищете?"
+                        class="w-full"
+                    />
+                </div>
+            </template>
+        </USlideover> -->
     </header>
 </template>
 
 <script setup lang="ts">
+import { useFormatPrice } from '~/composables/useFormatPrice';
+const { formatPrice } = useFormatPrice();
+
+interface Brand {
+    id: number;
+    name: string;
+    slug: string;
+    logo: string | null;
+}
+
+interface Product {
+    id: number;
+    name: string;
+    slug: string;
+    price: string;
+    is_available: boolean;
+    stock: number;
+    brand: { id: number; name: string; logo?: string | null } | null;
+}
+
+interface CategoryGroup {
+    id: number;
+    name: string;
+    slug: string;
+    products: Product[];
+}
+
+interface OverviewResponse {
+    brands: Brand[];
+    categories: any[];
+    catalog: CategoryGroup[];
+}
+
 const categories = ref<any[]>([]);
 const activeDropdown = ref<number | null>(null);
 const searchQuery = ref('');
 const api = useApi();
+const popoverProps = {
+    align: 'start',
+    side: 'bottom',
+    sideOffset: 8,
+};
+
+const catalogOpen = ref(false);
+const catalogDropdown = ref(false);
 
 const mobileMenu = ref({
     open: false,
+    searchOpen: false,
     activeCategory: null as number | null,
 });
 
@@ -205,11 +459,37 @@ const closeDropdown = () => {
     activeDropdown.value = null;
 };
 
+const { data, pending, error } = await api.get('/overview/', {
+    server: false,
+    // Кэшируем на 5 минут, чтобы не грузить API при каждом ховере
+    getCachedData: (key) => {
+        const entry = useNuxtApp().payload.data[key];
+        if (entry && Date.now() - entry._timestamp < 5 * 60 * 1000) {
+            return entry;
+        }
+    },
+    // Добавляем timestamp для кэширования
+    transform: (res) => ({ ...res, _timestamp: Date.now() }),
+});
+
+// Иконки по слагу категории
+const getCategoryIcon = (slug: string): string => {
+    const icons: Record<string, string> = {
+        phones: 'i-heroicons-device-phone-mobile',
+        laptops: 'i-heroicons-laptop',
+        'vacuum-cleaners': 'i-heroicons-bolt',
+        // добавьте свои
+        default: 'i-heroicons-cube',
+    };
+    return icons[slug] || icons.default;
+};
+
 const fetchCategories = async () => {
     try {
         const response = await api.get('/categories/');
         categories.value = response.data.results;
-    } catch (err: any) {
+        console.log('categories[0]', categories.value[0]);
+    } catch (err) {
         console.error('Failed to fetch categories:', err);
     }
 };
@@ -279,9 +559,7 @@ onMounted(() => {
 }
 
 .es-logo__title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
 }
 
 .es-logo__subtitle {
@@ -337,7 +615,7 @@ onMounted(() => {
 /* Нижняя полоса */
 .es-header__bottom {
     border-top: 1px solid #e5e7eb;
-    background-color: #0f172a;
+    background: #2d3748;
     color: #f9fafb;
 }
 
@@ -363,16 +641,11 @@ onMounted(() => {
 }
 
 .es-categories__item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
     border: none;
     background: transparent;
     color: #e5e7eb;
-    font-size: 0.9rem;
+    padding: 0.15rem 0;
     cursor: pointer;
-    padding: 0.25rem 0;
-    white-space: nowrap;
 }
 
 .es-categories__item:hover {

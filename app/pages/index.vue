@@ -98,7 +98,8 @@
                                         <div
                                             class="text-2xl font-bold text-primary"
                                         >
-                                            ${{
+                                            ₽
+                                            {{
                                                 parseFloat(
                                                     product.price,
                                                 ).toFixed(2)
@@ -195,7 +196,7 @@ const fetchProducts = async () => {
         error.value = err.response?.data || err;
         console.error('Failed to fetch products:', err);
     } finally {
-        console.log('prod-', products.value);
+        // console.log('prod-', products.value);
         pending.value = false;
     }
 };
