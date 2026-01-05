@@ -168,7 +168,7 @@ useSeoMeta({
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div>
                             <h1
-                                class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight"
+                                class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-900 leading-tight"
                             >
                                 {{ product.name }}
                             </h1>
