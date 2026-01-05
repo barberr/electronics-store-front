@@ -44,18 +44,21 @@ interface Product {
     images: ProductImage[];
 }
 
+const colorMode = useColorMode();
+const isDark = computed(() => colorMode.value === 'dark');
+
 // Функция загрузки товара (аналог fetchCategories)
 const fetchProduct = async () => {
     try {
-        console.log('Fetching product by slug:', slug.value);
+        // console.log('Fetching product by slug:', slug.value);
         const response = await api.get(`/products/${slug.value}/`);
-        console.log('Product response -', response);
+        // console.log('Product response -', response);
         product.value = response.data;
     } catch (err: any) {
         error.value = err.response?.data || err;
         console.error('Failed to fetch product:', err);
     } finally {
-        console.log('Product loaded:', product.value);
+        // console.log('Product loaded:', product.value);
         pending.value = false;
     }
 };
@@ -85,7 +88,9 @@ useSeoMeta({
         <div v-if="pending" class="flex justify-center py-20">
             <div class="text-center">
                 <ULoader size="xl" color="primary" class="mx-auto mb-4" />
-                <p class="text-gray-500">Загружаем товар...</p>
+                <p class="text-gray-500 dark:text-gray-400">
+                    Загружаем товар...
+                </p>
             </div>
         </div>
 
@@ -93,12 +98,14 @@ useSeoMeta({
         <div v-else-if="error" class="text-center py-20">
             <UIcon
                 name="i-heroicons-exclamation-triangle"
-                class="w-16 h-16 text-red-400 mx-auto mb-4"
+                class="w-16 h-16 text-red-400 dark:text-red-300 mx-auto mb-4"
             />
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+            <h2
+                class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2"
+            >
                 Товар не найден
             </h2>
-            <p class="text-gray-500 mb-6">
+            <p class="text-gray-500 dark:text-gray-400 mb-6">
                 Возможно, товар удален или slug изменился
             </p>
             <UButton @click="fetchProduct" color="primary">
@@ -161,19 +168,19 @@ useSeoMeta({
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div>
                             <h1
-                                class="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight"
+                                class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 leading-tight"
                             >
                                 {{ product.name }}
                             </h1>
                             <div
-                                class="flex items-center gap-3 mt-3 text-sm text-gray-500"
+                                class="flex items-center gap-3 mt-3 text-sm text-gray-500 dark:text-gray-400"
                             >
                                 <span class="font-medium">{{
                                     product.brand?.name || 'Без бренда'
                                 }}</span>
                                 <UIcon
                                     name="i-heroicons-chevron-right"
-                                    class="w-4 h-4"
+                                    class="w-4 h-4 text-gray-400 dark:text-gray-500"
                                 />
                                 <span>{{
                                     product.category?.name || 'Без категории'
@@ -183,7 +190,7 @@ useSeoMeta({
                         <NuxtLink
                             v-if="product.brand?.logo"
                             :to="`/brands/${product.brand.slug}`"
-                            class="w-12 h-12 p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                            class="w-12 h-12 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                         >
                             <NuxtImg
                                 :src="product.brand.logo!"
@@ -200,12 +207,12 @@ useSeoMeta({
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <span
-                                    class="text-sm font-medium text-gray-500 uppercase tracking-wide"
+                                    class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"
                                     >Цена</span
                                 >
                             </div>
                             <div
-                                class="text-4xl lg:text-5xl font-bold text-primary-600"
+                                class="text-4xl lg:text-5xl font-bold text-primary-600 dark:text-primary-400"
                             >
                                 {{
                                     Number(product.price).toLocaleString(
@@ -217,7 +224,7 @@ useSeoMeta({
                         </div>
 
                         <div
-                            class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+                            class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
                         >
                             <div class="flex items-center gap-2">
                                 <UBadge
@@ -227,6 +234,7 @@ useSeoMeta({
                                             ? 'green'
                                             : 'gray'
                                     "
+                                    class="text-gray-600 dark:text-gray-300"
                                     size="lg"
                                     variant="soft"
                                 >
@@ -237,7 +245,9 @@ useSeoMeta({
                                             : 'Нет в наличии'
                                     }}
                                 </UBadge>
-                                <span class="text-sm text-gray-600">
+                                <span
+                                    class="text-sm text-gray-600 dark:text-gray-300"
+                                >
                                     Остаток:
                                     {{ product.stock.toLocaleString() }} шт.
                                 </span>
@@ -261,13 +271,13 @@ useSeoMeta({
                             </UButton>
                             <UButton
                                 size="xl"
-                                color="gray"
-                                variant="ghost"
+                                color="neutral"
+                                variant="outline"
                                 class="text-lg font-semibold h-14"
                             >
                                 <UIcon
                                     name="i-heroicons-heart"
-                                    class="w-5 h-5 mr-2"
+                                    class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300"
                                 />
                                 В избранное
                             </UButton>
@@ -278,44 +288,66 @@ useSeoMeta({
                 <!-- Описание -->
                 <UCard v-if="product.description" class="p-6">
                     <h2
-                        class="text-xl font-semibold mb-4 flex items-center gap-2"
+                        class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
                     >
                         <UIcon
-                            name="i-heroicons-information-circle"
+                            name="w-6 h-6 text-gray-500 dark:text-gray-400"
                             class="w-6 h-6"
                         />
                         Описание
                     </h2>
-                    <div class="prose prose-sm max-w-none">
-                        <p>{{ product.description }}</p>
+                    <div class="prose prose-sm max-w-none dark:prose-invert">
+                        <p class="text-gray-700 dark:text-gray-300">
+                            {{ product.description }}
+                        </p>
                     </div>
                 </UCard>
 
                 <!-- Дополнительная информация -->
                 <UCard class="p-6">
-                    <h3 class="text-lg font-semibold mb-4">Характеристики</h3>
+                    <h3
+                        class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4"
+                    >
+                        Характеристики
+                    </h3>
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                            <dt class="font-medium text-gray-500">Артикул</dt>
-                            <dd class="text-gray-900">
+                            <dt
+                                class="font-medium text-gray-500 dark:text-gray-400"
+                            >
+                                Артикул
+                            </dt>
+                            <dd class="text-gray-900 dark:text-gray-100">
                                 {{ product.sku || 'N/A' }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="font-medium text-gray-500">Категория</dt>
-                            <dd class="text-gray-900">
+                            <dt
+                                class="font-medium text-gray-500 dark:text-gray-400"
+                            >
+                                Категория
+                            </dt>
+                            <dd class="text-gray-900 dark:text-gray-100">
                                 {{ product.category?.name }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="font-medium text-gray-500">Бренд</dt>
-                            <dd class="text-gray-900">
+                            <dt
+                                class="font-medium text-gray-500 dark:text-gray-400"
+                            >
+                                Бренд
+                            </dt>
+                            <dd class="text-gray-900 dark:text-gray-100">
                                 {{ product.brand?.name }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="font-medium text-gray-500">Создан</dt>
-                            <dd class="text-gray-900">
+                            <dt
+                                class="font-medium text-gray-500 dark:text-gray-400"
+                            >
+                                Создан
+                            </dt>
+                            <dd class="text-gray-900 dark:text-gray-100">
                                 {{
                                     new Date(
                                         product.created_at,
@@ -332,12 +364,16 @@ useSeoMeta({
         <div v-else class="text-center py-20">
             <UIcon
                 name="i-heroicons-question-mark-circle"
-                class="w-16 h-16 text-gray-400 mx-auto mb-4"
+                class="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4"
             />
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">
+            <h2
+                class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2"
+            >
                 Товар не найден
             </h2>
-            <p class="text-gray-500">Проверьте правильность ссылки</p>
+            <p class="text-gray-500 dark:text-gray-400">
+                Проверьте правильность ссылки
+            </p>
         </div>
     </UContainer>
 </template>
