@@ -175,7 +175,7 @@
                                                     4,
                                                 )"
                                                 :key="product.id"
-                                                :to="`/product/${product.slug}`"
+                                                :to="`/products/${product.slug}`"
                                                 class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                             >
                                                 <div
