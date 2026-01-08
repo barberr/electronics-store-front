@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { initAuth } = useAuth();
+
+onMounted(() => {
+    initAuth(); // ← загружает профиль, если токен есть
+});
+</script>
 
 <template>
     <UApp>

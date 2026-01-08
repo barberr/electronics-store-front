@@ -190,7 +190,7 @@ interface Product {
 const fetchProducts = async () => {
     const api = useApi();
     try {
-        const response = await api.get('/products/'); // → /api/v1/products/
+        const response = await api.get('/v1/products/'); // → /api/v1/products/
         products.value = response.data.results;
     } catch (err: any) {
         error.value = err.response?.data || err;

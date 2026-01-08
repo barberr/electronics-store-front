@@ -463,7 +463,7 @@ const closeDropdown = () => {
     activeDropdown.value = null;
 };
 
-const { data, pending, error } = await api.get('/overview/', {
+const { data, pending, error } = await api.get('/v1/overview/', {
     server: false,
     // Кэшируем на 5 минут, чтобы не грузить API при каждом ховере
     getCachedData: (key) => {
@@ -490,7 +490,7 @@ const getCategoryIcon = (slug: string): string => {
 
 const fetchCategories = async () => {
     try {
-        const response = await api.get('/categories/');
+        const response = await api.get('/v1/categories/');
         categories.value = response.data.results;
         console.log('categories[0]', categories.value[0]);
     } catch (err) {
@@ -500,7 +500,7 @@ const fetchCategories = async () => {
 
 const loadProducts = async (categoryId: number) => {
     try {
-        const res = await api.get(`/categories/${categoryId}/products/`);
+        const res = await api.get(`/v1/categories/${categoryId}/products/`);
         categories.value = categories.value.map((cat) =>
             cat.id === categoryId
                 ? { ...cat, products: res.data.results ?? res.data }
