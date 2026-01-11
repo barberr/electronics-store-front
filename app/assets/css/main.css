@@ -20,3 +20,17 @@
 body {
   @apply font-sans antialiased text-gray-800 bg-white;
 }
+
+.app {
+  @apply bg-gray-50 min-h-screen flex flex-col;
+}
+
+.main-content {
+  @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    @apply px-4 py-6;
+  }
+}

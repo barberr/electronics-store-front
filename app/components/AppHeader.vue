@@ -77,14 +77,41 @@
                         +7 (812) 222-22-22
                     </a>
                 </div>
-                <UButton
-                    icon="i-lucide-user"
-                    variant="ghost"
-                    color="gray"
-                    class="hidden md:inline-flex"
-                >
-                    Личный кабинет
-                </UButton>
+                <!-- Если НЕ авторизован -->
+                <template v-if="!isAuthenticated">
+                    <UButton
+                        icon="i-lucide-user"
+                        variant="ghost"
+                        color="gray"
+                        class="hidden md:inline-flex"
+                        @click="goToLogin"
+                    >
+                        Войти
+                    </UButton>
+                </template>
+
+                <!-- Если авторизован -->
+                <template v-else>
+                    <div class="flex items-center gap-1">
+                        <UButton
+                            icon="i-lucide-user"
+                            variant="ghost"
+                            color="gray"
+                            class="hidden md:inline-flex"
+                            :to="`/profile`"
+                        >
+                            {{ userDisplayName }}
+                        </UButton>
+                        <UButton
+                            variant="ghost"
+                            color="gray"
+                            class="hidden md:inline-flex"
+                            @click="handleLogout"
+                        >
+                            Выйти
+                        </UButton>
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -286,6 +313,21 @@
                     >
                         {{ category.name }}
                     </button>
+                    <!-- Дополнительно для авторизованных -->
+                    <button
+                        v-if="isAuthenticated"
+                        class="es-categories__item whitespace-nowrap text-sm"
+                        @click="goToAccount"
+                    >
+                        Личный кабинет
+                    </button>
+                    <button
+                        v-if="isAuthenticated"
+                        class="es-categories__item whitespace-nowrap text-sm"
+                        @click="goToOrders"
+                    >
+                        Мои заказы
+                    </button>
                 </nav>
             </div>
         </div>
@@ -400,7 +442,48 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth';
+import { storeToRefs } from 'pinia';
 import { useFormatPrice } from '~/composables/useFormatPrice';
+import { computed, ref, onMounted } from 'vue';
+
+const authStore = useAuthStore();
+
+// ✅ Реактивные refs (рекомендуется)
+const { user, isAuthenticated, isInitialized, initError } =
+    storeToRefs(authStore);
+// const userDisplayName = '';
+const userDisplayName = computed(() => {
+    // ✅ Безопасно: проверяем user.value ДО доступа к свойствам
+    if (!user.value) return '';
+
+    const { first_name, last_name, username, email } = user.value;
+    if (first_name || last_name) {
+        return (
+            `${first_name || ''} ${last_name || ''}`.trim() || username || email
+        );
+    }
+    return username || email || 'Пользователь';
+});
+
+// Методы для авторизации
+const goToLogin = () => {
+    navigateTo('/login');
+};
+
+const goToAccount = () => {
+    navigateTo('/profile');
+};
+
+const goToOrders = () => {
+    navigateTo('/profile/orders');
+};
+
+const handleLogout = async () => {
+    await authLogout();
+    // После logout можно принудительно обновить профиль или просто navigate
+};
+
 const { formatPrice } = useFormatPrice();
 
 interface Brand {
@@ -445,6 +528,14 @@ const popoverProps = {
 
 const catalogOpen = ref(false);
 const catalogDropdown = ref(false);
+
+const handleMobileAuth = () => {
+    if (authStore.isAuthenticated.value) {
+        logout();
+    } else {
+        router.push('/login');
+    }
+};
 
 const mobileMenu = ref({
     open: false,
@@ -511,9 +602,29 @@ const loadProducts = async (categoryId: number) => {
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
+    if (process.client) {
+        // ✅ Ждём полной инициализации
+        const success = await authStore.initialize();
+
+        console.log('Auth initialized:', {
+            isAuthenticated: authStore.isAuthenticated,
+            user: authStore.user,
+            isInitialized: authStore.isInitialized,
+        });
+
+        if (!success && initError.value) {
+            console.error('Auth error:', initError.value);
+        }
+    }
     fetchCategories();
 });
+
+// onMounted(() => {
+//     authStore.initAuth();
+//     console.log('Пользователь:', authStore.user);
+//     fetchCategories();
+// });
 </script>
 
 <style scoped>
