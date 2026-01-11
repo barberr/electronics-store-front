@@ -5,7 +5,7 @@ export default defineNuxtConfig({
         port: 3000, // порт, который вы выбрали
     },
 
-    modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxt/image'],
+    modules: ['@pinia/nuxt', '@nuxt/eslint', '@nuxt/ui', '@nuxt/image'],
 
     devtools: {
         enabled: true,
@@ -19,6 +19,7 @@ export default defineNuxtConfig({
 
     image: {
         // Разрешите внешние домены вашего API
+        // domains: ['10.10.4.12:8000'],
         domains: ['94.241.171.81'],
         // Используйте IPX для обработки изображений
         provider: 'ipx',
