@@ -51,7 +51,7 @@ const isDark = computed(() => colorMode.value === 'dark');
 const fetchProduct = async () => {
     try {
         // console.log('Fetching product by slug:', slug.value);
-        const response = await api.get(`/products/${slug.value}/`);
+        const response = await api.get(`/v1/products/${slug.value}/`);
         // console.log('Product response -', response);
         product.value = response.data;
     } catch (err: any) {
