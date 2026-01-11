@@ -49,7 +49,7 @@ definePageMeta({
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const { login, user } = useAuth();
+const { isAuthenticated, user, initAuth, login } = useAuth();
 const router = useRouter();
 
 const form = reactive({
@@ -71,8 +71,8 @@ const handleLogin = async () => {
     // console.log('result', result.success);
 
     if (result.success) {
-        console.log('✅ Успешный вход, user:', user.value);
-        await router.push('/profile');
+        console.log('✅ Успешный вход, user:', isAuthenticated, result);
+        await navigateTo('/profile');
     } else {
         error.value =
             typeof result.error === 'string'
@@ -82,6 +82,8 @@ const handleLogin = async () => {
 
     loading.value = false;
 };
+
+onMounted(() => {});
 </script>
 
 <style scoped>

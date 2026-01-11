@@ -554,18 +554,32 @@ const closeDropdown = () => {
     activeDropdown.value = null;
 };
 
-const { data, pending, error } = await api.get('/v1/overview/', {
-    server: false,
-    // Кэшируем на 5 минут, чтобы не грузить API при каждом ховере
-    getCachedData: (key) => {
-        const entry = useNuxtApp().payload.data[key];
-        if (entry && Date.now() - entry._timestamp < 5 * 60 * 1000) {
-            return entry;
-        }
+// Используем useAsyncData для реактивности и кэширования Nuxt
+const { data, pending, error } = await useAsyncData(
+    'overview-data', // 1. Уникальный ключ для кэша
+    () =>
+        api.get('/v1/overview/', {
+            skipAuth: true, // 👈 2. Флаг для Axios (чтобы не отправлять токен)
+        }),
+    {
+        // 3. Настройки Nuxt (server, cache, lazy и т.д.)
+        server: false,
+
+        getCachedData: (key) => {
+            const entry = useNuxtApp().payload.data[key];
+            if (entry && Date.now() - entry._timestamp < 5 * 60 * 1000) {
+                return entry;
+            }
+        },
+
+        // 4. Трансформация: Axios возвращает объект { data, status... },
+        // нам нужно достать payload из .data и добавить timestamp
+        transform: (response) => ({
+            ...response.data,
+            _timestamp: Date.now(),
+        }),
     },
-    // Добавляем timestamp для кэширования
-    transform: (res) => ({ ...res, _timestamp: Date.now() }),
-});
+);
 
 // Иконки по слагу категории
 const getCategoryIcon = (slug: string): string => {
@@ -581,11 +595,12 @@ const getCategoryIcon = (slug: string): string => {
 
 const fetchCategories = async () => {
     try {
-        const response = await api.get('/v1/categories/');
+        const response = await api.get('/v1/categories/', {
+            skipAuth: true, // 👈 Добавили флаг
+        });
         categories.value = response.data.results;
-        console.log('categories[0]', categories.value[0]);
-    } catch (err) {
-        console.error('Failed to fetch categories:', err);
+    } catch (err: any) {
+        console.error('Failed to fetch categories:', err.response?.data || err);
     }
 };
 
