@@ -1,176 +1,291 @@
 <!-- app/pages/profile/index.vue -->
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useToast } from '#imports';
+const toast = useToast();
 definePageMeta({
-    ssr: false, // ← отключает SSR для этой страницы
+    //     middleware: 'auth', // ← используйте middleware вместо проверки в onMounted
+    ssr: false, // ← убираем, используем middleware для SSR
 });
 
-const { user, tokens, logout, isAuthenticated, initAuth } = useAuth();
+const {
+    user,
+    isAuthenticated,
+    logout: authLogout,
+    fetchProfile,
+    initAuth,
+} = useAuth();
+
 const router = useRouter();
 
-onMounted(async () => {
-    await initAuth(); // ← подтягивает профиль, если есть токены
+const loading = ref(true);
+const profileError = ref('');
 
-    if (!isAuthenticated.value) {
-        router.push('/login');
+onMounted(async () => {
+    try {
+        if (process.client) {
+            // 1. Ждём initAuth, который уже сам дергает fetchProfile
+            await initAuth();
+
+            console.log(user.value);
+            return navigateTo('/profile');
+            // 2. Проверяем авторизацию ПОСЛЕ initAuth
+            if (!user.value) {
+                toast.add({
+                    title: 'Требуется авторизация',
+                    color: 'orange',
+                });
+                return navigateTo('/login');
+            }
+
+            // 3. Дополнительно догружать профиль можно уже не обязательно,
+            // но если хочешь – это просто обновление
+            const loaded = await fetchProfile();
+            if (!loaded) {
+                profileError.value = 'Ошибка загрузки профиля';
+            }
+        }
+    } catch (error) {
+        console.error('Profile init error:', error);
+        profileError.value = 'Ошибка инициализации';
+    } finally {
+        loading.value = false;
     }
 });
 
 const handleLogout = async () => {
-    await logout();
-    navigateTo('/login');
+    await authLogout();
+    // navigateTo выполняется в logout()
 };
 
-// Фильтр для даты (опционально)
-const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('ru-RU');
+// Фильтр для даты
+const formatDate = (dateString: string) => {
+    if (!dateString) return 'Не указана';
+    try {
+        return new Date(dateString).toLocaleDateString('ru-RU', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    } catch {
+        return dateString;
+    }
 };
+
+// Вычисляемое полное имя
+const displayName = computed(() => {
+    if (!user.value) return '';
+    const { first_name, last_name, username } = user.value;
+    if (first_name || last_name) {
+        return `${first_name || ''} ${last_name || ''}`.trim() || username;
+    }
+    return username || 'Пользователь';
+});
 </script>
 
 <template>
-    <UContainer class="py-8">
-        <div v-if="isAuthenticated" class="profile-page">
+    <UContainer class="py-8 max-w-4xl">
+        <!-- Лоадер -->
+        <div
+            v-if="!isAuthenticated"
+            class="flex items-center justify-center min-h-[400px]"
+        >
+            <div class="text-center">
+                <UIcon
+                    name="i-heroicons-arrow-path"
+                    class="w-12 h-12 animate-spin mx-auto mb-4 text-primary"
+                />
+                <p class="text-gray-500">Проверка авторизации...</p>
+            </div>
+        </div>
+
+        <!-- Контент профиля (только если авторизован) -->
+        <div v-else-if="isAuthenticated && user" class="profile-page">
             <!-- Header -->
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center">
+            <div
+                class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl"
+            >
+                <div class="flex items-center flex-1">
                     <UAvatar
-                        :src="user?.avatar || '/default-avatar.png'"
-                        :name="user?.username || ''"
-                        size="2xl"
-                        class="mr-6"
+                        :src="user.avatar || undefined"
+                        :name="displayName"
+                        size="xl"
+                        class="mr-6 ring-4 ring-white shadow-lg"
                     />
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900 mb-1">
-                            {{ user?.first_name || '' }}
-                            {{ user?.last_name || '' }}
+                        <h1
+                            class="text-3xl lg:text-4xl font-bold text-gray-900 mb-1 leading-tight"
+                        >
+                            {{ displayName }}
                         </h1>
-                        <p class="text-xl text-gray-500">
-                            {{ user?.username }}
+                        <p class="text-lg text-gray-600 mb-1">
+                            {{ user.username }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {{ user.email }}
                         </p>
                     </div>
                 </div>
-                <UBadge size="xl" color="green" variant="soft">Активен</UBadge>
+                <UBadge
+                    size="lg"
+                    color="green"
+                    variant="solid"
+                    class="whitespace-nowrap"
+                >
+                    Активный аккаунт
+                </UBadge>
             </div>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <UCard class="text-center p-6">
-                    <div class="text-3xl font-bold text-primary mb-2">
-                        {{ user?.id }}
+            <!-- Статистика -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <UCard
+                    class="text-center p-8 hover:shadow-xl transition-all duration-300"
+                >
+                    <div class="text-4xl font-bold text-primary mb-2">
+                        {{ user.id }}
                     </div>
-                    <div class="text-sm text-gray-500 uppercase tracking-wide">
-                        ID
+                    <div
+                        class="text-sm text-gray-500 uppercase tracking-wide font-medium"
+                    >
+                        ID профиля
                     </div>
                 </UCard>
-                <UCard class="text-center p-6">
-                    <div class="text-3xl font-bold text-blue-600 mb-2">
-                        {{ user?.email }}
+
+                <UCard
+                    class="text-center p-8 hover:shadow-xl transition-all duration-300"
+                >
+                    <div
+                        class="text-3xl font-bold text-blue-600 mb-2 break-all"
+                    >
+                        {{ user.email }}
                     </div>
-                    <div class="text-sm text-gray-500 uppercase tracking-wide">
+                    <div
+                        class="text-sm text-gray-500 uppercase tracking-wide font-medium"
+                    >
                         Email
                     </div>
                 </UCard>
-                <UCard class="text-center p-6">
+
+                <UCard
+                    class="text-center p-8 hover:shadow-xl transition-all duration-300"
+                >
                     <div class="text-3xl font-bold text-green-600 mb-2">
-                        {{ user?.date_joined | formatDate }}
+                        {{ formatDate(user.date_joined) }}
                     </div>
-                    <div class="text-sm text-gray-500 uppercase tracking-wide">
-                        Дата регистрации
+                    <div
+                        class="text-sm text-gray-500 uppercase tracking-wide font-medium"
+                    >
+                        Зарегистрирован
                     </div>
                 </UCard>
             </div>
 
-            <!-- Actions -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-                <UCard>
-                    <div class="flex items-center justify-between p-4">
+            <!-- Быстрые действия -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                <UCard class="p-8 hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold mb-1">Действия</h3>
-                            <p class="text-sm text-gray-500">
+                            <h3
+                                class="text-xl font-semibold text-gray-900 mb-2"
+                            >
                                 Управление профилем
+                            </h3>
+                            <p class="text-gray-600">
+                                Обновите личные данные и настройки
+                            </p>
+                        </div>
+                        <UButton
+                            to="/profile/edit"
+                            color="blue"
+                            variant="outline"
+                            size="lg"
+                            icon="i-heroicons-pencil-square"
+                        >
+                            Редактировать
+                        </UButton>
+                    </div>
+                </UCard>
+
+                <UCard class="p-8 hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3
+                                class="text-xl font-semibold text-gray-900 mb-2"
+                            >
+                                Безопасность
+                            </h3>
+                            <p class="text-gray-600">
+                                Управление паролем и сессиями
                             </p>
                         </div>
                         <UButton
                             to="/profile/change-password"
-                            color="blue"
-                            variant="ghost"
+                            color="orange"
+                            variant="outline"
+                            size="lg"
+                            icon="i-heroicons-key"
                         >
-                            <UIcon
-                                name="i-heroicons-pencil"
-                                class="mr-2 w-4 h-4"
-                            />
-                            Сменить пароль
-                        </UButton>
-                    </div>
-                </UCard>
-                <UCard>
-                    <div class="flex items-center justify-between p-4">
-                        <div>
-                            <h3 class="text-lg font-semibold mb-1">
-                                Безопасность
-                            </h3>
-                            <p class="text-sm text-gray-500">
-                                Управление сессиями
-                            </p>
-                        </div>
-                        <UButton color="gray" variant="ghost">
-                            <UIcon
-                                name="i-heroicons-shield-check"
-                                class="mr-2 w-4 h-4"
-                            />
-                            Сессии
+                            Пароль
                         </UButton>
                     </div>
                 </UCard>
             </div>
 
-            <!-- Logout -->
-            <div class="text-center">
+            <!-- Выход -->
+            <UCard
+                class="text-center p-12 border-2 border-dashed border-gray-200"
+            >
                 <UButton
                     @click="handleLogout"
                     color="red"
                     variant="outline"
-                    size="lg"
-                    class="px-8"
+                    size="xl"
+                    class="px-12 font-semibold"
+                    icon="i-heroicons-arrow-right-end-on-rectangle"
                 >
-                    <UIcon
-                        name="i-heroicons-arrow-right-end-on-rectangle"
-                        class="mr-2 w-5 h-5"
-                    />
                     Выйти из аккаунта
                 </UButton>
+                <p class="text-sm text-gray-500 mt-3">
+                    Будете перенаправлены на главную страницу
+                </p>
+            </UCard>
+        </div>
+
+        <!-- Ошибка загрузки -->
+        <div
+            v-else-if="isAuthenticated && !user"
+            class="flex items-center justify-center min-h-[400px]"
+        >
+            <div class="text-center">
+                <UIcon
+                    name="i-heroicons-exclamation-triangle"
+                    class="w-16 h-16 text-red-400 mx-auto mb-4"
+                />
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                    Ошибка загрузки профиля
+                </h2>
+                <p class="text-gray-500 mb-6 max-w-md mx-auto">
+                    Не удалось загрузить данные профиля. Попробуйте войти
+                    заново.
+                </p>
+                <UButton @click="fetchProfile" color="blue" class="mr-3"
+                    >Обновить</UButton
+                >
+                <UButton to="/login" color="gray" variant="outline"
+                    >Выйти</UButton
+                >
             </div>
-        </div>
-
-        <div v-else-if="!isAuthenticated" class="text-center py-20">
-            <UIcon
-                name="i-heroicons-user-circle"
-                class="w-24 h-24 text-gray-300 mx-auto mb-4"
-            />
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Авторизуйтесь</h2>
-            <p class="text-gray-500 mb-6">
-                Для доступа к профилю необходимо войти в аккаунт
-            </p>
-            <UButton to="/login" color="blue" size="lg">Войти</UButton>
-        </div>
-
-        <div v-else class="flex items-center justify-center min-h-[400px]">
-            <UDivider />
-            <UIcon
-                name="i-heroicons-arrow-path"
-                class="w-8 h-8 animate-spin mx-4 text-gray-400"
-            />
-            <UDivider />
-            <span class="ml-2 text-gray-500">Загрузка...</span>
         </div>
     </UContainer>
 </template>
+
 <style scoped>
 .profile-page :deep(.u-card) {
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .profile-page :deep(.u-card:hover) {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 </style>
