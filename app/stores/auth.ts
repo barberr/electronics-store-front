@@ -31,7 +31,6 @@ export const useAuthStore = defineStore('auth', () => {
             if (!savedTokens) return false;
 
             tokens.value = JSON.parse(savedTokens);
-
             // Проверяем профиль
             const { data } = await api.get('/auth/profile/');
             user.value = data;

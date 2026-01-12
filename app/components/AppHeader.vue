@@ -182,7 +182,7 @@
                                         <UButton
                                             variant="link"
                                             class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full"
-                                            :to="`/category/${group.slug}`"
+                                            :to="`/categories/${group.slug}`"
                                             @click="close"
                                         >
                                             <UIcon
@@ -243,7 +243,7 @@
                                                 variant="link"
                                                 size="xs"
                                                 class="px-2 py-1 mt-0.5 text-xs"
-                                                :to="`/category/${group.slug}`"
+                                                :to="`/categories/${group.slug}`"
                                                 @click="close"
                                             >
                                                 Показать все ({{
@@ -306,15 +306,16 @@
                 <nav
                     class="es-categories flex-1 flex items-center gap-4 overflow-x-auto"
                 >
-                    <button
+                    <NuxtLink
                         v-for="category in categories"
                         :key="category.id"
+                        :to="`/categories/${category.slug}`"
                         class="es-categories__item whitespace-nowrap text-sm"
                     >
                         {{ category.name }}
-                    </button>
+                    </NuxtLink>
                     <!-- Дополнительно для авторизованных -->
-                    <button
+                    <!-- <button
                         v-if="isAuthenticated"
                         class="es-categories__item whitespace-nowrap text-sm"
                         @click="goToAccount"
@@ -327,7 +328,7 @@
                         @click="goToOrders"
                     >
                         Мои заказы
-                    </button>
+                    </button> -->
                 </nav>
             </div>
         </div>

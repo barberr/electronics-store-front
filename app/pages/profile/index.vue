@@ -1,20 +1,21 @@
 <!-- app/pages/profile/index.vue -->
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth';
+import { storeToRefs } from 'pinia';
 import { ref, computed, onMounted } from 'vue';
 import { useToast } from '#imports';
-const toast = useToast();
+
 definePageMeta({
     //     middleware: 'auth', // ← используйте middleware вместо проверки в onMounted
     ssr: false, // ← убираем, используем middleware для SSR
 });
 
-const {
-    user,
-    isAuthenticated,
-    logout: authLogout,
-    fetchProfile,
-    initAuth,
-} = useAuth();
+const toast = useToast();
+const authStore = useAuthStore();
+
+// ✅ Реактивные refs (рекомендуется)
+const { user, isAuthenticated, isInitialized, initError, logout } =
+    storeToRefs(authStore);
 
 const router = useRouter();
 
@@ -24,25 +25,14 @@ const profileError = ref('');
 onMounted(async () => {
     try {
         if (process.client) {
-            // 1. Ждём initAuth, который уже сам дергает fetchProfile
-            await initAuth();
-
-            console.log(user.value);
-            return navigateTo('/profile');
-            // 2. Проверяем авторизацию ПОСЛЕ initAuth
-            if (!user.value) {
+            const success = await authStore.initialize();
+            console.log('success', success);
+            if (!success) {
                 toast.add({
                     title: 'Требуется авторизация',
                     color: 'orange',
                 });
                 return navigateTo('/login');
-            }
-
-            // 3. Дополнительно догружать профиль можно уже не обязательно,
-            // но если хочешь – это просто обновление
-            const loaded = await fetchProfile();
-            if (!loaded) {
-                profileError.value = 'Ошибка загрузки профиля';
             }
         }
     } catch (error) {
@@ -54,7 +44,7 @@ onMounted(async () => {
 });
 
 const handleLogout = async () => {
-    await authLogout();
+    await authStore.logout();
     // navigateTo выполняется в logout()
 };
 
@@ -155,7 +145,7 @@ const displayName = computed(() => {
                     class="text-center p-8 hover:shadow-xl transition-all duration-300"
                 >
                     <div
-                        class="text-3xl font-bold text-blue-600 mb-2 break-all"
+                        class="text-xl font-bold text-secondary mb-2 break-all"
                     >
                         {{ user.email }}
                     </div>
@@ -163,6 +153,26 @@ const displayName = computed(() => {
                         class="text-sm text-gray-500 uppercase tracking-wide font-medium"
                     >
                         Email
+                    </div>
+                    <div
+                        class="text-xl font-bold text-secondary mb-2 break-all"
+                    >
+                        {{ user.first_name }}
+                    </div>
+                    <div
+                        class="text-sm text-gray-500 uppercase tracking-wide font-medium"
+                    >
+                        Имя
+                    </div>
+                    <div
+                        class="text-xl font-bold text-secondary mb-2 break-all"
+                    >
+                        {{ user.last_name }}
+                    </div>
+                    <div
+                        class="text-sm text-gray-500 uppercase tracking-wide font-medium"
+                    >
+                        Фамилия
                     </div>
                 </UCard>
 
@@ -185,9 +195,7 @@ const displayName = computed(() => {
                 <UCard class="p-8 hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3
-                                class="text-xl font-semibold text-gray-900 mb-2"
-                            >
+                            <h3 class="text-xl font-semibold text-warning mb-2">
                                 Управление профилем
                             </h3>
                             <p class="text-gray-600">
@@ -200,6 +208,7 @@ const displayName = computed(() => {
                             variant="outline"
                             size="lg"
                             icon="i-heroicons-pencil-square"
+                            class="text-info"
                         >
                             Редактировать
                         </UButton>
@@ -209,9 +218,7 @@ const displayName = computed(() => {
                 <UCard class="p-8 hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3
-                                class="text-xl font-semibold text-gray-900 mb-2"
-                            >
+                            <h3 class="text-xl font-semibold text-warning mb-2">
                                 Безопасность
                             </h3>
                             <p class="text-gray-600">
@@ -224,6 +231,7 @@ const displayName = computed(() => {
                             variant="outline"
                             size="lg"
                             icon="i-heroicons-key"
+                            class="text-info"
                         >
                             Пароль
                         </UButton>
@@ -232,15 +240,12 @@ const displayName = computed(() => {
             </div>
 
             <!-- Выход -->
-            <UCard
-                class="text-center p-12 border-2 border-dashed border-gray-200"
-            >
+            <UCard class="text-center p-12 border-2 border-gray-200">
                 <UButton
                     @click="handleLogout"
                     color="red"
-                    variant="outline"
                     size="xl"
-                    class="px-12 font-semibold"
+                    class="px-12 font-semibold text-warning cursor-pointer hover:cursor-pointer"
                     icon="i-heroicons-arrow-right-end-on-rectangle"
                 >
                     Выйти из аккаунта
