@@ -121,7 +121,10 @@
         >
             <div class="es-container flex items-center gap-4 py-2">
                 <UPopover
+                    modal
                     v-model:open="catalogOpen"
+                    :open-delay="100"
+                    :close-delay="300"
                     :content="{
                         align: 'start',
                         side: 'bottom',
@@ -129,7 +132,7 @@
                     }"
                     :ui="{
                         content:
-                            'w-full max-w-6xl p-0 shadow-2xl border-0 bg-white rounded-lg overflow-hidden',
+                            'w-full p-0 shadow-2xl border-0 bg-white rounded-lg overflow-hidden max-h-[calc(100vh-100px)]',
                     }"
                 >
                     <!-- Триггер -->
@@ -149,7 +152,7 @@
                     <template #content="{ close }">
                         <ClientOnly>
                             <div
-                                class="p-3 max-w-[768px] w-full max-h-[60vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800"
+                                class="p-3 w-full max-h-[calc(100vh-100px)] overflow-y-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800"
                             >
                                 <!-- Загрузка -->
                                 <div
@@ -171,7 +174,7 @@
                                 <!-- Контент -->
                                 <div
                                     v-else
-                                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-2"
                                 >
                                     <div
                                         v-for="group in data?.catalog || []"
@@ -217,14 +220,17 @@
                                                         class="font-medium whitespace-nowrap ml-2"
                                                         :class="{
                                                             'text-green-600 dark:text-green-400':
-                                                                product.is_available,
+                                                                product.is_active,
                                                             'text-gray-400 line-through':
-                                                                !product.is_available,
+                                                                !product.is_active,
                                                         }"
                                                     >
+                                                        от
                                                         {{
                                                             formatPrice(
-                                                                product.price,
+                                                                getMinPrice(
+                                                                    product.variants,
+                                                                ),
                                                             )
                                                         }}
                                                     </span>
@@ -487,44 +493,37 @@ const handleLogout = async () => {
 
 const { formatPrice } = useFormatPrice();
 
-interface Brand {
-    id: number;
-    name: string;
-    slug: string;
-    logo: string | null;
-}
-
-interface Product {
-    id: number;
-    name: string;
-    slug: string;
-    price: string;
-    is_available: boolean;
-    stock: number;
-    brand: { id: number; name: string; logo?: string | null } | null;
-}
-
-interface CategoryGroup {
-    id: number;
-    name: string;
-    slug: string;
-    products: Product[];
-}
-
-interface OverviewResponse {
-    brands: Brand[];
-    categories: any[];
-    catalog: CategoryGroup[];
-}
-
 const categories = ref<any[]>([]);
 const activeDropdown = ref<number | null>(null);
 const searchQuery = ref('');
 const api = useApi();
-const popoverProps = {
-    align: 'start',
-    side: 'bottom',
-    sideOffset: 8,
+
+const getMinPrice = (variants) => {
+    // Проверяем, что variants существует и является массивом
+    if (!variants || !Array.isArray(variants)) {
+        return '';
+    }
+
+    // Фильтруем активные варианты
+    const activeVariants = variants.filter((v) => v.is_active);
+
+    // Если нет активных вариантов, возвращаем 0
+    if (activeVariants.length === 0) {
+        return '';
+    }
+
+    // Получаем минимальную цену среди активных вариантов
+    const minPrice = Math.min(
+        ...activeVariants.map((v) => {
+            // Приводим цену к числу (цена может быть строкой "15000.00")
+            const price = parseFloat(v.price);
+            // Проверяем, что это валидное число
+            return isNaN(price) ? Infinity : price;
+        }),
+    );
+
+    // Если все цены были некорректными, возвращаем 0
+    return minPrice === Infinity ? '' : minPrice;
 };
 
 const catalogOpen = ref(false);
@@ -623,11 +622,11 @@ onMounted(async () => {
         // ✅ Ждём полной инициализации
         const success = await authStore.initialize();
 
-        console.log('Auth initialized:', {
-            isAuthenticated: authStore.isAuthenticated,
-            user: authStore.user,
-            isInitialized: authStore.isInitialized,
-        });
+        // console.log('Auth initialized:', {
+        //     isAuthenticated: authStore.isAuthenticated,
+        //     user: authStore.user,
+        //     isInitialized: authStore.isInitialized,
+        // });
 
         if (!success && initError.value) {
             console.error('Auth error:', initError.value);
@@ -635,12 +634,6 @@ onMounted(async () => {
     }
     fetchCategories();
 });
-
-// onMounted(() => {
-//     authStore.initAuth();
-//     console.log('Пользователь:', authStore.user);
-//     fetchCategories();
-// });
 </script>
 
 <style scoped>

@@ -1,196 +1,167 @@
 <template>
     <div>
-        <UPageSection>
-            <h1>Products</h1>
+        <UContainer class="py-8 max-w-7xl">
+            <!-- Заголовок -->
+            <div class="mb-12">
+                <h1
+                    class="text-4xl font-bold text-gray-900 dark:text-white mb-2"
+                >
+                    {{ categoryName }}
+                </h1>
+                <div v-if="categoryDescription" class="max-w-2xl">
+                    <p class="text-lg text-gray-600 dark:text-gray-300">
+                        {{ categoryDescription }}
+                    </p>
+                </div>
+            </div>
 
             <!-- Загрузка -->
-            <p v-if="pending">Loading...</p>
+            <div
+                v-if="pending"
+                class="flex flex-col items-center justify-center py-20"
+            >
+                <UProgress
+                    value="indeterminate"
+                    class="w-24 h-2 mb-4"
+                    color="primary"
+                />
+                <p class="text-gray-500 dark:text-gray-400 text-lg">
+                    Загружаем товары...
+                </p>
+            </div>
 
             <!-- Ошибка -->
-            <p v-else-if="error" class="error">Error: {{ error.message }}</p>
+            <UAlert
+                v-else-if="error"
+                color="red"
+                title="Ошибка загрузки"
+                class="mb-8"
+            >
+                <template #description>
+                    {{ error.message || 'Не удалось загрузить товары' }}
+                </template>
+                <UButton size="sm" color="primary" @click="refreshCategory">
+                    Попробовать снова
+                </UButton>
+            </UAlert>
 
-            <!-- Успех -->
-            <PageGrid v-else-if="products.length">
-                <!-- <PageCard v-for="product in products" :key="product.id">
-                    >{{ product.name }} — {{ product.price }} ₽
-                </PageCard> -->
-                <div class="container mx-auto py-8">
+            <!-- Сетка товаров -->
+            <div v-else-if="products.length">
+                <!-- Фильтры/сортировка (опционально) -->
+                <div
+                    class="flex flex-wrap items-center justify-between mb-8 gap-4"
+                >
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                        class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
                     >
-                        <NuxtLink
-                            :to="`/products/${product.slug}`"
-                            class="block h-full"
-                            v-for="product in products"
+                        <span>Найдено:</span>
+                        <span
+                            class="font-semibold text-gray-900 dark:text-white"
+                            >{{ products.length }} товаров</span
                         >
-                            <UCard
-                                :key="product.id"
-                                class="h-full hover:shadow-xl transition-all duration-300 group"
-                                :ui="{
-                                    base: 'overflow-hidden',
-                                    header: 'p-0 h-48',
-                                    body: 'p-6',
-                                }"
-                            >
-                                <!-- Изображение продукта -->
-                                <template #header>
-                                    <NuxtImg
-                                        v-if="product.images?.[0]?.image"
-                                        :src="product.images[0].image"
-                                        :alt="product.name"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                        loading="lazy"
-                                    />
-                                    <div
-                                        v-else
-                                        class="w-full h-full bg-gray-200 flex items-center justify-center"
-                                    >
-                                        <UIcon
-                                            name="i-heroicons-camera"
-                                            class="w-16 h-16 text-gray-400"
-                                        />
-                                    </div>
-                                </template>
-
-                                <!-- Контент карточки -->
-                                <div class="space-y-3">
-                                    <!-- Бренд -->
-                                    <div class="flex items-center gap-2">
-                                        <NuxtImg
-                                            v-if="product.brand?.logo"
-                                            :src="product.brand.logo"
-                                            :alt="product.brand.name"
-                                            class="w-8 h-8 rounded-full object-contain"
-                                        />
-                                        <span
-                                            class="text-sm font-medium text-gray-500"
-                                            >{{
-                                                product.brand?.name ||
-                                                'Без бренда'
-                                            }}</span
-                                        >
-                                    </div>
-
-                                    <!-- Категория -->
-                                    <UChip
-                                        size="xs"
-                                        color="gray"
-                                        variant="soft"
-                                        class="w-fit"
-                                    >
-                                        {{
-                                            product.category?.name ||
-                                            'Без категории'
-                                        }}
-                                    </UChip>
-
-                                    <!-- Название -->
-                                    <h3
-                                        class="font-bold text-lg leading-tight line-clamp-2 hover:text-primary transition-colors"
-                                    >
-                                        {{ product.name }}
-                                    </h3>
-
-                                    <!-- Цена и доступность -->
-                                    <div
-                                        class="flex items-center justify-between"
-                                    >
-                                        <div
-                                            class="text-2xl font-bold text-primary"
-                                        >
-                                            ₽
-                                            {{
-                                                parseFloat(
-                                                    product.price,
-                                                ).toFixed(2)
-                                            }}
-                                        </div>
-                                        <UBadge
-                                            v-if="!product.is_available"
-                                            color="gray"
-                                            variant="solid"
-                                        >
-                                            Нет в наличии
-                                        </UBadge>
-                                    </div>
-
-                                    <!-- Кнопка -->
-                                    <UButton
-                                        block
-                                        color="primary"
-                                        :disabled="
-                                            !product.is_available ||
-                                            product.stock === 0
-                                        "
-                                        @click="() => addToCart(product)"
-                                    >
-                                        {{
-                                            product.is_available &&
-                                            product.stock > 0
-                                                ? 'В корзину'
-                                                : 'Нет в наличии'
-                                        }}
-                                        <template #trailing>
-                                            <UIcon
-                                                name="i-heroicons-shopping-bag"
-                                            />
-                                        </template>
-                                    </UButton>
-                                </div>
-                            </UCard>
-                        </NuxtLink>
                     </div>
-                </div>
-            </PageGrid>
 
-            <p v-else>No products found.</p>
-        </UPageSection>
+                    <!-- Сортировка -->
+                    <USelectMenu
+                        v-model="sortBy"
+                        :items="sortOptions"
+                        placeholder="Сортировать по..."
+                        icon="i-heroicons-arrow-down"
+                        class="w-48"
+                        size="sm"
+                    />
+                </div>
+
+                <!-- Карточки товаров -->
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6"
+                >
+                    <ProductCard
+                        v-for="product in sortedProducts"
+                        :key="product.id"
+                        :product="product"
+                        @add-to-cart="addToCart"
+                    />
+                </div>
+            </div>
+
+            <!-- Пустой список -->
+            <div
+                v-else
+                class="text-center py-20 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-slate-900/50 rounded-2xl"
+            >
+                <UIcon
+                    name="i-heroicons-shopping-bag-open"
+                    class="w-20 h-20 text-gray-400 dark:text-gray-500 mx-auto mb-4"
+                />
+                <h3
+                    class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                >
+                    Товары в этой категории скоро появятся
+                </h3>
+                <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                    Следите за обновлениями ассортимента
+                </p>
+            </div>
+        </UContainer>
     </div>
 </template>
 <script setup lang="ts">
 import type { PageGrid, PageCard } from '@nuxt/ui';
 import useApi from '~/composables/useApi';
+import { useFormatPrice } from '~/composables/useFormatPrice';
+const { formatPrice } = useFormatPrice();
 
-const products = ref<any[]>([]);
+const products = ref<Product[]>([]);
 const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
 
-interface ProductImage {
-    id: number;
-    image: string;
-    is_main: boolean;
-}
+const sortBy = ref<'name' | 'price' | '-price' | 'stock' | '-stock'>('name');
+const sortOptions = [
+    { label: 'По названию (А-Я)', value: 'name' },
+    { label: 'По цене (низкая → высокая)', value: 'price' },
+    { label: 'По цене (высокая → низкая)', value: '-price' },
+    { label: 'По наличию (много → мало)', value: '-stock' },
+    { label: 'По наличию (мало → много)', value: 'stock' },
+];
 
-interface Brand {
-    id: number;
-    name: string;
-    slug: string;
-    logo: string;
-}
+const sortedProducts = computed(() => {
+    return [...products.value].sort((a, b) => {
+        switch (sortBy.value) {
+            case 'name':
+                return a.name.localeCompare(b.name);
 
-interface Category {
-    id: number;
-    name: string;
-    slug: string;
-}
+            case 'price':
+                return parseFloat(a.price) - parseFloat(b.price);
 
-interface Product {
-    id: number;
-    name: string;
-    slug: string;
-    category: Category;
-    brand: Brand;
-    description: string;
-    price: string;
-    stock: number;
-    is_available: boolean;
-    images: ProductImage[];
-}
+            case '-price':
+                return parseFloat(b.price) - parseFloat(a.price);
+
+            case 'stock':
+                return a.stock - b.stock;
+
+            case '-stock':
+                return b.stock - a.stock;
+
+            default:
+                return 0;
+        }
+    });
+});
+
+// Функция для получения главного изображения
+const getMainImage = (images: any[]) => {
+    // Ищем первое изображение с is_main: true
+    const mainImage = images.find((img) => img.is_main);
+    return mainImage ? mainImage.image : null;
+};
 
 const fetchProducts = async () => {
     const api = useApi();
     try {
-        const response = await api.get('/v1/products/'); // → /api/v1/products/
+        const response = await api.get('/v1/products/', {
+            skipAuth: true, // 👈 Добавили флаг
+        }); // → /api/v1/products/
         products.value = response.data.results;
     } catch (err: any) {
         error.value = err.response?.data || err;

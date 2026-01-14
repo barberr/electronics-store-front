@@ -1,7 +1,7 @@
 <!-- app.vue -->
 <script setup lang="ts">
 // Глобальная инициализация авторизации только на клиенте
-const { initAuth } = useAuth();
+// const { initAuth } = useAuth();
 
 onMounted(() => {});
 
@@ -18,11 +18,11 @@ onMounted(() => {});
             <!-- Основной контент -->
             <main class="main-content flex-1">
                 <!-- Flash сообщения (если используете) -->
-                <UContainer v-if="$route.meta.layout === 'default'">
+                <!-- <UContainer v-if="$route.meta.layout === 'default'">
                     <div class="pt-4 pb-8">
                         <UNotifications />
                     </div>
-                </UContainer>
+                </UContainer> -->
 
                 <!-- Страницы -->
                 <NuxtPage />

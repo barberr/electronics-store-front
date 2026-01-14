@@ -7,25 +7,25 @@ const slug = computed(() => route.params.slug as string);
 const { formatPrice } = useFormatPrice();
 const api = useApi();
 
-// --- Интерфейсы ---
-interface Product {
-    id: number;
-    name: string;
-    slug: string;
-    price: string;
-    is_available: boolean;
-    stock: number;
-    brand: { id: number; name: string; logo?: string | null } | null;
-    image?: string; // Предполагаем, что API возвращает превью
-}
+// // --- Интерфейсы ---
+// interface Product {
+//     id: number;
+//     name: string;
+//     slug: string;
+//     price: string;
+//     is_available: boolean;
+//     stock: number;
+//     brand: { id: number; name: string; logo?: string | null } | null;
+//     image?: string; // Предполагаем, что API возвращает превью
+// }
 
-interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    description: string;
-    products?: Product[]; // Если API возвращает вложенные товары
-}
+// interface Category {
+//     id: number;
+//     name: string;
+//     slug: string;
+//     description: string;
+//     products?: Product[]; // Если API возвращает вложенные товары
+// }
 
 // --- Состояние ---
 const category = ref<Category | null>(null);
@@ -42,6 +42,9 @@ const fetchCategoryData = async () => {
         // Если бэкенд отдает товары внутри категории:
         const { data: catData } = await api.get(
             `/v1/categories/${slug.value}/`,
+            {
+                skipAuth: true, // 👈 Добавили флаг
+            },
         );
         category.value = catData;
 
@@ -59,6 +62,7 @@ const fetchCategoryData = async () => {
                 },
             );
             products.value = prodData.results || prodData;
+            console.log('products.value', products.value);
         }
     } catch (err: any) {
         error.value = err.response?.data || err;
@@ -142,84 +146,12 @@ useSeoMeta({
                 v-else
                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
             >
-                <NuxtLink
+                <ProductCard
                     v-for="product in products"
                     :key="product.id"
-                    :to="`/products/${product.slug}`"
-                    class="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
-                >
-                    <!-- Картинка -->
-                    <div
-                        class="aspect-[4/3] bg-gray-100 relative overflow-hidden"
-                    >
-                        <NuxtImg
-                            v-if="product.image"
-                            :src="product.image"
-                            :alt="product.name"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            sizes="300px"
-                        />
-                        <div
-                            v-else
-                            class="w-full h-full flex items-center justify-center text-gray-400"
-                        >
-                            <UIcon name="i-heroicons-photo" class="w-12 h-12" />
-                        </div>
-
-                        <!-- Бейдж наличия (абсолютно) -->
-                        <div class="absolute top-2 right-2">
-                            <UBadge
-                                :color="
-                                    product.is_available && product.stock > 0
-                                        ? 'green'
-                                        : 'gray'
-                                "
-                                size="xs"
-                                variant="solid"
-                            >
-                                {{
-                                    product.is_available && product.stock > 0
-                                        ? 'В наличии'
-                                        : 'Нет'
-                                }}
-                            </UBadge>
-                        </div>
-                    </div>
-
-                    <!-- Инфо -->
-                    <div class="p-4 space-y-2">
-                        <!-- Бренд -->
-                        <div
-                            v-if="product.brand"
-                            class="text-xs text-gray-500 font-medium uppercase tracking-wide"
-                        >
-                            {{ product.brand.name }}
-                        </div>
-
-                        <!-- Название -->
-                        <h3
-                            class="font-medium text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 min-h-[2.5em]"
-                        >
-                            {{ product.name }}
-                        </h3>
-
-                        <!-- Цена и кнопка -->
-                        <div class="flex items-end justify-between pt-2">
-                            <div class="font-bold text-lg text-gray-900">
-                                {{ formatPrice(product.price) }}
-                            </div>
-
-                            <UButton
-                                icon="i-heroicons-shopping-bag"
-                                size="xs"
-                                color="primary"
-                                variant="soft"
-                                :ui="{ rounded: 'rounded-full' }"
-                                @click.prevent=""
-                            />
-                        </div>
-                    </div>
-                </NuxtLink>
+                    :product="product"
+                    @add-to-cart="addToCart"
+                />
             </div>
         </div>
     </UContainer>
