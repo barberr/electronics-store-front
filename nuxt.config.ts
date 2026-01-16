@@ -15,12 +15,22 @@ export default defineNuxtConfig({
         fonts: false,
     },
 
+    googleFonts: {
+        families: {
+            Inter: true,
+            Manrope: true,
+        },
+        subsets: ['latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'],
+        display: 'swap',
+        preload: true,
+    },
+
     css: ['~/assets/css/main.css'],
 
     image: {
         // Разрешите внешние домены вашего API
-        // domains: ['10.10.4.12:8000'],
-        domains: ['94.241.171.81'],
+        domains: ['10.10.4.12:8000'],
+        // domains: ['94.241.171.81'],
         // Используйте IPX для обработки изображений
         provider: 'ipx',
         // Опции для IPX
@@ -30,6 +40,10 @@ export default defineNuxtConfig({
                 quality: 80,
             },
         },
+    },
+
+    imports: {
+        dirs: ['types/**/*.ts'],
     },
 
     routeRules: {

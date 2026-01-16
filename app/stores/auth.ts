@@ -85,9 +85,15 @@ export const useAuthStore = defineStore('auth', () => {
     const logout = async () => {
         try {
             if (tokens.value?.refresh) {
-                await api.post('/auth/logout/', {
-                    refresh: tokens.value.refresh,
-                });
+                await api.post(
+                    '/auth/logout/',
+                    {
+                        refresh: tokens.value.refresh,
+                    },
+                    {
+                        headers: { 'Content-Type': 'application/json' }, // ← ЯВНО
+                    },
+                );
             }
         } catch (error) {
             console.error('Logout error:', error);

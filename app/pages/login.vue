@@ -1,44 +1,103 @@
 <!-- app/pages/login.vue -->
 <template>
-    <div class="login-container">
-        <h1>Вход в аккаунт</h1>
-
-        <form @submit.prevent="handleLogin" :class="{ loading: loading }">
-            <div class="form-group">
-                <label for="username">Имя пользователя или email</label>
-                <input
-                    id="username"
-                    v-model="form.username"
-                    type="text"
-                    required
-                    :disabled="loading"
-                    placeholder="Введите имя пользователя"
-                />
+    <div
+        class="login-container min-h-screen flex items-center justify-center py-2 px-4 sm:px-6 lg:px-8"
+    >
+        <div class="max-w-md w-full space-y-8">
+            <div>
+                <h2 class="mt-6 text-center text-3xl font-bold text-text-100">
+                    Вход в аккаунт
+                </h2>
+                <p class="mt-2 text-center text-text-400 text-sm">
+                    Введите данные для входа
+                </p>
             </div>
 
-            <div class="form-group">
-                <label for="password">Пароль</label>
-                <input
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    required
-                    :disabled="loading"
-                    placeholder="Введите пароль"
-                />
-            </div>
+            <UCard class="p-8 space-y-6">
+                <form @submit.prevent="handleLogin" class="space-y-6">
+                    <!-- Имя пользователя / email -->
+                    <div>
+                        <label
+                            for="username"
+                            class="block text-sm font-medium text-text-100 mb-2"
+                        >
+                            Имя пользователя или email
+                        </label>
+                        <UInput
+                            id="username"
+                            v-model="form.username"
+                            size="lg"
+                            variant="soft"
+                            placeholder="Введите имя пользователя"
+                            :loading="loading"
+                            :disabled="loading"
+                            required
+                        />
+                    </div>
 
-            <button type="submit" :disabled="loading">
-                {{ loading ? 'Вход...' : 'Войти' }}
-            </button>
+                    <!-- Пароль -->
+                    <div>
+                        <label
+                            for="password"
+                            class="block text-sm font-medium text-text-100 mb-2"
+                        >
+                            Пароль
+                        </label>
+                        <UInput
+                            id="password"
+                            v-model="form.password"
+                            type="password"
+                            size="lg"
+                            variant="soft"
+                            placeholder="••••••••"
+                            :loading="loading"
+                            :disabled="loading"
+                            required
+                        />
+                    </div>
 
-            <p v-if="error" class="error">{{ error }}</p>
+                    <!-- Ошибка -->
+                    <UAlert
+                        v-if="error"
+                        icon="i-heroicons-exclamation-triangle"
+                        color="red"
+                        variant="soft"
+                        class="text-text-100"
+                    >
+                        {{ error }}
+                    </UAlert>
 
-            <p class="link">
-                Нет аккаунта?
-                <NuxtLink to="/">Зарегистрироваться</NuxtLink>
-            </p>
-        </form>
+                    <!-- Кнопка входа -->
+                    <UButton
+                        type="submit"
+                        color="primary"
+                        size="xl"
+                        block
+                        :loading="loading"
+                        :disabled="loading"
+                    >
+                        <template #leading>
+                            <UIcon name="i-heroicons-arrow-right" />
+                        </template>
+                        {{ loading ? 'Входим...' : 'Войти' }}
+                    </UButton>
+                </form>
+
+                <!-- Регистрация -->
+                <div class="text-center space-y-4">
+                    <p class="text-text-400 text-sm">Нет аккаунта?</p>
+                    <UButton
+                        to="/register"
+                        color="neutral"
+                        variant="soft"
+                        block
+                        size="lg"
+                    >
+                        Создать аккаунт
+                    </UButton>
+                </div>
+            </UCard>
+        </div>
     </div>
 </template>
 
@@ -46,10 +105,8 @@
 definePageMeta({
     middleware: 'guest',
 });
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
 
-const { isAuthenticated, user, initAuth, login } = useAuth();
+const { isAuthenticated, login } = useAuthStore(); // Используй store
 const router = useRouter();
 
 const form = reactive({
@@ -64,94 +121,33 @@ const handleLogin = async () => {
     loading.value = true;
     error.value = '';
 
-    const result = await login({
-        username: form.username,
-        password: form.password,
-    });
-    // console.log('result', result.success);
+    try {
+        const result = await login({
+            username: form.username,
+            password: form.password,
+        });
 
-    if (result.success) {
-        console.log('✅ Успешный вход, user:', isAuthenticated, result);
-        await navigateTo('/profile');
-    } else {
-        error.value =
-            typeof result.error === 'string'
-                ? result.error
-                : JSON.stringify(result.error); // на случай, если error — объект
+        if (result.success) {
+            await navigateTo('/profile');
+        } else {
+            error.value = result.error || 'Ошибка входа';
+        }
+    } catch (err) {
+        error.value = 'Ошибка сервера. Попробуйте позже.';
+        console.error('Login error:', err);
+    } finally {
+        loading.value = false;
     }
-
-    loading.value = false;
 };
-
-onMounted(() => {});
 </script>
 
 <style scoped>
+/* Кастомные стили только если нужны */
 .login-container {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 1.5rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-weight: bold;
-}
-
-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-}
-
-button {
-    width: 100%;
-    padding: 0.75rem;
-    background: #1d4ed8;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-button:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-}
-
-.error {
-    color: #e53e3e;
-    margin-top: 0.5rem;
-    text-align: center;
-}
-
-.link {
-    text-align: center;
-    margin-top: 1rem;
-}
-
-.link a {
-    color: #1d4ed8;
-    text-decoration: none;
-}
-
-.link a:hover {
-    text-decoration: underline;
+    background: linear-gradient(
+        135deg,
+        var(--color-bg-950) 0%,
+        var(--color-surface-900) 100%
+    );
 }
 </style>

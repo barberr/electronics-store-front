@@ -2,177 +2,150 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
-import { reactive, ref, onMounted } from 'vue';
-import { useToast } from '#imports';
+import { reactive, ref } from 'vue';
 
 definePageMeta({
-    ssr: false,
+    middleware: 'auth', // ✅ Авторизация
 });
 
-const toast = useToast();
-const router = useRouter();
 const authStore = useAuthStore();
 const api = useApi();
 
-// Refs из стора
-const { user, isAuthenticated, isInitialized } = storeToRefs(authStore);
+const { user } = storeToRefs(authStore);
 
-// Состояние формы
+// Форма
 const form = reactive({
     first_name: '',
     last_name: '',
     email: '',
-    username: '', // Обычно username read-only, но добавим для отображения
+    username: '',
+    phone: '', // Добавил телефон из твоей модели
+    full_name: '',
 });
 
-const loading = ref(true);
+// Состояние
 const saving = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
-// Инициализация данных
-onMounted(async () => {
-    try {
-        if (process.client) {
-            // 1. Убеждаемся, что авторизация прошла
-            const success = await authStore.initialize();
-
-            if (!success || !isAuthenticated.value) {
-                toast.add({
-                    title: 'Требуется авторизация',
-                    color: 'orange',
-                });
-                return navigateTo('/login');
-            }
-
-            // 2. Заполняем форму данными пользователя
-            if (user.value) {
-                form.first_name = user.value.first_name || '';
-                form.last_name = user.value.last_name || '';
-                form.email = user.value.email || '';
-                form.username = user.value.username || '';
-            }
-        }
-    } catch (error) {
-        console.error('Edit init error:', error);
-        toast.add({ title: 'Ошибка загрузки данных', color: 'red' });
-    } finally {
-        loading.value = false;
-    }
-});
-
-// Сохранение изменений
 const handleSave = async () => {
     saving.value = true;
     errors.value = {};
 
     try {
-        // Отправляем PATCH запрос (обновляем только измененные поля)
         const { data } = await api.patch('/auth/profile/', {
             first_name: form.first_name,
             last_name: form.last_name,
             email: form.email,
+            phone: form.phone,
+            full_name: form.full_name,
         });
 
-        // Обновляем данные в сторе
-        authStore.user = data;
+        // Обновляем стор
+        Object.assign(authStore.user, data);
 
-        toast.add({
-            title: 'Профиль обновлен',
-            description: 'Ваши данные успешно сохранены',
-            color: 'green',
-        });
-
-        // Возвращаемся в профиль
-        router.push('/profile');
+        await navigateTo('/profile');
     } catch (error: any) {
-        console.error('Update error:', error);
-
-        // Обработка ошибок валидации от Django (обычно это объект ключей)
         if (error.response?.data) {
             errors.value = error.response.data;
-
-            const errorMsg = Object.values(error.response.data)
-                .flat()
-                .join(', ');
-
-            toast.add({
-                title: 'Ошибка сохранения',
-                description: errorMsg || 'Проверьте введенные данные',
-                color: 'red',
-            });
-        } else {
-            toast.add({ title: 'Произошла ошибка сервера', color: 'red' });
         }
     } finally {
         saving.value = false;
     }
 };
+
+// Инициализация (server-side safe)
+const { data: initialUser } = await useFetch('/auth/profile/', {
+    key: 'user-profile',
+    server: false, // Только клиент
+});
+
+watch(
+    () => user.value,
+    (newUser) => {
+        if (newUser) {
+            form.first_name = newUser.first_name || '';
+            form.last_name = newUser.last_name || '';
+            form.email = newUser.email || '';
+            form.username = newUser.username || '';
+            form.phone = newUser.phone || '';
+            form.full_name = newUser.full_name || '';
+        }
+    },
+    { immediate: true },
+);
 </script>
 
+<!-- app/pages/profile/edit.vue (исправленная версия) -->
 <template>
-    <UContainer class="py-8 max-w-2xl">
-        <!-- Лоадер инициализации -->
-        <div
-            v-if="loading"
-            class="flex items-center justify-center min-h-[300px]"
+    <UContainer class="py-12 max-w-2xl">
+        <!-- Заголовок с тёмным фоном -->
+        <UCard
+            class="p-6 mb-8 bg-gradient-to-r from-accent-950 to-surface-900 shadow-xl border-0"
         >
-            <UIcon
-                name="i-heroicons-arrow-path"
-                class="w-10 h-10 animate-spin text-primary"
-            />
-        </div>
-
-        <div v-else>
-            <!-- Заголовок -->
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-4">
-                    <UButton
-                        to="/profile"
-                        icon="i-heroicons-arrow-left"
-                        variant="ghost"
-                        color="gray"
-                        class="hidden sm:inline-flex"
-                    />
-                    <h1 class="text-2xl font-bold text-gray-900">
-                        Редактирование профиля
-                    </h1>
-                </div>
+            <div class="flex items-center gap-4">
+                <UButton
+                    to="/profile"
+                    icon="i-heroicons-arrow-left"
+                    variant="ghost"
+                    color="neutral"
+                    class="text-text-100 hover:text-accent-200 hidden sm:inline-flex"
+                />
+                <h1 class="text-3xl font-bold text-text-100 flex-1">
+                    Редактирование профиля
+                </h1>
             </div>
+        </UCard>
 
-            <UCard class="p-4 sm:p-6 shadow-md">
-                <form @submit.prevent="handleSave" class="space-y-6">
-                    <!-- Username (Read Only) -->
-                    <UFormGroup
-                        label="Имя пользователя (Логин)"
-                        help="Нельзя изменить"
-                    >
-                        <UInput
-                            v-model="form.username"
-                            icon="i-heroicons-user"
-                            disabled
-                            color="gray"
-                            variant="outline"
-                            class="opacity-75"
-                        />
-                    </UFormGroup>
+        <!-- Форма редактирования -->
+        <UCard class="shadow-2xl border-accent-800">
+            <form @submit.prevent="handleSave" class="p-8 space-y-8">
+                <!-- Username (readonly) -->
+                <UFormGroup label="Имя пользователя" help="Нельзя изменить">
+                    <UInput
+                        v-model="form.username"
+                        icon="i-heroicons-user-circle"
+                        disabled
+                        color="neutral"
+                        variant="soft"
+                        class="bg-accent-950 text-text-100"
+                    />
+                </UFormGroup>
 
-                    <!-- Email -->
-                    <UFormGroup
-                        label="Email адрес"
-                        name="email"
-                        :error="errors.email?.[0]"
-                        required
-                    >
-                        <UInput
-                            v-model="form.email"
-                            type="email"
-                            icon="i-heroicons-envelope"
-                            placeholder="example@mail.com"
-                        />
-                    </UFormGroup>
+                <!-- Email -->
+                <UFormGroup
+                    label="Электронная почта"
+                    name="email"
+                    :error="errors.email?.[0]"
+                    required
+                >
+                    <UInput
+                        v-model="form.email"
+                        type="email"
+                        icon="i-heroicons-envelope"
+                        variant="soft"
+                        color="neutral"
+                        placeholder="example@mail.com"
+                    />
+                </UFormGroup>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2">
-                        <!-- Имя -->
+                <!-- Полное имя -->
+                <UFormGroup
+                    label="Полное имя"
+                    name="full_name"
+                    :error="errors.full_name?.[0]"
+                >
+                    <UInput
+                        v-model="form.full_name"
+                        icon="i-heroicons-user-group"
+                        variant="soft"
+                        color="neutral"
+                        placeholder="Иван Иванович"
+                    />
+                </UFormGroup>
+
+                <!-- Имя + Фамилия (grid с улучшенным дизайном) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <UFormGroup
                             label="Имя"
                             name="first_name"
@@ -180,12 +153,15 @@ const handleSave = async () => {
                         >
                             <UInput
                                 v-model="form.first_name"
-                                icon="i-heroicons-identification"
+                                icon="i-heroicons-user"
+                                variant="soft"
+                                color="neutral"
                                 placeholder="Иван"
                             />
                         </UFormGroup>
+                    </div>
 
-                        <!-- Фамилия -->
+                    <div>
                         <UFormGroup
                             label="Фамилия"
                             name="last_name"
@@ -193,37 +169,77 @@ const handleSave = async () => {
                         >
                             <UInput
                                 v-model="form.last_name"
-                                icon="i-heroicons-identification"
+                                icon="i-heroicons-user"
+                                variant="soft"
+                                color="neutral"
                                 placeholder="Иванов"
                             />
                         </UFormGroup>
                     </div>
+                </div>
 
-                    <!-- Кнопки действий -->
-                    <div
-                        class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100 mt-6"
+                <!-- Телефон + ДР (дополнительные поля) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <UFormGroup
+                        label="Телефон"
+                        name="phone"
+                        :error="errors.phone?.[0]"
                     >
-                        <UButton
-                            to="/profile"
-                            variant="ghost"
-                            color="gray"
-                            :disabled="saving"
-                        >
-                            Отмена
-                        </UButton>
+                        <UInput
+                            v-model="form.phone"
+                            icon="i-heroicons-phone"
+                            variant="soft"
+                            color="neutral"
+                            placeholder="+7 (999) 123-45-67"
+                        />
+                    </UFormGroup>
 
-                        <UButton
-                            type="submit"
-                            color="primary"
-                            size="lg"
-                            :loading="saving"
-                            icon="i-heroicons-check"
-                        >
-                            Сохранить изменения
-                        </UButton>
-                    </div>
-                </form>
-            </UCard>
-        </div>
+                    <UFormGroup
+                        label="Дата рождения"
+                        name="dob"
+                        :error="errors.dob?.[0]"
+                    >
+                        <UInput
+                            v-model="form.dob"
+                            type="date"
+                            icon="i-heroicons-cake"
+                            variant="soft"
+                            color="neutral"
+                        />
+                    </UFormGroup>
+                </div>
+
+                <!-- Кнопки (улучшенный дизайн) -->
+                <div
+                    class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-accent-800 bg-accent-950/50 p-6 rounded-xl"
+                >
+                    <UButton
+                        to="/profile"
+                        variant="ghost"
+                        color="neutral"
+                        block
+                        sm:flex-none
+                        :disabled="saving"
+                        class="text-text-100 hover:text-accent-200"
+                    >
+                        <UIcon name="i-heroicons-arrow-left" class="mr-2" />
+                        Отмена
+                    </UButton>
+
+                    <UButton
+                        type="submit"
+                        color="primary"
+                        size="lg"
+                        block
+                        sm:flex-none
+                        :loading="saving"
+                        class="shadow-lg hover:shadow-xl transition-all font-semibold"
+                    >
+                        <UIcon name="i-heroicons-check-circle" class="mr-2" />
+                        Сохранить изменения
+                    </UButton>
+                </div>
+            </form>
+        </UCard>
     </UContainer>
 </template>

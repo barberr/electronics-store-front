@@ -1,5 +1,7 @@
 <template>
-    <header class="es-header border-b border-gray-200 bg-white">
+    <header
+        class="es-header border-b dark:border-surface-900 bg-bg-950 dark:bg-surface-900"
+    >
         <!-- Основной ряд: mobile first -->
         <div class="es-container flex items-center justify-between h-14">
             <!-- Левая зона: бургер + логотип -->
@@ -8,7 +10,7 @@
                 <UButton
                     class="md:hidden"
                     icon="i-heroicons-bars-3"
-                    color="gray"
+                    color="neutral"
                     variant="ghost"
                     square
                     @click="mobileMenu.open = true"
@@ -18,24 +20,24 @@
                 <NuxtLink to="/" class="flex items-center gap-2">
                     <img
                         src="/logo-electronics-store.svg"
-                        alt="Electronics Store"
+                        alt="Izistor"
                         class="es-logo__img w-8 h-8"
                     />
                     <span
-                        class="es-logo__title text-sm font-semibold tracking-wide uppercase"
+                        class="es-logo__title text-text-100 font-semibold tracking-wide uppercase"
                     >
-                        electronics store
+                        Izistor
                     </span>
                 </NuxtLink>
             </div>
 
-            <!-- Центральная зона: поиск (по умолчанию только иконка) -->
+            <!-- Центральная зона: поиск -->
             <div class="flex items-center justify-center flex-1 px-2 md:px-4">
                 <!-- Иконка поиска на мобильных -->
                 <UButton
                     class="md:hidden"
                     icon="i-heroicons-magnifying-glass-20-solid"
-                    color="gray"
+                    color="neutral"
                     variant="ghost"
                     square
                     @click="mobileMenu.searchOpen = true"
@@ -58,22 +60,25 @@
                 <UButton
                     icon="i-lucide-heart"
                     variant="ghost"
-                    color="gray"
+                    color="neutral"
                     square
                 />
                 <UButton
                     icon="i-lucide-git-compare"
                     variant="ghost"
-                    color="gray"
+                    color="neutral"
                     square
                     class="hidden sm:inline-flex"
                 />
                 <!-- Телефоны только на lg+ -->
                 <div class="hidden lg:flex flex-col items-end mr-3">
-                    <a href="tel:+78129426246" class="text-xs font-medium">
+                    <a
+                        href="tel:+78129426246"
+                        class="text-xs font-medium text-text-100 hover:text-accent-300"
+                    >
                         +7 (812) 111-11-11
                     </a>
-                    <a href="tel:+78129359083" class="text-xs text-gray-500">
+                    <a href="tel:+78129359083" class="text-xs text-text-400">
                         +7 (812) 222-22-22
                     </a>
                 </div>
@@ -82,7 +87,7 @@
                     <UButton
                         icon="i-lucide-user"
                         variant="ghost"
-                        color="gray"
+                        color="neutral"
                         class="hidden md:inline-flex"
                         @click="goToLogin"
                     >
@@ -96,7 +101,7 @@
                         <UButton
                             icon="i-lucide-user"
                             variant="ghost"
-                            color="gray"
+                            color="neutral"
                             class="hidden md:inline-flex"
                             :to="`/profile`"
                         >
@@ -104,7 +109,7 @@
                         </UButton>
                         <UButton
                             variant="ghost"
-                            color="gray"
+                            color="neutral"
                             class="hidden md:inline-flex"
                             @click="handleLogout"
                         >
@@ -117,7 +122,7 @@
 
         <!-- Нижняя полоса меню: появляется с md -->
         <div
-            class="hidden es-header__bottom py-2 md:block md:mt-2 text-slate-50"
+            class="hidden es-header__bottom py-2 md:block md:mt-2 bg-accent-950 text-text-100"
         >
             <div class="es-container flex items-center gap-4 py-2">
                 <UPopover
@@ -316,25 +321,10 @@
                         v-for="category in categories"
                         :key="category.id"
                         :to="`/categories/${category.slug}`"
-                        class="es-categories__item whitespace-nowrap text-sm"
+                        class="es-categories__item text-text-100 hover:text-accent-200 whitespace-nowrap text-sm"
                     >
                         {{ category.name }}
                     </NuxtLink>
-                    <!-- Дополнительно для авторизованных -->
-                    <!-- <button
-                        v-if="isAuthenticated"
-                        class="es-categories__item whitespace-nowrap text-sm"
-                        @click="goToAccount"
-                    >
-                        Личный кабинет
-                    </button>
-                    <button
-                        v-if="isAuthenticated"
-                        class="es-categories__item whitespace-nowrap text-sm"
-                        @click="goToOrders"
-                    >
-                        Мои заказы
-                    </button> -->
                 </nav>
             </div>
         </div>
@@ -457,7 +447,7 @@ import { computed, ref, onMounted } from 'vue';
 const authStore = useAuthStore();
 
 // ✅ Реактивные refs (рекомендуется)
-const { user, isAuthenticated, isInitialized, initError } =
+const { user, isAuthenticated, isInitialized, initError, logout } =
     storeToRefs(authStore);
 // const userDisplayName = '';
 const userDisplayName = computed(() => {
@@ -487,7 +477,7 @@ const goToOrders = () => {
 };
 
 const handleLogout = async () => {
-    await authLogout();
+    await authStore.logout();
     // После logout можно принудительно обновить профиль или просто navigate
 };
 
@@ -638,9 +628,9 @@ onMounted(async () => {
 
 <style scoped>
 .es-header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    /* background-color: #ffffff; */
+    /* border-bottom: 1px solid #e5e7eb; */
+    /* font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; */
 }
 
 /* Общий контейнер */
@@ -738,7 +728,7 @@ onMounted(async () => {
 
 /* Нижняя полоса */
 .es-header__bottom {
-    border-top: 1px solid #e5e7eb;
+    /* border-top: 1px solid #e5e7eb; */
     background: #2d3748;
     color: #f9fafb;
 }

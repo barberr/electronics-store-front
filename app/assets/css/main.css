@@ -1,29 +1,76 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@theme static {
-  --font-sans: 'Public Sans', sans-serif;
+@layer components {
+  /* Ссылки видимые на тёмном фоне */
+  a {
+    @apply text-accent-400 hover:text-accent-200 transition-colors duration-200 underline-offset-2 hover:underline;
+  }
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
-  --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  /* В темной теме */
+  .dark a {
+    @apply text-accent-300 hover:text-accent-100;
+  }
+
+  /* Ссылки в карточках/блоках */
+  .card a,
+  [role="article"] a,
+  .prose a {
+    @apply text-primary-400 hover:text-primary-300;
+  }
+
+  .dark .card a,
+  .dark .prose a {
+    @apply text-primary-300 hover:text-primary-200;
+  }
 }
 
+@theme {
+	--font-sans: 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
+  /* Фон и поверхности */
+  --color-bg-950: #0E0F12;
+  --color-surface-900: #15171C;
+
+  /* Текст */
+  --color-text-100: #FFFFFF;
+  --color-text-400: #A6A8AD;
+
+  /* Акцент (основной цвет UI) */
+  --color-accent-50: #F5F6F7;
+  --color-accent-100: #E9EAED;
+  --color-accent-200: #D3D6DD;
+  --color-accent-300: #BFC3CC;
+  --color-accent-400: #AAB0BA;
+  --color-accent-500: #949BA7;
+  --color-accent-600: #7A8190;
+  --color-accent-700: #606673;
+  --color-accent-800: #484C57;
+  --color-accent-900: #30313A;
+  --color-accent-950: #1C1D23;
+}
+
+/* Базовый фон и текст */
+:root {
+  --ui-bg: #0E0F12;
+  --ui-border: #15171C;
+  --ui-text: #FFFFFF;
+  --ui-muted: #A6A8AD;
+  --ui-primary: var(--color-accent-500);
+}
+
+
 body {
-  @apply font-sans antialiased text-gray-800 bg-white;
+	
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.5;
 }
 
 .app {
   @apply bg-gray-50 min-h-screen flex flex-col;
 }
+
+h1 { font-size: clamp(2.75rem, 5vw, 3rem); font-weight: 600; }
 
 .main-content {
   @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;

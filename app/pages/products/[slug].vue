@@ -514,9 +514,7 @@ useSeoMeta({
                                                     "
                                                     size="sm"
                                                 >
-                                                    {{
-                                                        group[0].stock || 0
-                                                    }}
+                                                    {{ group[0].stock || 0 }}
                                                     шт.
                                                 </UBadge>
                                             </div>
@@ -534,28 +532,6 @@ useSeoMeta({
                             </div>
                         </div>
 
-                        <!-- Статус доступности (если вариантов нет или 1) -->
-                        <div
-                            v-else
-                            class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
-                        >
-                            <UBadge
-                                :color="isAvailable ? 'green' : 'gray'"
-                                size="lg"
-                                variant="soft"
-                                class="text-gray-600 dark:text-gray-300"
-                            >
-                                {{
-                                    isAvailable ? 'В наличии' : 'Нет в наличии'
-                                }}
-                            </UBadge>
-                            <span
-                                class="text-sm text-gray-600 dark:text-gray-300"
-                            >
-                                {{ availableVariantsCount }} шт.
-                            </span>
-                        </div>
-
                         <!-- Кнопки покупки -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                             <UButton
@@ -568,10 +544,7 @@ useSeoMeta({
                                     name="i-heroicons-shopping-bag"
                                     class="w-5 h-5 mr-2"
                                 />
-                                В корзину ({{
-                                    selectedVariant?.stock || 0
-                                }}
-                                шт.)
+                                В корзину
                             </UButton>
                             <UButton
                                 size="xl"
