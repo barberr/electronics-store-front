@@ -47,31 +47,6 @@
 
             <!-- Сетка товаров -->
             <div v-else-if="products.length">
-                <!-- Фильтры/сортировка (опционально) -->
-                <div
-                    class="flex flex-wrap items-center justify-between mb-8 gap-4"
-                >
-                    <div
-                        class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
-                    >
-                        <span>Найдено:</span>
-                        <span
-                            class="font-semibold text-gray-900 dark:text-white"
-                            >{{ products.length }} товаров</span
-                        >
-                    </div>
-
-                    <!-- Сортировка -->
-                    <USelectMenu
-                        v-model="sortBy"
-                        :items="sortOptions"
-                        placeholder="Сортировать по..."
-                        icon="i-heroicons-arrow-down"
-                        class="w-48"
-                        size="sm"
-                    />
-                </div>
-
                 <!-- Карточки товаров -->
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6"
