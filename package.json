@@ -11,12 +11,15 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.2.1",
     "@pinia/nuxt": "^0.11.3",
     "axios": "^1.13.2",
     "nuxt": "^4.2.2",
-    "pinia": "^3.0.4"
+    "outline": "link:@heroicons/vue/24/outline",
+    "pinia": "^3.0.4",
+    "solid": "link:@heroicons/vue/24/solid"
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.74",
