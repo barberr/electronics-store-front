@@ -2,7 +2,16 @@
 <script setup lang="ts">
 // Глобальная инициализация авторизации только на клиенте
 // const { initAuth } = useAuth();
-
+const heroiconsList = [
+    'arrow-down',
+    'photo',
+    'shopping-bag',
+    'home',
+    'user',
+    'cog',
+    'bell',
+    'magnifying-glass',
+];
 onMounted(() => {});
 
 // Глобальные обработчики событий (опционально)
