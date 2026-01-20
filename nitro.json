@@ -1,0 +1,7 @@
+{
+  "routes": {
+    "/_nuxt_icon/**": {
+      "proxy": "https://api.iconify.design/**"
+    }
+  }
+}

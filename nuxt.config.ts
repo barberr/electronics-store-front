@@ -17,6 +17,11 @@ export default defineNuxtConfig({
         icons: ['heroicons', 'simple-icons', 'lucide'],
     },
 
+    icon: {
+        server: false, // Отключаем серверный API для иконок
+        client: true, // Используем только клиентские иконки
+    },
+
     googleFonts: {
         families: {
             Inter: true,
@@ -62,8 +67,20 @@ export default defineNuxtConfig({
             },
         },
     },
+    // Настройки для продакшена
+    nitro: {
+        preset: 'node-server',
+
+        // Прокси для иконок
+        routeRules: {
+            '/_nuxt_icon/**': {
+                proxy: 'https://api.iconify.design/**',
+            },
+        },
+    },
     ssr: true,
     experimental: {
+        payloadExtraction: false,
         inlineSSRStyles: false,
     },
 });
