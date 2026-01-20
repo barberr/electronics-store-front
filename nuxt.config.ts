@@ -12,8 +12,9 @@ export default defineNuxtConfig({
     },
 
     ui: {
+        global: true,
         fonts: false,
-        icons: ['heroicons'],
+        icons: ['heroicons', 'simple-icons', 'lucide'],
     },
 
     googleFonts: {
@@ -60,5 +61,9 @@ export default defineNuxtConfig({
                 braceStyle: '1tbs',
             },
         },
+    },
+    ssr: true,
+    experimental: {
+        inlineSSRStyles: false,
     },
 });

@@ -19,18 +19,5 @@ export default defineAppConfig({
                 'sans-serif',
             ],
         },
-        icons: {
-            // Указываем только нужные иконки
-            heroicons: {
-                photo: 'i-heroicons-photo',
-                'shopping-bag': 'i-heroicons-shopping-bag',
-                'arrow-down': 'i-heroicons-arrow-down',
-                home: 'i-heroicons-home',
-                user: 'i-heroicons-user',
-                cog: 'i-heroicons-cog',
-                bell: 'i-heroicons-bell',
-                'magnifying-glass': 'i-heroicons-magnifying-glass',
-            },
-        },
     },
 });
