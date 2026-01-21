@@ -51,7 +51,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-    <UContainer class="py-12 max-w-4xl">
+    <UContainer class="py-12 flex flex-col items-center">
         <!-- Лоадер (если middleware пропустит) -->
         <div
             v-if="!isAuthenticated"
@@ -67,18 +67,18 @@ const handleLogout = async () => {
         <div v-else-if="user" class="space-y-12">
             <!-- Header -->
             <UCard
-                class="p-8 lg:p-12 bg-gradient-to-br from-accent-950 to-surface-900 border-0"
+                class="max-w-2xs md:max-w-full bg-gradient-to-br from-accent-950 to-surface-900 border-0"
             >
                 <div
                     class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
                 >
                     <div class="flex items-center flex-1">
-                        <UAvatar
+                        <!-- <UAvatar
                             :src="user.avatar"
                             :name="displayName"
                             size="2xl"
                             class="ring-4 ring-bg-950 shadow-2xl mr-6"
-                        />
+                        /> -->
                         <div>
                             <h1
                                 class="text-3xl lg:text-4xl font-bold text-text-100 mb-2 leading-tight"

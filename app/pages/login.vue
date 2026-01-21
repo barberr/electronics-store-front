@@ -62,9 +62,9 @@
                         icon="i-heroicons-exclamation-triangle"
                         color="red"
                         variant="soft"
-                        class="text-text-100"
+                        class="text-red-600"
+                        :title="error"
                     >
-                        {{ error }}
                     </UAlert>
 
                     <!-- Кнопка входа -->
@@ -130,7 +130,8 @@ const handleLogin = async () => {
         if (result.success) {
             await navigateTo('/profile');
         } else {
-            error.value = result.error || 'Ошибка входа';
+            error.value = 'Ошибка входа';
+            console.log('error.value', error.value);
         }
     } catch (err) {
         error.value = 'Ошибка сервера. Попробуйте позже.';

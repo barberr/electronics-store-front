@@ -5,17 +5,7 @@
         <!-- Основной ряд: mobile first -->
         <div class="es-container flex items-center justify-between h-14">
             <!-- Левая зона: бургер + логотип -->
-            <div class="flex items-center gap-3">
-                <!-- Бургер только на мобильных -->
-                <UButton
-                    class="md:hidden"
-                    icon="i-heroicons-bars-3"
-                    color="neutral"
-                    variant="ghost"
-                    square
-                    @click="mobileMenu.open = true"
-                />
-
+            <div class="flex items-center gap-1">
                 <!-- Логотип + текст -->
                 <NuxtLink to="/" class="flex items-center gap-2">
                     <img
@@ -62,6 +52,7 @@
                     variant="ghost"
                     color="neutral"
                     square
+                    class="hidden sm:inline-flex"
                 />
                 <UButton
                     icon="i-lucide-git-compare"
@@ -118,6 +109,182 @@
                     </div>
                 </template>
             </div>
+
+            <!-- для мобильных -->
+            <div class="md:hidden pl-8">
+                <template v-if="!isAuthenticated">
+                    <UButton
+                        icon="i-lucide-user"
+                        variant="ghost"
+                        color="neutral"
+                        class="md:hidden"
+                        @click="goToLogin"
+                    >
+                        Войти
+                    </UButton>
+                </template>
+
+                <!-- Если авторизован -->
+                <template v-else>
+                    <div class="flex items-center gap-1">
+                        <UButton
+                            icon="i-lucide-user"
+                            variant="ghost"
+                            color="neutral"
+                            class="md:hidden"
+                            :to="`/profile`"
+                        >
+                            {{ user.first_name }}
+                        </UButton>
+                        <UButton
+                            icon="i-lucide-log-out"
+                            variant="ghost"
+                            color="neutral"
+                            class="md:hidden"
+                            @click="handleLogout"
+                        >
+                            <span class="hidden md:inline-block">Выйти</span>
+                        </UButton>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div
+            class="flex flex-row items-center bg-accent-950 text-text-100 h-14"
+        >
+            <!-- Бургер только на мобильных -->
+            <USlideover
+                title="Каталог"
+                class="md:hidden pl-8"
+                :close="{
+                    color: 'primary',
+                    variant: 'outline',
+                    class: 'rounded-full',
+                }"
+            >
+                <UButton
+                    icon="i-heroicons-bars-3"
+                    color="neutral"
+                    variant="ghost"
+                    size="xl"
+                    square
+                    @click="mobileMenu.open = true"
+                />
+
+                <template #body>
+                    <ClientOnly>
+                        <div
+                            v-if="data?.catalog"
+                            class="px-4 py-2 space-y-4 max-h-[calc(100vh-120px)] overflow-y-auto"
+                        >
+                            <div
+                                v-for="group in data.catalog"
+                                :key="group.slug"
+                                class="min-w-0"
+                            >
+                                <!-- Заголовок категории (кликабельный) -->
+                                <UButton
+                                    variant="link"
+                                    class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full flex justify-between items-center"
+                                    @click="toggleCategory(group.slug)"
+                                >
+                                    <div class="flex items-center">
+                                        <UIcon
+                                            :name="getCategoryIcon(group.slug)"
+                                            class="mr-2 text-gray-500 dark:text-gray-400"
+                                            size="16"
+                                        />
+                                        {{ group.name }}
+                                    </div>
+                                    <!-- Иконка стрелки вниз/вверх -->
+                                    <UIcon
+                                        :name="
+                                            expandedCategory === group.slug
+                                                ? 'i-heroicons-chevron-up'
+                                                : 'i-heroicons-chevron-down'
+                                        "
+                                        class="text-gray-500 dark:text-gray-400"
+                                        size="16"
+                                    />
+                                </UButton>
+
+                                <!-- Товары (показываются только если категория раскрыта) -->
+                                <div
+                                    v-if="expandedCategory === group.slug"
+                                    class="mt-2 space-y-1 ml-2 border-l-2 border-gray-200 dark:border-gray-700 pl-2"
+                                >
+                                    <NuxtLink
+                                        v-for="product in group.products.slice(
+                                            0,
+                                            4,
+                                        )"
+                                        :key="product.id"
+                                        :to="`/products/${product.slug}`"
+                                        @click="closeSlideover"
+                                        class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                    >
+                                        <div
+                                            class="flex justify-between items-start"
+                                        >
+                                            <span class="truncate">{{
+                                                product.name
+                                            }}</span>
+                                            <span
+                                                class="font-medium whitespace-nowrap ml-2"
+                                                :class="{
+                                                    'text-green-600 dark:text-green-400':
+                                                        product.is_active,
+                                                    'text-gray-400 line-through':
+                                                        !product.is_active,
+                                                }"
+                                            >
+                                                от
+                                                {{
+                                                    formatPrice(
+                                                        getMinPrice(
+                                                            product.variants,
+                                                        ),
+                                                    )
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="product.brand?.name"
+                                            class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                                        >
+                                            {{ product.brand.name }}
+                                        </div>
+                                    </NuxtLink>
+
+                                    <!-- "Показать все" если товаров >4 -->
+                                    <UButton
+                                        v-if="group.products.length > 4"
+                                        variant="link"
+                                        size="xs"
+                                        class="px-2 py-1 mt-0.5 text-xs"
+                                        :to="`/categories/${group.slug}`"
+                                        @click="closeSlideover"
+                                    >
+                                        Показать все ({{
+                                            group.products.length
+                                        }})
+                                    </UButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <template #fallback>
+                            <div class="px-4 py-6">
+                                <USkeleton
+                                    v-for="i in 3"
+                                    :key="i"
+                                    class="h-8 mb-4"
+                                />
+                            </div>
+                        </template>
+                    </ClientOnly>
+                </template>
+            </USlideover>
         </div>
 
         <!-- Нижняя полоса меню: появляется с md -->
@@ -328,113 +495,6 @@
                 </nav>
             </div>
         </div>
-
-        <!-- Мобильное боковое меню (каталог + категории) -->
-        <!-- <USlideover v-model="mobileMenu.open" side="left" class="md:hidden">
-            <template #default>
-                <div class="p-4 space-y-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-base font-semibold">Каталог</span>
-                        <UButton
-                            icon="i-heroicons-x-mark-20-solid"
-                            variant="ghost"
-                            color="gray"
-                            square
-                            @click="mobileMenu.open = false"
-                        />
-                    </div>
-
-                    <UInput
-                        v-model="searchQuery"
-                        size="lg"
-                        icon="i-heroicons-magnifying-glass-20-solid"
-                        placeholder="Поиск по каталогу"
-                        class="w-full"
-                    />
-
-                    <UCollapsibleGroup class="space-y-2">
-                        <UCollapsible
-                            v-for="category in categories"
-                            :key="category.id"
-                            :open="mobileMenu.activeCategory === category.id"
-                            @open-change="
-                                (isOpen) =>
-                                    (mobileMenu.activeCategory = isOpen
-                                        ? category.id
-                                        : null)
-                            "
-                        >
-                            <template #trigger="{ open }">
-                                <div
-                                    class="flex items-center justify-between p-3 rounded hover:bg-gray-50"
-                                >
-                                    <span class="font-medium text-sm">
-                                        {{ category.name }}
-                                    </span>
-                                    <UIcon
-                                        :name="
-                                            open
-                                                ? 'i-heroicons-minus'
-                                                : 'i-heroicons-plus'
-                                        "
-                                        class="w-5 h-5"
-                                    />
-                                </div>
-                            </template>
-
-                            <div class="pt-1 space-y-1">
-                                <NuxtLink
-                                    v-for="product in category.products"
-                                    :key="product.id"
-                                    :to="`/products/${product.slug}`"
-                                    class="block px-3 py-2 text-xs rounded hover:bg-gray-100"
-                                >
-                                    {{ product.name }}
-                                </NuxtLink>
-                            </div>
-                        </UCollapsible>
-                    </UCollapsibleGroup>
-
-                    <div class="pt-4 border-t space-y-2 text-sm">
-                        <a href="tel:+78129426246" class="block"
-                            >+7 (812) 111-11-11</a
-                        >
-                        <a href="tel:+78129359083" class="block text-gray-600">
-                            +7 (812) 222-22-22
-                        </a>
-                    </div>
-                </div>
-            </template>
-        </USlideover> -->
-
-        <!-- Отдельный mobile‑поиск (если хочешь полноэкранный поиск) -->
-        <!-- <USlideover
-            v-model="mobileMenu.searchOpen"
-            side="top"
-            class="md:hidden"
-        >
-            <template #default>
-                <div class="p-4 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-base font-semibold">Поиск</span>
-                        <UButton
-                            icon="i-heroicons-x-mark-20-solid"
-                            variant="ghost"
-                            color="gray"
-                            square
-                            @click="mobileMenu.searchOpen = false"
-                        />
-                    </div>
-                    <UInput
-                        v-model="searchQuery"
-                        size="lg"
-                        icon="i-heroicons-magnifying-glass-20-solid"
-                        placeholder="Что вы ищете?"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </USlideover> -->
     </header>
 </template>
 
@@ -517,32 +577,26 @@ const getMinPrice = (variants) => {
 };
 
 const catalogOpen = ref(false);
-const catalogDropdown = ref(false);
 
-const handleMobileAuth = () => {
-    if (authStore.isAuthenticated.value) {
-        logout();
-    } else {
-        router.push('/login');
-    }
-};
+// Реактивное состояние для раскрытой категории
+const expandedCategory = ref(null);
+
+// Переключение категории
+function toggleCategory(slug) {
+    expandedCategory.value = expandedCategory.value === slug ? null : slug;
+}
+
+// Закрытие слайдовера (и сброс состояния)
+function closeSlideover() {
+    mobileMenu.open = false;
+    expandedCategory.value = null; // опционально: сбрасывать при переходе
+}
 
 const mobileMenu = ref({
     open: false,
     searchOpen: false,
     activeCategory: null as number | null,
 });
-
-const openDropdown = async (id: number) => {
-    if (!categories.value.find((c) => c.id === id)?.products) {
-        await loadProducts(id);
-    }
-    activeDropdown.value = id;
-};
-
-const closeDropdown = () => {
-    activeDropdown.value = null;
-};
 
 // Используем useAsyncData для реактивности и кэширования Nuxt
 const { data, pending, error } = await useAsyncData(
@@ -575,7 +629,7 @@ const { data, pending, error } = await useAsyncData(
 const getCategoryIcon = (slug: string): string => {
     const icons: Record<string, string> = {
         phones: 'i-heroicons-device-phone-mobile',
-        laptops: 'i-heroicons-laptop',
+        laptops: 'i-heroicons-computer-desktop',
         'vacuum-cleaners': 'i-heroicons-bolt',
         // добавьте свои
         default: 'i-heroicons-cube',
@@ -611,17 +665,11 @@ onMounted(async () => {
     if (process.client) {
         // ✅ Ждём полной инициализации
         const success = await authStore.initialize();
-
-        // console.log('Auth initialized:', {
-        //     isAuthenticated: authStore.isAuthenticated,
-        //     user: authStore.user,
-        //     isInitialized: authStore.isInitialized,
-        // });
-
         if (!success && initError.value) {
             console.error('Auth error:', initError.value);
         }
     }
+    console.log('mobileMenu', mobileMenu);
     fetchCategories();
 });
 </script>

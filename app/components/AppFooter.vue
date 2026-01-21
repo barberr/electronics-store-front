@@ -1,9 +1,11 @@
 <template>
-    <footer class="footer">
+    <footer
+        class="footer border-b dark:border-surface-900 bg-bg-950 dark:bg-surface-900"
+    >
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>Техника от Боряна</h3>
+                    <h3>izistor</h3>
                     <p>© {{ currentYear }} All rights reserved.</p>
                 </div>
 
@@ -26,8 +28,8 @@ const currentYear = new Date().getFullYear();
 
 <style scoped>
 .footer {
-    background: #2d3748;
-    color: #cbd5e0;
+    /* background: #2d3748;
+    color: #cbd5e0; */
     padding: 2rem 0;
     margin-top: auto;
 }
