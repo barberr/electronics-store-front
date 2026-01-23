@@ -29,7 +29,8 @@
 	--font-sans: 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
   /* Фон и поверхности */
   --color-bg-950: #0E0F12;
-  --color-surface-900: #15171C;
+  --color-bg-900: #15171C;
+  --color-surface-900: #1F2127;
 
   /* Текст */
   --color-text-100: #FFFFFF;
@@ -68,7 +69,7 @@ body {
 }
 
 .app {
-  @apply bg-gray-50 min-h-screen flex flex-col;
+  @apply bg-bg-950 min-h-screen flex flex-col;
 }
 
 h1 { font-size: clamp(2.75rem, 5vw, 3rem); font-weight: 600; }

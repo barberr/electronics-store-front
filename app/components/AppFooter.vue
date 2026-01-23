@@ -1,7 +1,5 @@
 <template>
-    <footer
-        class="footer border-b dark:border-surface-900 bg-bg-950 dark:bg-surface-900"
-    >
+    <footer class="footer border-t border-surface-900 bg-bg-950">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">

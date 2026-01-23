@@ -1,9 +1,9 @@
 <template>
-    <header
-        class="es-header border-b dark:border-surface-900 bg-bg-950 dark:bg-surface-900"
-    >
+    <header class="es-header border-b border-surface-900 bg-bg-900">
         <!-- Основной ряд: mobile first -->
-        <div class="es-container flex items-center justify-between h-14">
+        <div
+            class="es-container flex items-center justify-between h-14 border-b border-surface-900"
+        >
             <!-- Левая зона: бургер + логотип -->
             <div class="flex items-center gap-1">
                 <!-- Логотип + текст -->
@@ -150,7 +150,7 @@
             </div>
         </div>
         <div
-            class="flex flex-row items-center bg-accent-950 text-text-100 h-14"
+            class="block md:hidden mdflex flex-row items-center border-b border-surface-900 bg-bg-900 h-14"
         >
             <!-- Бургер только на мобильных -->
             <USlideover
@@ -289,7 +289,7 @@
 
         <!-- Нижняя полоса меню: появляется с md -->
         <div
-            class="hidden es-header__bottom py-2 md:block md:mt-2 bg-accent-950 text-text-100"
+            class="hidden md:block es-header__bottom py-2 border-b border-surface-900 bg-bg-900"
         >
             <div class="es-container flex items-center gap-4 py-2">
                 <UPopover
@@ -775,11 +775,6 @@ onMounted(async () => {
 }
 
 /* Нижняя полоса */
-.es-header__bottom {
-    /* border-top: 1px solid #e5e7eb; */
-    background: #2d3748;
-    color: #f9fafb;
-}
 
 .es-header__bottom-inner {
     display: flex;
