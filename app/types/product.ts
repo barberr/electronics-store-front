@@ -92,12 +92,32 @@ export interface BrandResponse {
     logo: string | null;
 }
 
-interface ProductVariant {
+export interface HeroBlock {
     id: number;
-    sku: string;
-    price: string;
-    old_price: string | null;
+    title: string;
+    subtitle?: string;
+    description?: string;
+    status: string;
     is_active: boolean;
-    stock: number;
-    attributes: Record<string, any>;
+    order: number;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
+    product?: number;
+    product_name?: string;
+    image?: string;
+    background_image?: string;
+    background_color: string;
+    text_color: string;
+    button_text?: string;
+    button_link?: string;
 }
+
+export interface HeroBlockResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: HeroBlock[];
+}
+
+

@@ -31,10 +31,14 @@
   --color-bg-950: #0E0F12;
   --color-bg-900: #15171C;
   --color-surface-900: #1F2127;
+  --color-surface-950: #17181C;
+
+  --color-shadow-950: #000020;
 
   /* Текст */
   --color-text-100: #FFFFFF;
   --color-text-400: #A6A8AD;
+  --color-text-900: #F5F6F7;
 
   /* Акцент (основной цвет UI) */
   --color-accent-50: #F5F6F7;
@@ -75,7 +79,7 @@ body {
 h1 { font-size: clamp(2.75rem, 5vw, 3rem); font-weight: 600; }
 
 .main-content {
-  @apply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  @apply relative z-10 max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8;
 }
 
 @media (max-width: 768px) {

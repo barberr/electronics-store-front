@@ -1,6 +1,7 @@
 <template>
     <div>
-        <UContainer class="py-8 max-w-7xl">
+        <HeroBlock v-if="heroBlock" :hero="heroBlock" />
+        <UContainer class="py-8 max-w-full">
             <!-- Заголовок -->
             <div class="mb-12">
                 <h1
@@ -124,6 +125,36 @@ const sortedProducts = computed(() => {
     });
 });
 
+// Hero Block данные
+const heroBlock = ref<HeroBlock | null>(null);
+const heroPending = ref<boolean>(true);
+const heroError = ref<Error | null>(null);
+
+const fetchHeroBlock = async () => {
+    const api = useApi();
+    try {
+        const response = await api.get('/v1/hero-blocks/', {
+            skipAuth: true,
+            params: {
+                status: 'published',
+                is_active: true,
+                ordering: 'order'
+            }
+        });
+        
+        if (response.data?.results?.length) {
+            heroBlock.value = response.data.results[0];
+        } else {
+            heroBlock.value = null;
+        }
+    } catch (err: any) {
+        heroError.value = err.response?.data || err;
+        console.error('Failed to fetch hero block:', err);
+    } finally {
+        heroPending.value = false;
+    }
+};
+
 // Функция для получения главного изображения
 const getMainImage = (images: any[]) => {
     // Ищем первое изображение с is_main: true
@@ -149,5 +180,6 @@ const fetchProducts = async () => {
 
 onMounted(() => {
     fetchProducts();
+    fetchHeroBlock();
 });
 </script>

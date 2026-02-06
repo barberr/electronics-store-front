@@ -41,10 +41,10 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
 <template>
     <NuxtLink
         :to="`/products/${product.slug}`"
-        class="group block h-full focus:outline-none"
+        class="group block h-full focus:outline-none "
     >
         <UCard
-            class="h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border dark:border-accent-800 bg-bg-950/50 dark:bg-surface-900 ring-0 hover:ring-accent-400/30"
+            class="w-72 md:w-80 h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border dark:border-accent-800 bg-surface-950 dark:bg-surface-950 ring-0 hover:ring-accent-400/30"
             :ui="{ body: { padding: 'p-0' } }"
         >
             <!-- Изображение -->
@@ -55,7 +55,7 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
                     v-if="firstImage"
                     :src="firstImage"
                     :alt="product.name"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
                     sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     loading="lazy"
                 />

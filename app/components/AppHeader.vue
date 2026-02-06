@@ -2,7 +2,7 @@
     <header class="es-header border-b border-surface-900 bg-bg-900">
         <!-- Основной ряд: mobile first -->
         <div
-            class="es-container flex items-center justify-between h-14 border-b border-surface-900"
+            class="es-container max-w-7xl flex items-center justify-between h-14 border-b border-surface-900"
         >
             <!-- Левая зона: бургер + логотип -->
             <div class="flex items-center gap-1">
@@ -291,7 +291,7 @@
         <div
             class="hidden md:block es-header__bottom py-2 border-b border-surface-900 bg-bg-900"
         >
-            <div class="es-container flex items-center gap-4 py-2">
+            <div class="es-container max-w-7xl  flex items-center gap-4 py-2">
                 <UPopover
                     modal
                     v-model:open="catalogOpen"
@@ -683,7 +683,6 @@ onMounted(async () => {
 
 /* Общий контейнер */
 .es-container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
 }

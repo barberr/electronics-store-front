@@ -11,57 +11,6 @@ const error = ref<Error | null>(null);
 
 const api = useApi();
 
-// Обновленные интерфейсы под новое API
-// interface ProductImage {
-//   id: number
-//   image: string
-//   alt_text: string
-//   order: number
-// }
-
-// interface ProductVariant {
-//   id: number
-//   sku: string | null
-//   attributes: Record<string, string>
-//   price: string
-//   old_price: string | null
-//   is_active: boolean
-//   stock: number | null
-// }
-
-// interface Brand {
-//   id: number
-//   name: string
-//   slug: string
-//   logo: string | null
-// }
-
-// interface Category {
-//   id: number
-//   name: string
-//   slug: string
-// }
-
-// interface Product {
-//   id: number
-//   name: string
-//   slug: string
-//   brand: Brand | null
-//   category: Category | null
-//   short_description: string
-//   description: string
-//   seo_title: string
-//   seo_description: string
-//   is_active: boolean
-//   is_preorder: boolean
-//   delivery_text: string
-//   warranty_months: number
-//   images: ProductImage[]
-//   variants: ProductVariant[]
-//   created_at: string
-//   updated_at: string
-// }
-
 const { formatPrice } = useFormatPrice();
 
 // Вычисляемые свойства
@@ -190,14 +139,14 @@ useSeoMeta({
         <div v-else-if="error" class="text-center py-20">
             <UIcon
                 name="i-heroicons-exclamation-triangle"
-                class="w-16 h-16 text-red-400 dark:text-red-300 mx-auto mb-4"
+                class="w-16 h-16 text-red-400 mx-auto mb-4"
             />
             <h2
                 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2"
             >
                 Товар не найден
             </h2>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">
+            <p class="text-gray-500 mb-6">
                 Возможно, товар удален или slug изменился
             </p>
             <UButton @click="fetchProduct" color="primary"
@@ -229,7 +178,7 @@ useSeoMeta({
                         v-else
                         :src="galleryImages[currentImageIndex]?.image"
                         :alt="product.name"
-                        class="w-full h-96 object-cover hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        class="w-full h-96 object-contain hover:scale-105 transition-transform duration-300 cursor-pointer"
                         sizes="500px"
                         @click="
                             currentImageIndex =
@@ -256,7 +205,7 @@ useSeoMeta({
                         <NuxtImg
                             :src="img.image"
                             :alt="`${product.name} - изображение ${index + 1}`"
-                            class="w-full h-20 object-cover"
+                            class="w-full h-20 object-contain"
                             sizes="100px"
                         />
                     </UCard>
@@ -270,28 +219,28 @@ useSeoMeta({
                     <div class="flex items-start justify-between gap-4 mb-4">
                         <div>
                             <h1
-                                class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-900 leading-tight"
+                                class="text-3xl lg:text-4xl font-bold text-text-900 leading-tight"
                             >
                                 {{ product.name }}
                             </h1>
                             <div
-                                class="flex items-center gap-3 mt-3 text-sm text-gray-500 dark:text-gray-400"
+                                class="flex items-center gap-3 mt-3 text-sm text-text-100"
                             >
                                 <NuxtLink
                                     v-if="product.brand"
                                     :to="`/brands/${product.brand.slug}`"
-                                    class="font-medium hover:text-primary transition-colors"
+                                    class="font-medium hover:text-text-400 transition-colors"
                                 >
                                     {{ product.brand.name }}
                                 </NuxtLink>
                                 <UIcon
                                     name="i-heroicons-chevron-right"
-                                    class="w-4 h-4 text-gray-400"
+                                    class="w-4 h-4 text-text-100"
                                 />
                                 <NuxtLink
                                     v-if="product.category"
                                     :to="`/categories/${product.category.slug}`"
-                                    class="font-medium hover:text-primary transition-colors"
+                                    class="font-medium hover:text-text-400 transition-colors"
                                 >
                                     {{ product.category.name }}
                                 </NuxtLink>

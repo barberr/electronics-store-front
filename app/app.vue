@@ -16,13 +16,6 @@ onMounted(() => {});
 
             <!-- Основной контент -->
             <main class="main-content flex-1">
-                <!-- Flash сообщения (если используете) -->
-                <!-- <UContainer v-if="$route.meta.layout === 'default'">
-                    <div class="pt-4 pb-8">
-                        <UNotifications />
-                    </div>
-                </UContainer> -->
-
                 <!-- Страницы -->
                 <NuxtPage />
             </main>
