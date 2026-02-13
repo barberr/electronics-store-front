@@ -1,9 +1,12 @@
 <template>
     <div>
         <HeroBlock v-if="heroBlock" :hero="heroBlock" />
-        <UContainer class="py-8 max-w-full">
+        <UContainer 
+            class="max-w-full py-16 px-0"
+            :ui="{ padding: '' }"
+            >
             <!-- Заголовок -->
-            <div class="mb-12">
+            <!-- <div class="mb-12">
                 <h1
                     class="text-4xl font-bold text-gray-900 dark:text-white mb-2"
                 >
@@ -14,7 +17,7 @@
                         {{ categoryDescription }}
                     </p>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Загрузка -->
             <div
@@ -50,13 +53,13 @@
             <div v-else-if="products.length">
                 <!-- Карточки товаров -->
                 <div
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch"
                 >
                     <ProductCard
                         v-for="product in sortedProducts"
                         :key="product.id"
                         :product="product"
-                        @add-to-cart="addToCart"
+                        @add-to-cart=""
                     />
                 </div>
             </div>

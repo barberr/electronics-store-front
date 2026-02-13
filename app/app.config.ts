@@ -6,9 +6,9 @@ export default defineAppConfig({
             neutral: 'zinc',
         },
         // Кастомные контейнеры
-        container: {
-            base: 'w-full max-w-(--ui-container) mx-auto px-4 py-4 sm:px-6 lg:px-8',
-        },
+        // container: {
+        //     base: 'w-full max-w-(--ui-container) mx-auto ',
+        // },
         // Типографика (через Tailwind font-sans)
         fontFamily: {
             sans: [

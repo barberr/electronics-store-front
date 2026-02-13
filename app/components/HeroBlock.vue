@@ -14,7 +14,7 @@
 
         <UContainer class="relative z-10 py-16">
             <div
-                class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[70vh] max-h-[85vh]"
+                class="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-12 items-center min-h-[50vh] md:min-h-[70vh] md:max-h-[85vh]"
             >
                 <!-- Текстовая часть -->
                 <div class="space-y-6 max-w-2xl">

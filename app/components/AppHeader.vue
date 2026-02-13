@@ -61,6 +61,22 @@
                     square
                     class="hidden sm:inline-flex"
                 />
+                <!-- 🛒 КОРЗИНА - НОВАЯ КНОПКА -->
+                <UButton
+                    icon="i-lucide-shopping-cart"
+                    variant="ghost"
+                    color="neutral"
+                    :class="cartItemsCount > 0 ? 'text-accent-300' : 'text-text-400'"
+                    @click="goToCart"
+                    aria-label="Корзина"
+                >
+                    <span 
+                    v-if="cartItemsCount > 0" 
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                    >
+                    {{ cartItemsCount }}
+                    </span>
+                </UButton>
                 <!-- Телефоны только на lg+ -->
                 <div class="hidden lg:flex flex-col items-end mr-3">
                     <a
@@ -154,6 +170,7 @@
         >
             <!-- Бургер только на мобильных -->
             <USlideover
+                v-model:open="mobileMenu.open"
                 title="Каталог"
                 class="md:hidden pl-8"
                 :close="{
@@ -503,8 +520,18 @@ import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 import { computed, ref, onMounted } from 'vue';
+import useCart from '~/composables/useCart';
 
 const authStore = useAuthStore();
+
+const { 
+  cart, 
+  loading: cartLoading, 
+  error: cartError, 
+  fetchCart,
+  getTotalItems,
+  getTotalPrice 
+} = useCart();
 
 // ✅ Реактивные refs (рекомендуется)
 const { user, isAuthenticated, isInitialized, initError, logout } =
@@ -577,6 +604,11 @@ const getMinPrice = (variants) => {
 };
 
 const catalogOpen = ref(false);
+const mobileMenu = ref({
+    open: false,
+    searchOpen: false,
+    activeCategory: null as number | null,
+});
 
 // Реактивное состояние для раскрытой категории
 const expandedCategory = ref(null);
@@ -588,15 +620,11 @@ function toggleCategory(slug) {
 
 // Закрытие слайдовера (и сброс состояния)
 function closeSlideover() {
-    mobileMenu.open = false;
+    mobileMenu.value.open = false;
     expandedCategory.value = null; // опционально: сбрасывать при переходе
 }
 
-const mobileMenu = ref({
-    open: false,
-    searchOpen: false,
-    activeCategory: null as number | null,
-});
+
 
 // Используем useAsyncData для реактивности и кэширования Nuxt
 const { data, pending, error } = await useAsyncData(
@@ -661,6 +689,15 @@ const loadProducts = async (categoryId: number) => {
     }
 };
 
+// 📊 Реактивные вычисляемые свойства для корзины
+const cartItemsCount = computed(() => getTotalItems());
+const cartTotalPrice = computed(() => getTotalPrice());
+
+// 🧭 Метод навигации в корзину
+const goToCart = () => {
+  navigateTo('/cart');
+};
+
 onMounted(async () => {
     if (process.client) {
         // ✅ Ждём полной инициализации
@@ -671,7 +708,17 @@ onMounted(async () => {
     }
     console.log('mobileMenu', mobileMenu);
     fetchCategories();
+    await fetchCart();
 });
+watch(isAuthenticated, async (newAuthStatus) => {
+  if (process.client) {
+    // Небольшая задержка для стабильности
+    setTimeout(async () => {
+      await fetchCart();
+    }, 100);
+  }
+});
+
 </script>
 
 <style scoped>

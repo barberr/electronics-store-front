@@ -79,7 +79,7 @@ body {
 h1 { font-size: clamp(2.75rem, 5vw, 3rem); font-weight: 600; }
 
 .main-content {
-  @apply relative z-10 max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  @apply relative z-10 max-w-full mx-auto py-8;
 }
 
 @media (max-width: 768px) {

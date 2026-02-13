@@ -19,7 +19,7 @@ const minPrice = computed(() => {
 });
 
 // Доступность
-const isAvailable = computed(() => props.product.is_active && !!minPrice.value);
+const isAvailable = computed(() => props.product.is_active); //&& !!minPrice.value);
 
 // Первое изображение
 const firstImage = computed(() => props.product.images[0]?.image || null);
@@ -36,6 +36,10 @@ const emit = defineEmits<{
 }>();
 
 const handleAddToCart = () => emit('add-to-cart', props.product);
+
+onMounted(() => {
+    // console.log('isAvailable', isAvailable);
+});
 </script>
 
 <template>
@@ -102,7 +106,7 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
             </div>
 
             <!-- Контент -->
-            <div class="flex-1 p-6 flex flex-col gap-3">
+            <div class="flex-1 p-2 flex flex-col gap-3">
                 <!-- Бренд/Категория -->
                 <div class="flex items-center gap-2 flex-wrap">
                     <span
@@ -128,7 +132,7 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
 
                 <!-- Цена -->
                 <div
-                    class="mt-auto flex items-end justify-between gap-4 pt-4 border-t border-accent-800/50"
+                    class="mt-auto flex flex-col items-end justify-between gap-4 pt-4 border-t border-accent-800/50"
                 >
                     <div>
                         <div
@@ -160,7 +164,7 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
                             <div
                                 class="w-2 h-2 bg-success rounded-full animate-pulse"
                             />
-                            В наличии ({{ availableVariantsCount }} вар.)
+                            Под заказ • 3–5 дней ({{ availableVariantsCount }} вар.)
                         </div>
                     </div>
 
@@ -173,10 +177,11 @@ const handleAddToCart = () => emit('add-to-cart', props.product);
                         class="rounded-xl px-4 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all font-semibold min-w-[3rem]"
                         @click.stop="handleAddToCart"
                     >
-                        <UIcon
+                        Подробнее
+                        <!-- <UIcon
                             name="i-heroicons-shopping-bag"
                             class="w-5 h-5"
-                        />
+                        /> -->
                     </UButton>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue';
 import { useFormatPrice } from '~/composables/useFormatPrice';
+import useCart from '~/composables/useCart';
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
@@ -10,14 +11,14 @@ const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
 
 const api = useApi();
-
+const { addToCart } = useCart();
 const { formatPrice } = useFormatPrice();
 
 // Вычисляемые свойства
 const minPrice = computed(() => {
     const activeVariants =
         product.value?.variants.filter(
-            (v) => v.is_active && v.stock !== null && v.stock > 0,
+            (v) => v.is_active && v.stock !== null,
         ) || [];
     return activeVariants.length > 0
         ? Math.min(...activeVariants.map((v) => parseFloat(v.price)))
@@ -25,21 +26,36 @@ const minPrice = computed(() => {
 });
 
 const isAvailable = computed(() => {
-    return product.value?.is_active && minPrice.value !== null;
+    return product.value?.is_active;
 });
 
 const availableVariantsCount = computed(() => {
     return (
         product.value?.variants.filter(
-            (v) => v.is_active && v.stock !== null && v.stock > 0,
+            (v) => v.is_active && v.stock !== null,
         ).length || 0
     );
 });
 
-const selectedVariant = ref<ProductVariant | null>(null);
+const selectedAttributes = ref<Record<string, string>>({});
 const expandedVariants = ref(false);
 
-// Группировка вариантов по атрибутам (например, цвет, память)
+// Вычисляемый выбранный вариант
+const selectedVariant = computed(() => {
+    if (!product.value?.variants.length) return null;
+    
+    const matchingVariant = product.value.variants.find(variant => {
+        if (!variant.is_active) return false;
+        
+        return Object.entries(selectedAttributes.value).every(([attrName, attrValue]) => {
+            return variant.attributes[attrName] === attrValue;
+        });
+    });
+    
+    return matchingVariant || null;
+});
+
+// Группировка вариантов
 const variantGroups = computed(() => {
     if (!product.value?.variants.length) return [];
 
@@ -58,11 +74,11 @@ const variantGroups = computed(() => {
     });
 
     return Object.values(groups).filter((g) =>
-        g.some((v) => v.stock !== null && v.stock > 0),
+        g.some((v) => v.stock !== null),
     );
 });
 
-// Доступные атрибуты для фильтрации (цвет, память и т.д.)
+// Доступные атрибуты
 const availableAttributes = computed(() => {
     const attrs: Record<string, string[]> = {};
 
@@ -78,26 +94,35 @@ const availableAttributes = computed(() => {
     return attrs;
 });
 
-// Выбор варианта
-const selectVariant = (variant: ProductVariant) => {
-    selectedVariant.value = variant;
+const selectAttribute = (attrName: string, value: string) => {
+    selectedAttributes.value = {
+        ...selectedAttributes.value,
+        [attrName]: value
+    };
+    
+    if (variantGroups.value.length > 3) {
+        expandedVariants.value = true;
+    }
 };
-const currentImageIndex = ref(0);
 
-// Галерея изображений
+const currentImageIndex = ref(0);
 const galleryImages = computed(() => {
     return [...(product.value?.images || [])].sort((a, b) => a.order - b.order);
 });
 
-// Загрузка товара
+// Загрузка товара - ИСПРАВЛЕНО!
 const fetchProduct = async () => {
     try {
         const response = await api.get(`/v1/products/${slug.value}/`);
         product.value = response.data;
-        selectedVariant.value =
-            product.value?.variants.find(
-                (v) => v.is_active && v.stock && v.stock > 0,
-            ) || null;
+        
+        // Устанавливаем начальные атрибуты первого доступного варианта
+        const firstAvailable = product.value?.variants.find(
+            (v) => v.is_active && v.stock !== null,
+        );
+        if (firstAvailable) {
+            selectedAttributes.value = { ...firstAvailable.attributes };
+        }
     } catch (err: any) {
         error.value = err.response?.data || err;
     } finally {
@@ -113,7 +138,6 @@ watch(
     { immediate: true },
 );
 
-// SEO
 useSeoMeta({
     title: () => product.value?.seo_title || product.value?.name || 'Товар',
     description: () =>
@@ -121,6 +145,18 @@ useSeoMeta({
         product.value?.short_description ||
         'Подробности о товаре',
 });
+
+const addToCartHandler = async () => {
+    if (!selectedVariant.value) {
+        console.warn('Нет выбранного варианта');
+        return;
+    }
+    await addToCart(selectedVariant.value.id, 1);
+};
+
+const selectAttributeFromVariant = (variant: ProductVariant) => {
+    selectedAttributes.value = { ...variant.attributes };
+};
 </script>
 
 <template>
@@ -128,7 +164,7 @@ useSeoMeta({
         <!-- Загрузка -->
         <div v-if="pending" class="flex justify-center py-20">
             <div class="text-center">
-                <ULoader size="xl" color="primary" class="mx-auto mb-4" />
+                <!-- <ULoader size="xl" color="primary" class="mx-auto mb-4" /> -->
                 <p class="text-gray-500 dark:text-gray-400">
                     Загружаем товар...
                 </p>
@@ -271,15 +307,9 @@ useSeoMeta({
                                 Цена
                             </span>
                             <div class="space-y-1">
-                                <div
-                                    v-if="selectedVariant && minPrice"
-                                    class="text-4xl lg:text-5xl font-bold text-primary-600 dark:text-primary-400"
-                                >
-                                    {{
-                                        formatPrice(
-                                            parseFloat(selectedVariant.price),
-                                        )
-                                    }}
+                                <div v-if="selectedVariant" 
+                                    class="text-4xl lg:text-5xl font-bold text-primary-600 dark:text-primary-400">
+                                    {{ formatPrice(parseFloat(selectedVariant.price)) }}
                                 </div>
                                 <div
                                     v-else-if="minPrice"
@@ -303,7 +333,7 @@ useSeoMeta({
                         </div>
 
                         <!-- Выбор вариантов -->
-                        <div
+                        <div 
                             v-if="product.variants.length > 1"
                             class="space-y-4"
                         >
@@ -325,9 +355,7 @@ useSeoMeta({
                                 <!-- Группы атрибутов -->
                                 <div class="space-y-3">
                                     <div
-                                        v-for="(
-                                            values, attrName
-                                        ) in availableAttributes"
+                                        v-for="(values, attrName) in availableAttributes"
                                         :key="attrName"
                                         class="space-y-2"
                                     >
@@ -350,14 +378,11 @@ useSeoMeta({
                                                 color="gray"
                                                 variant="soft"
                                                 class="capitalize"
+                                                @click="selectAttribute(attrName, value)"
                                                 :class="{
                                                     'ring-2 ring-primary-500 bg-primary-100 text-primary-700':
-                                                        selectedVariant
-                                                            ?.attributes[
-                                                            attrName
-                                                        ] === value,
+                                                        selectedAttributes[attrName] === value,
                                                 }"
-                                                @click="() => {}"
                                             >
                                                 {{ value }}
                                             </UButton>
@@ -374,17 +399,13 @@ useSeoMeta({
                                     <h4
                                         class="text-lg font-semibold text-gray-900 dark:text-gray-100"
                                     >
-                                        Доступные варианты ({{
-                                            availableVariantsCount
-                                        }})
+                                        Доступные варианты ({{ availableVariantsCount }})
                                     </h4>
                                     <UButton
-                                        v-if="product.variants.length > 4"
+                                        v-if="product.variants.length > 3"
                                         variant="link"
                                         size="sm"
-                                        @click="
-                                            expandedVariants = !expandedVariants
-                                        "
+                                        @click="expandedVariants = !expandedVariants"
                                     >
                                         {{
                                             expandedVariants
@@ -409,19 +430,15 @@ useSeoMeta({
                                     <UCard
                                         v-for="group in variantGroups.slice(
                                             0,
-                                            expandedVariants ? undefined : 4,
+                                            expandedVariants ? undefined : 3,
                                         )"
                                         :key="group[0].id"
                                         class="p-4 hover:shadow-md transition-all cursor-pointer border-2 hover:border-primary-200"
                                         :class="{
                                             'ring-2 ring-primary-500 border-primary-500 bg-primary-50 dark:bg-primary-950/50':
-                                                group.some(
-                                                    (v) =>
-                                                        selectedVariant?.id ===
-                                                        v.id,
-                                                ),
+                                                selectedVariant && selectedVariant.id === group[0].id,
                                         }"
-                                        @click="selectVariant(group[0])"
+                                        @click="selectAttributeFromVariant(group[0])"
                                     >
                                         <div class="space-y-2">
                                             <!-- Атрибуты -->
@@ -429,9 +446,7 @@ useSeoMeta({
                                                 class="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400"
                                             >
                                                 <span
-                                                    v-for="(
-                                                        value, key
-                                                    ) in group[0].attributes"
+                                                    v-for="(value, key) in group[0].attributes"
                                                     :key="key"
                                                     class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full"
                                                 >
@@ -488,6 +503,7 @@ useSeoMeta({
                                 color="primary"
                                 :disabled="!isAvailable || !selectedVariant"
                                 class="text-lg font-semibold h-14"
+                                @click="addToCartHandler"
                             >
                                 <UIcon
                                     name="i-heroicons-shopping-bag"
