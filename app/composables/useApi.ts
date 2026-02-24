@@ -7,7 +7,7 @@ declare module 'axios' {
         skipAuth?: boolean;
     }
 }
-const baseURL = process.env.NODE_ENV === 'production' 
+const baseURL = process.env.NODE_ENV === 'production' // В хависимости от профиля сам подставится нужный endpoint
   ? 'https://izistore.info/api/'
   : 'http://127.0.0.1:8000/api/'
 const api = axios.create({

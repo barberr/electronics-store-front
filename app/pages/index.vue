@@ -2,87 +2,36 @@
     <div>
         <HeroBlock v-if="heroBlock" :hero="heroBlock" />
         <UContainer 
-            class="max-w-full py-16 px-0"
+            v-if="popularProducts.length > 0"
+            class="max-w-full py-12 px-0"
             :ui="{ padding: '' }"
-            >
-            <!-- Заголовок -->
-            <!-- <div class="mb-12">
-                <h1
-                    class="text-4xl font-bold text-gray-900 dark:text-white mb-2"
-                >
-                    {{ categoryName }}
-                </h1>
-                <div v-if="categoryDescription" class="max-w-2xl">
-                    <p class="text-lg text-gray-600 dark:text-gray-300">
-                        {{ categoryDescription }}
-                    </p>
-                </div>
-            </div> -->
+        >
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    Популярные товары
+                </h2>
+            </div>
 
-            <!-- Загрузка -->
-            <div
-                v-if="pending"
-                class="flex flex-col items-center justify-center py-20"
+            <!-- Слайдер популярных товаров -->
+             <UCarousel
+                v-slot="{ item }"
+                loop
+                dots
+                arrows
+                
+                class="max-w-7xl mx-auto"
+                :items="popularProducts"
+                :ui="{ item: 'basis-1/3' }"
             >
-                <UProgress
-                    value="indeterminate"
-                    class="w-24 h-2 mb-4"
-                    color="primary"
+                <ProductCard 
+                    class="rounded-lg"
+                    :product="item" 
+                     @add-to-cart=""
                 />
-                <p class="text-gray-500 dark:text-gray-400 text-lg">
-                    Загружаем товары...
-                </p>
-            </div>
-
-            <!-- Ошибка -->
-            <UAlert
-                v-else-if="error"
-                color="red"
-                title="Ошибка загрузки"
-                class="mb-8"
-            >
-                <template #description>
-                    {{ error.message || 'Не удалось загрузить товары' }}
-                </template>
-                <UButton size="sm" color="primary" @click="refreshCategory">
-                    Попробовать снова
-                </UButton>
-            </UAlert>
-
-            <!-- Сетка товаров -->
-            <div v-else-if="products.length">
-                <!-- Карточки товаров -->
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch"
-                >
-                    <ProductCard
-                        v-for="product in sortedProducts"
-                        :key="product.id"
-                        :product="product"
-                        @add-to-cart=""
-                    />
-                </div>
-            </div>
-
-            <!-- Пустой список -->
-            <div
-                v-else
-                class="text-center py-20 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-slate-900/50 rounded-2xl"
-            >
-                <UIcon
-                    name="i-heroicons-shopping-bag-open"
-                    class="w-20 h-20 text-gray-400 dark:text-gray-500 mx-auto mb-4"
-                />
-                <h3
-                    class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
-                >
-                    Товары в этой категории скоро появятся
-                </h3>
-                <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                    Следите за обновлениями ассортимента
-                </p>
-            </div>
+                <!-- <img :src="item" width="234" height="234" class="rounded-lg"> -->
+            </UCarousel>
         </UContainer>
+        
     </div>
 </template>
 <script setup lang="ts">
@@ -92,6 +41,7 @@ import { useFormatPrice } from '~/composables/useFormatPrice';
 const { formatPrice } = useFormatPrice();
 
 const products = ref<Product[]>([]);
+const popularProducts = ref<Product[]>([]);
 const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
 
@@ -181,8 +131,23 @@ const fetchProducts = async () => {
     }
 };
 
+const fetchPopularProducts = async () => {
+    const api = useApi();
+    try {
+        const response = await api.get('/v1/products/popular/', {
+            skipAuth: true,
+        });
+        popularProducts.value = response.data || [];
+        console.log('popularProducts -',popularProducts);
+    } catch (err: any) {
+        console.warn('Не удалось загрузить популярные товары:', err);
+        // Не показываем ошибку пользователю — блок просто не отобразится
+    }
+};
+
 onMounted(() => {
     fetchProducts();
     fetchHeroBlock();
+    fetchPopularProducts();
 });
 </script>

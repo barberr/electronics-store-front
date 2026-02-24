@@ -667,10 +667,11 @@ const getCategoryIcon = (slug: string): string => {
 
 const fetchCategories = async () => {
     try {
-        const response = await api.get('/v1/categories/', {
+        const response = await api.get('/v1/categories/header-menu/', {
             skipAuth: true, // 👈 Добавили флаг
         });
-        categories.value = response.data.results;
+        // console.log('response -', response);
+        categories.value = response.data;
     } catch (err: any) {
         console.error('Failed to fetch categories:', err.response?.data || err);
     }
@@ -849,6 +850,7 @@ watch(isAuthenticated, async (newAuthStatus) => {
     color: #e5e7eb;
     padding: 0.15rem 0;
     cursor: pointer;
+    text-transform: uppercase;
 }
 
 .es-categories__item:hover {
