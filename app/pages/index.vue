@@ -21,7 +21,7 @@
                 
                 class="max-w-7xl mx-auto"
                 :items="popularProducts"
-                :ui="{ item: 'basis-1/3' }"
+                :ui="{ item: 'basis-full sm:basis-1/2 lg:basis-1/3 flex justify-center' }"
             >
                 <ProductCard 
                     class="rounded-lg"

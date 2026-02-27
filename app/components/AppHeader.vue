@@ -707,7 +707,7 @@ onMounted(async () => {
             console.error('Auth error:', initError.value);
         }
     }
-    console.log('mobileMenu', mobileMenu);
+    // console.log('mobileMenu', mobileMenu);
     fetchCategories();
     await fetchCart();
 });

@@ -100,11 +100,13 @@ export interface HeroBlock {
     status: string;
     is_active: boolean;
     order: number;
-    published_at: string;
+    published_at: string; // ISO 8601 datetime
     created_at: string;
     updated_at: string;
     product?: number;
+    product_slug?: string;
     product_name?: string;
+    video_mp4?: string;        // ← добавлено
     image?: string;
     background_image?: string;
     background_color: string;

@@ -93,66 +93,92 @@ useSeoMeta({
 </script>
 
 <template>
-    <UContainer class="py-8 max-w-7xl">
-        <!-- Загрузка -->
-        <div
-            v-if="pending"
-            class="flex flex-col items-center justify-center py-20 space-y-4"
-        >
-            <UIcon
-                name="i-heroicons-arrow-path"
-                class="w-10 h-10 animate-spin text-primary"
-            />
-            <p class="text-gray-500">Загрузка товаров...</p>
-        </div>
+    <UContainer 
+        class="max-w-full py-16 px-0"
+        :ui="{ padding: '' }"
+    >
 
-        <!-- Ошибка -->
-        <div v-else-if="error" class="text-center py-20">
-            <UIcon
-                name="i-heroicons-exclamation-circle"
-                class="w-16 h-16 text-red-400 mx-auto mb-4"
-            />
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                Категория не найдена
-            </h2>
-            <p class="text-gray-500 mb-6">
-                Возможно, неправильный адрес или категория удалена
-            </p>
-            <UButton to="/" color="primary" variant="soft">На главную</UButton>
-        </div>
-
-        <!-- Контент -->
-        <div v-else-if="category">
-            <!-- Заголовок категории -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">
-                    {{ category.name }}
-                </h1>
-                <p v-if="category.description" class="text-gray-600 max-w-3xl">
-                    {{ category.description }}
+            <!-- Загрузка -->
+            <div
+                v-if="pending"
+                class="flex flex-col items-center justify-center py-20"
+            >
+                <UProgress
+                    value="indeterminate"
+                    class="w-24 h-2 mb-4"
+                    color="primary"
+                />
+                <p class="text-gray-500 dark:text-gray-400 text-lg">
+                    Загружаем товары...
                 </p>
             </div>
 
-            <!-- Если товаров нет -->
-            <div
-                v-if="products.length === 0"
-                class="text-center py-12 bg-gray-50 rounded-lg"
+            <!-- Ошибка -->
+            <UAlert
+                v-else-if="error"
+                color="red"
+                title="Ошибка загрузки"
+                class="mb-8"
             >
-                <p class="text-gray-500">В этой категории пока нет товаров.</p>
-            </div>
+                <template #description>
+                    {{ error.message || 'Не удалось загрузить товары' }}
+                </template>
+                <UButton size="sm" color="primary" @click="refreshCategory">
+                    Попробовать снова
+                </UButton>
+            </UAlert>
 
-            <!-- Сетка товаров -->
-            <div
-                v-else
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-            >
-                <ProductCard
-                    v-for="product in products"
-                    :key="product.id"
-                    :product="product"
-                    @add-to-cart="addToCart"
-                />
+            <div v-else-if="category">
+                <!-- Заголовок категории -->
+                <div class="mb-8">
+                    <h1 class="category-title text-3xl font-bold color-text-100 mb-2">
+                        {{ category.name }}
+                    </h1>
+                    <p v-if="category.description" class="text-gray-600 max-w-3xl">
+                        {{ category.description }}
+                    </p>
+                </div>
+
+                <!-- Сетка товаров -->
+                <div v-if="products.length">
+                    <!-- Карточки товаров -->
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch"
+                    >
+                        <ProductCard
+                            v-for="product in products"
+                            :key="product.id"
+                            :product="product"
+                            @add-to-cart="addToCart"
+                        />
+                    </div>
+                </div>
+
+                <!-- Пустой список -->
+                <div
+                    v-else
+                    class="text-center py-20 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-slate-900/50 rounded-2xl"
+                >
+                    <UIcon
+                        name="i-heroicons-shopping-bag-open"
+                        class="w-20 h-20 text-gray-400 dark:text-gray-500 mx-auto mb-4"
+                    />
+                    <h3
+                        class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                    >
+                        Товары в этой категории скоро появятся
+                    </h3>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                        Следите за обновлениями ассортимента
+                    </p>
+                </div>
             </div>
-        </div>
-    </UContainer>
+        </UContainer>
+    
 </template>
+
+<style scoped>
+    .category-title {
+        text-transform: uppercase;
+    }
+</style>
