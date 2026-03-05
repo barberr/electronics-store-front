@@ -61,20 +61,21 @@
                     square
                     class="hidden sm:inline-flex"
                 />
-                <!-- 🛒 КОРЗИНА - НОВАЯ КНОПКА -->
+                <!-- КОРЗИНА - НОВАЯ КНОПКА -->
                 <UButton
                     icon="i-lucide-shopping-cart"
                     variant="ghost"
                     color="neutral"
-                    :class="cartItemsCount > 0 ? 'text-accent-300' : 'text-text-400'"
+                    class="relative"
+                    :class="cart.cartItemsCount.value > 0 ? 'text-accent-300' : 'text-text-400'"
                     @click="goToCart"
                     aria-label="Корзина"
                 >
                     <span 
-                    v-if="cartItemsCount > 0" 
+                    v-if="cart.cartItemsCount.value > 0" 
                     class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                     >
-                    {{ cartItemsCount }}
+                    {{ cart.cartItemsCount }}
                     </span>
                 </UButton>
                 <!-- Телефоны только на lg+ -->
@@ -520,23 +521,17 @@ import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 import { computed, ref, onMounted } from 'vue';
-import useCart from '~/composables/useCart';
+import { useCart } from '~/composables/useCart';
 
+// ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЧЕРЕЗ STORE
+// доступ к функциям через cart.function & authStore.function
+const cart = useCart();
 const authStore = useAuthStore();
-
-const { 
-  cart, 
-  loading: cartLoading, 
-  error: cartError, 
-  fetchCart,
-  getTotalItems,
-  getTotalPrice 
-} = useCart();
 
 // ✅ Реактивные refs (рекомендуется)
 const { user, isAuthenticated, isInitialized, initError, logout } =
     storeToRefs(authStore);
-// const userDisplayName = '';
+    
 const userDisplayName = computed(() => {
     // ✅ Безопасно: проверяем user.value ДО доступа к свойствам
     if (!user.value) return '';
@@ -691,8 +686,8 @@ const loadProducts = async (categoryId: number) => {
 };
 
 // 📊 Реактивные вычисляемые свойства для корзины
-const cartItemsCount = computed(() => getTotalItems());
-const cartTotalPrice = computed(() => getTotalPrice());
+// const cartItemsCount = computed(() => getTotalItems());
+// const cartTotalPrice = computed(() => getTotalPrice());
 
 // 🧭 Метод навигации в корзину
 const goToCart = () => {
@@ -708,17 +703,23 @@ onMounted(async () => {
         }
     }
     // console.log('mobileMenu', mobileMenu);
+    
+    // ✅ ЗАГРУЗКА КОРЗИНЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ (включая анонимов!)
+    try {
+      await cart.fetchCart(); // ← Работает через сессию даже без авторизации
+    } catch (err) {
+      console.warn('Не удалось загрузить корзину:', err);
+    }
     fetchCategories();
-    await fetchCart();
 });
-watch(isAuthenticated, async (newAuthStatus) => {
-  if (process.client) {
-    // Небольшая задержка для стабильности
-    setTimeout(async () => {
-      await fetchCart();
-    }, 100);
-  }
-});
+// watch(isAuthenticated, async (newAuthStatus) => {
+//   if (process.client) {
+//     // Небольшая задержка для стабильности
+//     setTimeout(async () => {
+//       await fetchCart();
+//     }, 100);
+//   }
+// });
 
 </script>
 

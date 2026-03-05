@@ -52,7 +52,7 @@
           </p>
 
           <div class="flex flex-col sm:flex-row justify-center gap-4">
-            <UButton
+            <!-- <UButton
               v-if="hero.button_text"
               :to="hero.button_link || `/products/${hero.product_slug}`"
               size="xl"
@@ -61,7 +61,7 @@
               icon="i-heroicons-shopping-bag"
             >
               {{ hero.button_text }}
-            </UButton>
+            </UButton> -->
             <UButton
               v-if="hero.product"
               :to="`/products/${hero.product_slug}`"

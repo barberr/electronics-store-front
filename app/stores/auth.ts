@@ -140,6 +140,77 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const register = async (credentials: {
+        username: string;
+        email: string;
+        password: string;
+        password2: string;
+        first_name?: string;
+        last_name?: string;
+    }) => {
+        try {
+            // Очищаем предыдущие токены перед регистрацией
+            tokens.value = null;
+            user.value = null;
+            localStorage.removeItem('auth_tokens');
+            
+            // Отправляем запрос на регистрацию
+            const { data } = await api.post('/auth/register/', {
+                username: credentials.username.trim(),
+                email: credentials.email.trim(),
+                password: credentials.password,
+                password2: credentials.password2,
+                first_name: credentials.first_name?.trim() || '',
+                last_name: credentials.last_name?.trim() || '',
+            });
+
+            // ✅ ВАЖНО: В текущей реализации DRF RegisterView НЕ возвращает токены
+            // Поэтому после регистрации перенаправляем на страницу входа
+            // с флагом успешной регистрации
+            
+            return { 
+                success: true,
+                message: 'Регистрация успешна! Теперь вы можете войти в аккаунт.',
+                user: data 
+            };
+        } catch (error: any) {
+            console.error('Registration error:', error);
+            
+            // Обработка ошибок валидации DRF
+            let errors: Record<string, string[]> = {};
+            let errorMessage = 'Ошибка регистрации. Проверьте введенные данные.';
+            
+            if (error.response?.data) {
+                // DRF возвращает ошибки в формате { поле: [сообщения] }
+                if (typeof error.response.data === 'object') {
+                    // Фильтруем системные поля (например, 'detail')
+                    Object.keys(error.response.data).forEach(key => {
+                        if (key !== 'detail' && Array.isArray(error.response.data[key])) {
+                            errors[key] = error.response.data[key];
+                        }
+                    });
+                    
+                    // Получаем общее сообщение об ошибке
+                    if (error.response.data.detail) {
+                        errorMessage = error.response.data.detail;
+                    } else if (error.response.data.non_field_errors) {
+                        errorMessage = error.response.data.non_field_errors[0];
+                    } else if (Object.keys(errors).length > 0) {
+                        // Берем первую ошибку из любого поля
+                        const firstErrorField = Object.keys(errors)[0];
+                        errorMessage = errors[firstErrorField][0];
+                    }
+                }
+            }
+            
+            return { 
+                success: false, 
+                error: errorMessage,
+                errors: errors 
+            };
+        }
+    };
+
     return {
         // Состояние
         user,
@@ -154,5 +225,6 @@ export const useAuthStore = defineStore('auth', () => {
         logout,
         refreshToken,
         fetchProfile,
+        register,
     };
 });

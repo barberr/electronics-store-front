@@ -122,4 +122,31 @@ export interface HeroBlockResponse {
     results: HeroBlock[];
 }
 
+export interface CartItemAttribute {
+  [key: string]: string;
+}
+
+export interface CartItem {
+  id: number;                    // ID элемента корзины (не варианта!)
+  variant: number;              // ID варианта товара
+  variant_name: string;         // Название варианта (например, "iPhone 17 Pro Max")
+  variant_attributes: CartItemAttribute; // Атрибуты: { "memory": "2Tb", "color": "Cosmic Orange" }
+  variant_price: string;        // Цена как строка "147790.00"
+  variant_image: string | null; // Путь к изображению или null
+  quantity: number;             // Количество
+  added_at: string;             // ISO дата добавления
+}
+
+export interface CartState {
+  id: number;                   // ID корзины
+  status: 'active' | 'pending' | 'completed' | 'abandoned';
+  items: CartItem[];
+  created_at: string;
+  updated_at: string;
+  
+  // Вычисляемые поля (не приходят от API, но удобны для использования)
+  total_items?: number;         // Сумма всех quantity
+  total_price?: number;         // Сумма всех (variant_price * quantity)
+}
+
 

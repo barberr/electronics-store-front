@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch, ref } from 'vue';
 import { useFormatPrice } from '~/composables/useFormatPrice';
-import useCart from '~/composables/useCart';
+
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
@@ -11,8 +11,15 @@ const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
 
 const api = useApi();
-const { addToCart } = useCart();
+const cart = useCart();
 const { formatPrice } = useFormatPrice();
+
+onMounted(() => {
+  if (!cart.cart.value) {
+    cart.fetchCart();
+  }
+  console.log('Cart -', cart);
+});
 
 // Вычисляемые свойства
 const minPrice = computed(() => {
@@ -130,13 +137,11 @@ const fetchProduct = async () => {
     }
 };
 
-watch(
-    () => slug.value,
-    () => {
-        if (slug.value) fetchProduct();
-    },
-    { immediate: true },
-);
+watch(slug, (newSlug, oldSlug) => {
+  if (newSlug && newSlug !== oldSlug) {
+    fetchProduct();
+  }
+}, { immediate: true });
 
 useSeoMeta({
     title: () => product.value?.seo_title || product.value?.name || 'Товар',
@@ -151,7 +156,7 @@ const addToCartHandler = async () => {
         console.warn('Нет выбранного варианта');
         return;
     }
-    await addToCart(selectedVariant.value.id, 1);
+    await cart.addToCart(selectedVariant.value.id, 1);
 };
 
 const selectAttributeFromVariant = (variant: ProductVariant) => {

@@ -35,7 +35,6 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { PageGrid, PageCard } from '@nuxt/ui';
 import useApi from '~/composables/useApi';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 const { formatPrice } = useFormatPrice();
