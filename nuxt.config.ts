@@ -58,6 +58,11 @@ export default defineNuxtConfig({
             },
         },
     },
+    vite: {
+        build: {
+        sourcemap: false
+        }
+    },
     // Настройки для продакшена
     nitro: {
         preset: 'node-server',
