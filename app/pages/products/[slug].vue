@@ -85,6 +85,12 @@ const variantGroups = computed(() => {
     );
 });
 
+const variantCards = computed(() => {
+    return variantGroups.value
+        .map((group) => group[0])
+        .filter((variant): variant is ProductVariant => Boolean(variant));
+});
+
 // Доступные атрибуты
 const availableAttributes = computed(() => {
     const attrs: Record<string, string[]> = {};
@@ -380,7 +386,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 v-for="value in values"
                                                 :key="value"
                                                 size="sm"
-                                                color="gray"
+                                                color="neutral"
                                                 variant="soft"
                                                 class="capitalize"
                                                 @click="selectAttribute(attrName, value)"
@@ -433,17 +439,17 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
                                 >
                                     <UCard
-                                        v-for="group in variantGroups.slice(
+                                        v-for="variant in variantCards.slice(
                                             0,
                                             expandedVariants ? undefined : 3,
                                         )"
-                                        :key="group[0].id"
+                                        :key="variant.id"
                                         class="p-4 hover:shadow-md transition-all cursor-pointer border-2 hover:border-primary-200"
                                         :class="{
                                             'ring-2 ring-primary-500 border-primary-500 bg-primary-50 dark:bg-primary-950/50':
-                                                selectedVariant && selectedVariant.id === group[0].id,
+                                                selectedVariant && selectedVariant.id === variant.id,
                                         }"
-                                        @click="selectAttributeFromVariant(group[0])"
+                                        @click="selectAttributeFromVariant(variant)"
                                     >
                                         <div class="space-y-2">
                                             <!-- Атрибуты -->
@@ -451,7 +457,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 class="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400"
                                             >
                                                 <span
-                                                    v-for="(value, key) in group[0].attributes"
+                                                    v-for="(value, key) in variant.attributes"
                                                     :key="key"
                                                     class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full"
                                                 >
@@ -469,31 +475,31 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                     {{
                                                         formatPrice(
                                                             parseFloat(
-                                                                group[0].price,
+                                                                variant.price,
                                                             ),
                                                         )
                                                     }}
                                                 </span>
                                                 <UBadge
                                                     :color="
-                                                        group[0].stock &&
-                                                        group[0].stock > 0
-                                                            ? 'green'
-                                                            : 'gray'
+                                                        variant.stock &&
+                                                        variant.stock > 0
+                                                            ? 'success'
+                                                            : 'neutral'
                                                     "
                                                     size="sm"
                                                 >
-                                                    {{ group[0].stock || 0 }}
+                                                    {{ variant.stock || 0 }}
                                                     шт.
                                                 </UBadge>
                                             </div>
 
                                             <!-- Артикул -->
                                             <div
-                                                v-if="group[0].sku"
+                                                v-if="variant.sku"
                                                 class="text-xs text-gray-500 dark:text-gray-400"
                                             >
-                                                Арт.: {{ group[0].sku }}
+                                                Арт.: {{ variant.sku }}
                                             </div>
                                         </div>
                                     </UCard>

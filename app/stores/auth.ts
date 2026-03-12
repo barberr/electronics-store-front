@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Инициализация (только клиент)
     const initialize = async () => {
-        if (!process.client || isInitialized.value) return true;
+        if (!import.meta.client || isInitialized.value) return true;
 
         try {
             isInitialized.value = false;
@@ -198,7 +198,10 @@ export const useAuthStore = defineStore('auth', () => {
                     } else if (Object.keys(errors).length > 0) {
                         // Берем первую ошибку из любого поля
                         const firstErrorField = Object.keys(errors)[0];
-                        errorMessage = errors[firstErrorField][0];
+                        const firstError = firstErrorField ? errors[firstErrorField]?.[0] : null;
+                        if (firstError) {
+                            errorMessage = firstError;
+                        }
                     }
                 }
             }

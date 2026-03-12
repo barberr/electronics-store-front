@@ -1,104 +1,186 @@
-// composables/useApi.ts
-import axios from 'axios';
-import { useRequestHeaders } from 'nuxt/app';
+import axios, { AxiosHeaders } from 'axios';
+import type {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig
+} from 'axios';
+import { navigateTo, useRequestHeaders, useRuntimeConfig } from 'nuxt/app';
 
-// Расширяем типы axios, чтобы TS не ругался
 declare module 'axios' {
-    export interface AxiosRequestConfig {
-        skipAuth?: boolean;
-    }
+  export interface AxiosRequestConfig {
+    skipAuth?: boolean;
+    _retry?: boolean;
+  }
 }
-const baseURL = process.env.NODE_ENV === 'production' // В хависимости от профиля сам подставится нужный endpoint
-  ? 'https://izistore.info/api/'
-  : 'http://127.0.0.1:8000/api/'
-const api = axios.create({
-    // baseURL: 'http://127.0.0.1:8000/api/',
-    // baseURL: 'http://10.10.4.12:8000/api/', // ← твой DRF API
-    // baseURL: 'https://94.241.171.81/api/',
-    // baseURL: 'https://izistore.info/api/',
-    baseURL,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': 'Token xxx' — если нужна аутентификация
-    },
-    withCredentials: true,
-});
 
-// Перехватчик запросов — добавляем токен
-api.interceptors.request.use((config) => {
-  // SSR: передаём куки из входящего запроса
-  if (process.server) {
-    const headers = useRequestHeaders(['cookie']);
-    if (headers.cookie) {
-      config.headers.cookie = headers.cookie;
-    }
+let apiInstance: AxiosInstance | null = null;
+let refreshPromise: Promise<string | null> | null = null;
+
+function setHeader(
+  headers: InternalAxiosRequestConfig['headers'],
+  key: string,
+  value: string
+) {
+  const normalizedHeaders = headers instanceof AxiosHeaders
+    ? headers
+    : new AxiosHeaders(headers);
+
+  normalizedHeaders.set(key, value);
+  return normalizedHeaders;
+}
+
+function getApiBase() {
+  const config = useRuntimeConfig();
+  return config.public.apiBase || (
+    import.meta.dev
+      ? 'http://127.0.0.1:8000/api/'
+      : 'https://izistore.info/api/'
+  );
+}
+
+async function refreshAccessToken(apiBase: string) {
+  if (refreshPromise) {
+    return refreshPromise;
   }
 
-  // Клиент: добавляем JWT из localStorage
-  if (process.client && !config.skipAuth) {
+  refreshPromise = (async () => {
+    if (!import.meta.client) {
+      return null;
+    }
+
     const tokensStr = localStorage.getItem('auth_tokens');
-    if (tokensStr) {
-      try {
-        const tokens = JSON.parse(tokensStr);
-        if (tokens.access) {
-          config.headers.Authorization = `Bearer ${tokens.access}`;
+    if (!tokensStr) {
+      return null;
+    }
+
+    let tokens: { access?: string; refresh?: string };
+
+    try {
+      tokens = JSON.parse(tokensStr);
+    } catch {
+      localStorage.removeItem('auth_tokens');
+      return null;
+    }
+
+    if (!tokens.refresh) {
+      localStorage.removeItem('auth_tokens');
+      return null;
+    }
+
+    const { data } = await axios.post(
+      new URL('auth/token/refresh/', apiBase).toString(),
+      { refresh: tokens.refresh },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
         }
-      } catch (e) {
-        console.warn('Failed to parse auth tokens from localStorage');
+      }
+    );
+
+    const nextTokens = {
+      access: data.access,
+      refresh: tokens.refresh
+    };
+
+    localStorage.setItem('auth_tokens', JSON.stringify(nextTokens));
+    return nextTokens.access ?? null;
+  })();
+
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
+function createApiClient(): AxiosInstance {
+  const apiBase = getApiBase();
+
+  const api = axios.create({
+    baseURL: apiBase,
+    timeout: 10000,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    if (import.meta.server) {
+      const headers = useRequestHeaders(['cookie']);
+      if (headers.cookie) {
+        config.headers = setHeader(config.headers, 'cookie', headers.cookie);
       }
     }
-  }
 
-  return config;
-});
+    if (import.meta.client && !config.skipAuth) {
+      const tokensStr = localStorage.getItem('auth_tokens');
+      if (tokensStr) {
+        try {
+          const tokens = JSON.parse(tokensStr);
+          if (tokens.access) {
+            config.headers = setHeader(config.headers, 'Authorization', `Bearer ${tokens.access}`);
+          }
+        } catch {
+          localStorage.removeItem('auth_tokens');
+          console.warn('Invalid auth_tokens in localStorage');
+        }
+      }
+    }
 
-// Перехватчик ответов — авто-рефреш при 401
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+    return config;
+  });
 
-    // Повторная попытка при 401 (не более 1 раза)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+  api.interceptors.response.use(
+    response => response,
+    async (error: AxiosError) => {
+      const originalRequest = error.config;
+
+      if (
+        !originalRequest ||
+        originalRequest.skipAuth ||
+        originalRequest._retry ||
+        error.response?.status !== 401
+      ) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
+      if (!import.meta.client) {
+        return Promise.reject(error);
+      }
+
       try {
-        // Пытаемся обновить токен
-        const tokensStr = localStorage.getItem('auth_tokens');
-        if (tokensStr) {
-          const tokens = JSON.parse(tokensStr);
-          if (tokens.refresh) {
-            const refreshResponse = await axios.post(`${baseURL}auth/token/refresh/`, {
-              refresh: tokens.refresh,
-            });
+        const accessToken = await refreshAccessToken(apiBase);
 
-            const newTokens = {
-              access: refreshResponse.data.access,
-              refresh: tokens.refresh,
-            };
-
-            localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
-
-            // Повторяем запрос с новым токеном
-            originalRequest.headers.Authorization = `Bearer ${newTokens.access}`;
-            return api(originalRequest);
-          }
+        if (!accessToken) {
+          throw error;
         }
+
+        originalRequest.headers = setHeader(
+          originalRequest.headers,
+          'Authorization',
+          `Bearer ${accessToken}`
+        );
+
+        return api(originalRequest);
       } catch (refreshError) {
-        // Очищаем токены при ошибке рефреша
         localStorage.removeItem('auth_tokens');
-        if (process.client) {
-          window.location.href = '/login';
-        }
+        await navigateTo('/login');
+        return Promise.reject(refreshError);
       }
     }
+  );
 
-    return Promise.reject(error);
-  }
-);
-
-// ✅ Экспортируем как композабл (возвращает инстанс axios)
-export default function useApi() {
   return api;
+}
+
+export default function useApi() {
+  if (!apiInstance) {
+    apiInstance = createApiClient();
+  }
+
+  return apiInstance;
 }

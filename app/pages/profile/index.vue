@@ -10,7 +10,7 @@ definePageMeta({
 });
 
 const authStore = useAuthStore();
-const { user, isAuthenticated, logout } = storeToRefs(authStore);
+const { user, isAuthenticated } = storeToRefs(authStore);
 
 const loading = ref(true);
 const profileError = ref('');
@@ -42,10 +42,16 @@ const formatDate = (dateString: string) => {
 
 const handleLogout = async () => {
     try {
-        await logout();
+        await authStore.logout();
         // navigateTo выполняется в logout()
     } catch (error) {
         console.error('Logout error:', error);
+    }
+};
+
+const reloadPage = () => {
+    if (import.meta.client) {
+        window.location.reload();
     }
 };
 </script>
@@ -269,7 +275,7 @@ const handleLogout = async () => {
                     <UButton
                         color="neutral"
                         variant="outline"
-                        @click="window.location.reload()"
+                        @click="reloadPage"
                     >
                         Обновить
                     </UButton>

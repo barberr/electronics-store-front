@@ -60,7 +60,7 @@
                     <UAlert
                         v-if="error"
                         icon="i-heroicons-exclamation-triangle"
-                        color="red"
+                        color="error"
                         variant="soft"
                         class="text-red-600"
                         :title="error"
@@ -106,8 +106,7 @@ definePageMeta({
     middleware: 'guest',
 });
 
-const { isAuthenticated, login } = useAuthStore(); // Используй store
-const router = useRouter();
+const { login } = useAuthStore();
 
 const form = reactive({
     username: '',

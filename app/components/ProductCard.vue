@@ -49,7 +49,7 @@ onMounted(() => {
     >
         <UCard
             class="w-72 md:w-80 h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border dark:border-accent-800 bg-surface-950 dark:bg-surface-950 ring-0 hover:ring-accent-400/30"
-            :ui="{ body: { padding: 'p-0' } }"
+            :ui="{ body: 'p-0' }"
         >
             <!-- Изображение -->
             <div

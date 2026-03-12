@@ -1,16 +1,36 @@
 // app/stores/cart.ts
+import { useToast } from '#imports';
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import useApi from '~/composables/useApi';
-import type { CartItem, CartState } from '~/types/cart';
+import type { CartState } from '~/types/product';
 
 export const useCartStore = defineStore('cart', () => {
   const api = useApi();
+  const toast = useToast();
 
   // Состояние
   const cart = ref<CartState | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
+
+  function enrichCart(data: CartState): CartState {
+    const total_items = data.total_items ?? data.items.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+
+    const total_price = data.total_price ?? data.items.reduce(
+      (sum, item) => sum + (parseFloat(item.variant_price) || 0) * item.quantity,
+      0
+    );
+
+    return {
+      ...data,
+      total_items,
+      total_price,
+    };
+  }
 
   // ✅ Вычисляемые свойства (на основе реальных данных из API)
   const cartItemsCount = computed(() => {
@@ -42,16 +62,7 @@ export const useCartStore = defineStore('cart', () => {
       const { data } = await api.get('/v1/cart/');
       
       // ✅ Добавляем вычисляемые поля для удобства использования
-      const enrichedCart: CartState = {
-        ...data,
-        total_items: data.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-        total_price: data.items.reduce((sum: number, item: CartItem) => {
-          const price = parseFloat(item.variant_price) || 0;
-          return sum + price * item.quantity;
-        }, 0),
-      };
-
-      cart.value = enrichedCart;
+      cart.value = enrichCart(data)
       return cart.value;
     } catch (err: any) {
       handleError(err, 'Не удалось загрузить корзину');
@@ -75,16 +86,7 @@ export const useCartStore = defineStore('cart', () => {
       });
 
       // ✅ Обогащаем ответ вычисляемыми полями
-      const enrichedCart: CartState = {
-        ...data,
-        total_items: data.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-        total_price: data.items.reduce((sum: number, item: CartItem) => {
-          const price = parseFloat(item.variant_price) || 0;
-          return sum + price * item.quantity;
-        }, 0),
-      };
-
-      cart.value = enrichedCart;
+      cart.value = enrichCart(data)
 
       showNotification({
         title: 'Товар добавлен',
@@ -114,16 +116,7 @@ export const useCartStore = defineStore('cart', () => {
         quantity,
       });
 
-      const enrichedCart: CartState = {
-        ...data,
-        total_items: data.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-        total_price: data.items.reduce((sum: number, item: CartItem) => {
-          const price = parseFloat(item.variant_price) || 0;
-          return sum + price * item.quantity;
-        }, 0),
-      };
-
-      cart.value = enrichedCart;
+      cart.value = enrichCart(data)
 
       showNotification({
         title: 'Корзина обновлена',
@@ -148,20 +141,12 @@ export const useCartStore = defineStore('cart', () => {
       loading.value = true;
       error.value = null;
 
-      const { data } = await api.delete('/v1/cart/remove_item/', 
-         { item_id: cartItemId }, // ← ID элемента корзины
+      const { data } = await api.delete('/v1/cart/remove_item/', {
+         data: { item_id: cartItemId }, // ← ID элемента корзины
+       }
       );
 
-      const enrichedCart: CartState = {
-        ...data,
-        total_items: data.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
-        total_price: data.items.reduce((sum: number, item: CartItem) => {
-          const price = parseFloat(item.variant_price) || 0;
-          return sum + price * item.quantity;
-        }, 0),
-      };
-
-      cart.value = enrichedCart;
+      cart.value = enrichCart(data)
 
       showNotification({
         title: 'Товар удален',
@@ -182,7 +167,7 @@ export const useCartStore = defineStore('cart', () => {
   // Очистить корзину
   // ============================================
   const clearCart = async () => {
-    if (process.client) {
+    if (import.meta.client) {
       const confirmed = window.confirm('Вы уверены, что хотите очистить корзину?');
       if (!confirmed) return false;
     }
@@ -193,13 +178,7 @@ export const useCartStore = defineStore('cart', () => {
 
       const { data } = await api.delete('/v1/cart/clear/');
       
-      const enrichedCart: CartState = {
-        ...data,
-        total_items: 0,
-        total_price: 0,
-      };
-
-      cart.value = enrichedCart;
+      cart.value = enrichCart(data)
 
       showNotification({
         title: 'Корзина очищена',
@@ -232,7 +211,7 @@ export const useCartStore = defineStore('cart', () => {
         type: 'success',
       });
 
-      if (data.next_step && process.client) {
+      if (data.next_step && import.meta.client) {
         window.location.href = data.next_step;
       }
 
@@ -274,12 +253,11 @@ export const useCartStore = defineStore('cart', () => {
     description: string;
     type: 'success' | 'error' | 'info';
   }) => {
-    if (process.client && window.$nuxt?.$notify) {
-      window.$nuxt.$notify({
+    if (import.meta.client) {
+      toast.add({
         title: notification.title,
-        message: notification.description,
-        type: notification.type,
-        duration: 3000,
+        description: notification.description,
+        color: notification.type === 'error' ? 'error' : notification.type
       });
     } else {
       console.log(`[${notification.type}] ${notification.title}: ${notification.description}`);

@@ -1,6 +1,6 @@
 // app/middleware/guest.ts
 export default defineNuxtRouteMiddleware((to, from) => {
-    if (process.server) {
+    if (import.meta.server) {
         return;
     }
     const { isAuthenticated } = useAuth();

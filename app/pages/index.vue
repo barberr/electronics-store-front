@@ -25,8 +25,7 @@
             >
                 <ProductCard 
                     class="rounded-lg"
-                    :product="item" 
-                     @add-to-cart=""
+                    :product="item"
                 />
                 <!-- <img :src="item" width="234" height="234" class="rounded-lg"> -->
             </UCarousel>
@@ -36,8 +35,6 @@
 </template>
 <script setup lang="ts">
 import useApi from '~/composables/useApi';
-import { useFormatPrice } from '~/composables/useFormatPrice';
-const { formatPrice } = useFormatPrice();
 
 const products = ref<Product[]>([]);
 const popularProducts = ref<Product[]>([]);
@@ -53,6 +50,25 @@ const sortOptions = [
     { label: 'По наличию (мало → много)', value: 'stock' },
 ];
 
+const getProductMinPrice = (product: Product) => {
+    const activeVariants = product.variants.filter((variant) => variant.is_active);
+    const prices = activeVariants
+        .map((variant) => parseFloat(variant.price))
+        .filter((price) => !Number.isNaN(price));
+
+    return prices.length ? Math.min(...prices) : Number.POSITIVE_INFINITY;
+};
+
+const getProductStock = (product: Product) => {
+    return product.variants.reduce((sum, variant) => {
+        if (!variant.is_active || variant.stock === null) {
+            return sum;
+        }
+
+        return sum + variant.stock;
+    }, 0);
+};
+
 const sortedProducts = computed(() => {
     return [...products.value].sort((a, b) => {
         switch (sortBy.value) {
@@ -60,16 +76,16 @@ const sortedProducts = computed(() => {
                 return a.name.localeCompare(b.name);
 
             case 'price':
-                return parseFloat(a.price) - parseFloat(b.price);
+                return getProductMinPrice(a) - getProductMinPrice(b);
 
             case '-price':
-                return parseFloat(b.price) - parseFloat(a.price);
+                return getProductMinPrice(b) - getProductMinPrice(a);
 
             case 'stock':
-                return a.stock - b.stock;
+                return getProductStock(a) - getProductStock(b);
 
             case '-stock':
-                return b.stock - a.stock;
+                return getProductStock(b) - getProductStock(a);
 
             default:
                 return 0;

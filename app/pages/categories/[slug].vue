@@ -1,11 +1,15 @@
 <!-- app/pages/category/[slug].vue -->
 <script setup lang="ts">
 import { useFormatPrice } from '~/composables/useFormatPrice';
+import { useCart } from '~/composables/useCart';
+import type { CategoryResponse, Product } from '~/types/product';
 
 const route = useRoute();
 const slug = computed(() => route.params.slug as string);
 const { formatPrice } = useFormatPrice();
 const api = useApi();
+const cart = useCart();
+const toast = useToast();
 
 // // --- Интерфейсы ---
 // interface Product {
@@ -28,7 +32,7 @@ const api = useApi();
 // }
 
 // --- Состояние ---
-const category = ref<Category | null>(null);
+const category = ref<CategoryResponse | null>(null);
 const products = ref<Product[]>([]);
 const pending = ref(true);
 const error = ref<any>(null);
@@ -70,6 +74,30 @@ const fetchCategoryData = async () => {
     } finally {
         pending.value = false;
     }
+};
+
+const refreshCategory = () => {
+    pending.value = true;
+    error.value = null;
+    fetchCategoryData();
+};
+
+const addToCart = async (product: Product) => {
+    const availableVariant = product.variants.find(
+        variant => variant.is_active && (variant.stock === null || variant.stock > 0)
+    );
+
+    if (!availableVariant) {
+        toast.add({
+            title: 'Нет в наличии',
+            description: 'У товара сейчас нет доступных вариантов',
+            color: 'warning',
+            icon: 'i-heroicons-exclamation-triangle'
+        });
+        return;
+    }
+
+    await cart.addToCart(availableVariant.id, 1);
 };
 
 // --- Watcher для навигации ---
@@ -116,7 +144,7 @@ useSeoMeta({
             <!-- Ошибка -->
             <UAlert
                 v-else-if="error"
-                color="red"
+                color="error"
                 title="Ошибка загрузки"
                 class="mb-8"
             >

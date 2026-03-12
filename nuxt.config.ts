@@ -12,34 +12,21 @@ export default defineNuxtConfig({
     },
 
     ui: {
-        global: true,
         fonts: false,
-        icons: ['heroicons', 'simple-icons', 'lucide'],
     },
 
     icon: {
-        server: false, // Отключаем серверный API для иконок
-        client: true, // Используем только клиентские иконки
-    },
-
-    googleFonts: {
-        families: {
-            Inter: true,
-            Manrope: true,
-        },
-        subsets: ['latin', 'latin-ext', 'cyrillic', 'cyrillic-ext'],
-        display: 'swap',
-        preload: true,
+        provider: 'iconify',
+        serverBundle: {
+            collections: ['heroicons', 'simple-icons', 'lucide']
+        }
     },
 
     css: ['~/assets/css/main.css'],
 
     image: {
         // Разрешите внешние домены вашего API
-        domains:
-            process.env.NODE_ENV === 'production'
-                ? ['94.241.171.81']
-                : ['10.10.4.12:8000'],
+        domains: import.meta.dev ? ['10.10.4.12:8000'] : ['94.241.171.81'],
         // domains: ['10.10.4.12:8000'],
         // domains: ['94.241.171.81'],
         // Используйте IPX для обработки изображений
@@ -85,6 +72,10 @@ export default defineNuxtConfig({
     ssr: true,
     experimental: {
         payloadExtraction: false,
-        inlineSSRStyles: false,
     },
+    runtimeConfig: {
+        public: {
+            apiBase: ''
+        }
+    }
 });

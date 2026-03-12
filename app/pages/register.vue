@@ -150,7 +150,7 @@
           <UAlert
             v-if="errorMessage"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             class="text-red-600"
             :title="errorMessage"
@@ -197,7 +197,6 @@ definePageMeta({
 
 const toast = useToast()
 const authStore = useAuthStore();
-const router = useRouter();
 
 const form = reactive({
   username: '',
@@ -214,7 +213,7 @@ const fieldErrors = ref<Record<string, string[]>>({});
 
 // Валидация совпадения паролей
 const passwordMismatch = computed(() => {
-  return form.password && form.password2 && form.password !== form.password2;
+  return Boolean(form.password && form.password2 && form.password !== form.password2);
 });
 
 // Валидация формы для отключения кнопки
@@ -256,9 +255,8 @@ const handleRegister = async () => {
       toast.add({
         title: 'Регистрация успешна!',
         description: 'Теперь вы можете войти в аккаунт',
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        timeout: 5000
+        color: 'success',
+        icon: 'i-heroicons-check-circle'
       });
       
       // Перенаправляем на страницу входа
@@ -274,9 +272,8 @@ const handleRegister = async () => {
         toast.add({
         title: 'Ошибка',
         description: 'Не удалось зарегистрироваться. Попробуйте позже.',
-        color: 'red',
-        icon: 'i-heroicons-exclamation-triangle',
-        timeout: 5000
+        color: 'error',
+        icon: 'i-heroicons-exclamation-triangle'
         });
     }
   } catch (err: any) {

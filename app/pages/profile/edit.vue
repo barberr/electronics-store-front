@@ -21,6 +21,7 @@ const form = reactive({
     username: '',
     phone: '', // Добавил телефон из твоей модели
     full_name: '',
+    dob: '',
 });
 
 // Состояние
@@ -69,6 +70,7 @@ watch(
             form.username = newUser.username || '';
             form.phone = newUser.phone || '';
             form.full_name = newUser.full_name || '';
+            form.dob = newUser.dob || '';
         }
     },
     { immediate: true },

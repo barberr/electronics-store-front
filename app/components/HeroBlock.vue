@@ -66,7 +66,7 @@
               v-if="hero.product"
               :to="`/products/${hero.product_slug}`"
               size="xl"
-              color="white"
+              color="neutral"
               class="px-8 py-4 text-lg font-semibold hover:scale-105 transition-transform"
               variant="outline"
             >

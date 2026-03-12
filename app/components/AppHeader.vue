@@ -522,6 +522,7 @@ import { storeToRefs } from 'pinia';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 import { computed, ref, onMounted } from 'vue';
 import { useCart } from '~/composables/useCart';
+import type { ProductVariant } from '~/types/product';
 
 // ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЧЕРЕЗ STORE
 // доступ к функциям через cart.function & authStore.function
@@ -529,7 +530,7 @@ const cart = useCart();
 const authStore = useAuthStore();
 
 // ✅ Реактивные refs (рекомендуется)
-const { user, isAuthenticated, isInitialized, initError, logout } =
+const { user, isAuthenticated, isInitialized, initError } =
     storeToRefs(authStore);
     
 const userDisplayName = computed(() => {
@@ -570,7 +571,7 @@ const activeDropdown = ref<number | null>(null);
 const searchQuery = ref('');
 const api = useApi();
 
-const getMinPrice = (variants) => {
+const getMinPrice = (variants: ProductVariant[] | null | undefined) => {
     // Проверяем, что variants существует и является массивом
     if (!variants || !Array.isArray(variants)) {
         return '';
@@ -606,10 +607,10 @@ const mobileMenu = ref({
 });
 
 // Реактивное состояние для раскрытой категории
-const expandedCategory = ref(null);
+const expandedCategory = ref<string | null>(null);
 
 // Переключение категории
-function toggleCategory(slug) {
+function toggleCategory(slug: string) {
     expandedCategory.value = expandedCategory.value === slug ? null : slug;
 }
 
@@ -657,7 +658,7 @@ const getCategoryIcon = (slug: string): string => {
         // добавьте свои
         default: 'i-heroicons-cube',
     };
-    return icons[slug] || icons.default;
+    return icons[slug] ?? 'i-heroicons-cube';
 };
 
 const fetchCategories = async () => {
@@ -695,7 +696,7 @@ const goToCart = () => {
 };
 
 onMounted(async () => {
-    if (process.client) {
+    if (import.meta.client) {
         // ✅ Ждём полной инициализации
         const success = await authStore.initialize();
         if (!success && initError.value) {
