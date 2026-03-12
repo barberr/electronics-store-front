@@ -64,8 +64,17 @@
                         variant="soft"
                         class="text-red-600"
                         :title="error"
+                    />
+
+                    <UButton
+                        v-if="requiresVerification"
+                        :to="verificationLink"
+                        color="warning"
+                        variant="soft"
+                        block
                     >
-                    </UAlert>
+                        Подтвердить email
+                    </UButton>
 
                     <!-- Кнопка входа -->
                     <UButton
@@ -116,6 +125,21 @@ const form = reactive({
 const loading = ref(false);
 const error = ref('');
 
+const requiresVerification = computed(() => {
+    return error.value === 'Email is not verified';
+});
+
+const verificationLink = computed(() => {
+    const query = form.username.includes('@')
+        ? { email: form.username.trim() }
+        : undefined;
+
+    return {
+        path: '/verify-email',
+        query
+    };
+});
+
 const handleLogin = async () => {
     loading.value = true;
     error.value = '';
@@ -129,8 +153,7 @@ const handleLogin = async () => {
         if (result.success) {
             await navigateTo('/profile');
         } else {
-            error.value = 'Ошибка входа';
-            console.log('error.value', error.value);
+            error.value = result.error || 'Ошибка входа';
         }
     } catch (err) {
         error.value = 'Ошибка сервера. Попробуйте позже.';

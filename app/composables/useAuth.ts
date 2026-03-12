@@ -18,5 +18,8 @@ export const useAuth = () => {
         refreshToken: store.refreshToken,
         fetchProfile: store.fetchProfile,
         initialize: store.initialize,
+        register: store.register,
+        verifyEmailPin: store.verifyEmailPin,
+        resendEmailPin: store.resendEmailPin,
     };
 };

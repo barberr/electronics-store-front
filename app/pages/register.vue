@@ -251,16 +251,19 @@ const handleRegister = async () => {
     });
 
     if (result.success) {
-      // Показываем уведомление об успехе
       toast.add({
-        title: 'Регистрация успешна!',
-        description: 'Теперь вы можете войти в аккаунт',
+        title: 'Регистрация завершена',
+        description: result.message || 'Мы отправили PIN-код на ваш email',
         color: 'success',
         icon: 'i-heroicons-check-circle'
       });
-      
-      // Перенаправляем на страницу входа
-      await navigateTo('/login', { replace: true });
+
+      await navigateTo({
+        path: '/verify-email',
+        query: {
+          email: result.email || form.email
+        }
+      }, { replace: true });
     } else {
       errorMessage.value = result.error || 'Не удалось создать аккаунт';
       

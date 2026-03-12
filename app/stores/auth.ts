@@ -13,6 +13,28 @@ export const useAuthStore = defineStore('auth', () => {
 
     const api = useApi();
 
+    const applyAuthSession = async (session: {
+        access: string;
+        refresh: string;
+        user?: any;
+    }) => {
+        tokens.value = {
+            access: session.access,
+            refresh: session.refresh,
+        };
+
+        localStorage.setItem('auth_tokens', JSON.stringify(tokens.value));
+
+        if (session.user) {
+            user.value = session.user;
+        } else {
+            const { data: profileData } = await api.get('/auth/profile/');
+            user.value = profileData;
+        }
+
+        isInitialized.value = true;
+    };
+
     // ✅ Основной computed - true только при полном успехе
     const isAuthenticated = computed(() => {
         return !!tokens.value?.access && !!user.value && isInitialized.value;
@@ -55,20 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
     }) => {
         try {
             const { data } = await api.post('/auth/login/', credentials);
-
-            tokens.value = {
-                access: data.access,
-                refresh: data.refresh,
-            };
-
-            // Сохраняем токены
-            localStorage.setItem('auth_tokens', JSON.stringify(tokens.value));
-
-            // Загружаем профиль
-            const { data: profileData } = await api.get('/auth/profile/');
-            user.value = profileData;
-
-            isInitialized.value = true;
+            await applyAuthSession(data);
             return { success: true };
         } catch (error: any) {
             return {
@@ -164,14 +173,11 @@ export const useAuthStore = defineStore('auth', () => {
                 last_name: credentials.last_name?.trim() || '',
             });
 
-            // ✅ ВАЖНО: В текущей реализации DRF RegisterView НЕ возвращает токены
-            // Поэтому после регистрации перенаправляем на страницу входа
-            // с флагом успешной регистрации
-            
             return { 
                 success: true,
-                message: 'Регистрация успешна! Теперь вы можете войти в аккаунт.',
-                user: data 
+                message: data.message,
+                email: data.email,
+                verification_required: data.verification_required === true
             };
         } catch (error: any) {
             console.error('Registration error:', error);
@@ -214,6 +220,54 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const verifyEmailPin = async (payload: { email: string; pin: string }) => {
+        try {
+            const { data } = await api.post('/auth/verify-email-pin/', {
+                email: payload.email.trim(),
+                pin: payload.pin.trim(),
+            });
+
+            await applyAuthSession(data);
+
+            return {
+                success: true,
+                message: data.message,
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                error:
+                    error.response?.data?.pin?.[0] ||
+                    error.response?.data?.detail ||
+                    error.response?.data?.message ||
+                    'Не удалось подтвердить email',
+            };
+        }
+    };
+
+    const resendEmailPin = async (email: string) => {
+        try {
+            const { data } = await api.post('/auth/resend-email-pin/', {
+                email: email.trim(),
+            });
+
+            return {
+                success: true,
+                message: data.message,
+                email: data.email,
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                error:
+                    error.response?.data?.email?.[0] ||
+                    error.response?.data?.detail ||
+                    error.response?.data?.message ||
+                    'Не удалось отправить PIN повторно',
+            };
+        }
+    };
+
     return {
         // Состояние
         user,
@@ -229,5 +283,7 @@ export const useAuthStore = defineStore('auth', () => {
         refreshToken,
         fetchProfile,
         register,
+        verifyEmailPin,
+        resendEmailPin,
     };
 });
