@@ -67,15 +67,15 @@
                     variant="ghost"
                     color="neutral"
                     class="relative"
-                    :class="cart.cartItemsCount.value > 0 ? 'text-accent-300' : 'text-text-400'"
+                    :class="cartItemsCount > 0 ? 'text-accent-300' : 'text-text-400'"
                     @click="goToCart"
                     aria-label="Корзина"
                 >
                     <span 
-                    v-if="cart.cartItemsCount.value > 0" 
+                    v-if="cartItemsCount > 0" 
                     class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                     >
-                    {{ cart.cartItemsCount }}
+                    {{ cartItemsCount }}
                     </span>
                 </UButton>
                 <!-- Телефоны только на lg+ -->
@@ -520,13 +520,13 @@
 import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useFormatPrice } from '~/composables/useFormatPrice';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useCart } from '~/composables/useCart';
 import type { ProductVariant } from '~/types/product';
 
 // ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЧЕРЕЗ STORE
 // доступ к функциям через cart.function & authStore.function
-const cart = useCart();
+const { cartItemsCount, fetchCart } = useCart();
 const authStore = useAuthStore();
 
 // ✅ Реактивные refs (рекомендуется)
@@ -707,20 +707,27 @@ onMounted(async () => {
     
     // ✅ ЗАГРУЗКА КОРЗИНЫ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ (включая анонимов!)
     try {
-      await cart.fetchCart(); // ← Работает через сессию даже без авторизации
+      await fetchCart(); // ← Работает через сессию даже без авторизации
     } catch (err) {
       console.warn('Не удалось загрузить корзину:', err);
     }
     fetchCategories();
 });
-// watch(isAuthenticated, async (newAuthStatus) => {
-//   if (process.client) {
-//     // Небольшая задержка для стабильности
-//     setTimeout(async () => {
-//       await fetchCart();
-//     }, 100);
-//   }
-// });
+
+watch(
+    () => isAuthenticated.value,
+    async () => {
+        if (!import.meta.client) {
+            return;
+        }
+
+        try {
+            await fetchCart();
+        } catch (err) {
+            console.warn('Не удалось обновить корзину после смены авторизации:', err);
+        }
+    }
+);
 
 </script>
 
