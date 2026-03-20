@@ -182,8 +182,8 @@
                 <span class="font-bold">{{ formatCurrency(cartTotalPrice) }}</span>
               </div>
               <div class="flex justify-between text-text-100">
-                <span>Доставка</span>
-                <span class="text-text-400">Рассчитывается при оформлении</span>
+                <span>Доставка&nbsp;</span>
+                <span class="text-text-400"> Рассчитывается при оформлении</span>
               </div>
               <div class="border-t border-gray-200 dark:border-gray-800 pt-4 flex justify-between font-bold text-text-100 text-lg">
                 <span>Итого</span>
