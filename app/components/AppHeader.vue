@@ -131,6 +131,7 @@
             placeholder="Поиск по каталогу"
             class="w-full"
             @focus="desktopSearchFocused = true"
+            @input="desktopSearchFocused = true"
             @blur="handleDesktopSearchBlur"
             @keydown.enter.prevent="handleSearchSubmit"
           />
@@ -858,6 +859,8 @@ function handleSearchSubmit() {
 function selectSearchResult(slug: string) {
   desktopSearchFocused.value = false
   mobileMenu.value.searchOpen = false
+  searchQuery.value = ''
+  resetSearchState()
   navigateTo(`/products/${slug}`)
 }
 
