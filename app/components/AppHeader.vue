@@ -27,24 +27,167 @@
       <!-- Центральная зона: поиск -->
       <div class="flex items-center justify-center flex-1 px-2 md:px-4">
         <!-- Иконка поиска на мобильных -->
-        <UButton
+        <USlideover
+          v-model:open="mobileMenu.searchOpen"
+          title="Поиск по каталогу"
           class="md:hidden"
-          icon="i-heroicons-magnifying-glass-20-solid"
-          color="neutral"
-          variant="ghost"
-          square
-          @click="mobileMenu.searchOpen = true"
-        />
+          :close="{
+            color: 'primary',
+            variant: 'outline',
+            class: 'rounded-full'
+          }"
+        >
+          <UButton
+            class="md:hidden"
+            icon="i-heroicons-magnifying-glass-20-solid"
+            color="neutral"
+            variant="ghost"
+            square
+            @click="mobileMenu.searchOpen = true"
+          />
+
+          <template #body>
+            <div class="px-4 py-4">
+              <UInput
+                v-model="searchQuery"
+                size="lg"
+                icon="i-heroicons-magnifying-glass-20-solid"
+                placeholder="Например, iPhone 15 Pro"
+                class="w-full"
+                autofocus
+              />
+
+              <div class="mt-4">
+                <div
+                  v-if="shouldShowSearchState"
+                  class="es-search-results"
+                >
+                  <div
+                    v-if="searchPending"
+                    class="es-search-results__state"
+                  >
+                    <UIcon
+                      name="i-lucide-loader-circle"
+                      class="h-4 w-4 animate-spin"
+                    />
+                    <span>Ищем товары...</span>
+                  </div>
+
+                  <div
+                    v-else-if="searchError"
+                    class="es-search-results__state es-search-results__state_error"
+                  >
+                    {{ searchError }}
+                  </div>
+
+                  <div
+                    v-else-if="searchResults.length"
+                    class="es-search-results__list"
+                  >
+                    <button
+                      v-for="product in searchResults"
+                      :key="product.id"
+                      type="button"
+                      class="es-search-results__item"
+                      @click="selectSearchResult(product.slug)"
+                    >
+                      <div class="es-search-results__main">
+                        <span class="es-search-results__name">{{ product.name }}</span>
+                        <span class="es-search-results__category">
+                          {{ product.category?.name }}
+                        </span>
+                      </div>
+                      <span class="es-search-results__price">
+                        от {{ formatPrice(getMinPrice(product.variants)) }}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div
+                    v-else
+                    class="es-search-results__state"
+                  >
+                    Ничего не найдено
+                  </div>
+                </div>
+
+                <div
+                  v-else
+                  class="es-search-results__hint"
+                >
+                  Введите минимум 2 символа, чтобы найти товар
+                </div>
+              </div>
+            </div>
+          </template>
+        </USlideover>
 
         <!-- Поле поиска на md+ -->
-        <div class="hidden md:flex w-full max-w-md">
+        <div class="relative hidden md:flex w-full max-w-md">
           <UInput
             v-model="searchQuery"
             size="md"
             icon="i-heroicons-magnifying-glass-20-solid"
             placeholder="Поиск по каталогу"
             class="w-full"
+            @focus="desktopSearchFocused = true"
+            @blur="handleDesktopSearchBlur"
+            @keydown.enter.prevent="handleSearchSubmit"
           />
+
+          <div
+            v-if="shouldShowDesktopSearchResults"
+            class="es-search-results es-search-results_desktop"
+          >
+            <div
+              v-if="searchPending"
+              class="es-search-results__state"
+            >
+              <UIcon
+                name="i-lucide-loader-circle"
+                class="h-4 w-4 animate-spin"
+              />
+              <span>Ищем товары...</span>
+            </div>
+
+            <div
+              v-else-if="searchError"
+              class="es-search-results__state es-search-results__state_error"
+            >
+              {{ searchError }}
+            </div>
+
+            <div
+              v-else-if="searchResults.length"
+              class="es-search-results__list"
+            >
+              <button
+                v-for="product in searchResults"
+                :key="product.id"
+                type="button"
+                class="es-search-results__item"
+                @mousedown.prevent
+                @click="selectSearchResult(product.slug)"
+              >
+                <div class="es-search-results__main">
+                  <span class="es-search-results__name">{{ product.name }}</span>
+                  <span class="es-search-results__category">
+                    {{ product.category?.name }}
+                  </span>
+                </div>
+                <span class="es-search-results__price">
+                  от {{ formatPrice(getMinPrice(product.variants)) }}
+                </span>
+              </button>
+            </div>
+
+            <div
+              v-else
+              class="es-search-results__state"
+            >
+              Ничего не найдено
+            </div>
+          </div>
         </div>
       </div>
 
@@ -547,9 +690,9 @@
 import { useAuthStore } from '~/stores/auth'
 import { storeToRefs } from 'pinia'
 import { useFormatPrice } from '~/composables/useFormatPrice'
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCart } from '~/composables/useCart'
-import type { Category, ProductVariant } from '~/types/product'
+import type { Category, Product, ProductListResponse, ProductVariant } from '~/types/product'
 
 // ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЧЕРЕЗ STORE
 // доступ к функциям через cart.function & authStore.function
@@ -587,7 +730,14 @@ const { formatPrice } = useFormatPrice()
 
 const categories = ref<Category[]>([])
 const searchQuery = ref('')
+const searchResults = ref<Product[]>([])
+const searchPending = ref(false)
+const searchError = ref('')
+const searchResolved = ref(false)
+const desktopSearchFocused = ref(false)
 const api = useApi()
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let searchRequestId = 0
 
 const getMinPrice = (variants: ProductVariant[] | null | undefined) => {
   // Проверяем, что variants существует и является массивом
@@ -624,6 +774,20 @@ const mobileMenu = ref({
   activeCategory: null as number | null
 })
 
+const normalizedSearchQuery = computed(() => searchQuery.value.trim())
+const shouldShowSearchState = computed(() =>
+  normalizedSearchQuery.value.length >= 2
+  && (
+    searchPending.value
+    || searchError.value.length > 0
+    || searchResults.value.length > 0
+    || searchResolved.value
+  )
+)
+const shouldShowDesktopSearchResults = computed(() =>
+  desktopSearchFocused.value && shouldShowSearchState.value
+)
+
 // Реактивное состояние для раскрытой категории
 const expandedCategory = ref<string | null>(null)
 
@@ -636,6 +800,65 @@ function toggleCategory(slug: string) {
 function closeSlideover() {
   mobileMenu.value.open = false
   expandedCategory.value = null // опционально: сбрасывать при переходе
+}
+
+function resetSearchState() {
+  searchResults.value = []
+  searchPending.value = false
+  searchError.value = ''
+  searchResolved.value = false
+}
+
+function handleDesktopSearchBlur() {
+  window.setTimeout(() => {
+    desktopSearchFocused.value = false
+  }, 120)
+}
+
+async function fetchSearchResults(query: string) {
+  const requestId = ++searchRequestId
+
+  searchPending.value = true
+  searchError.value = ''
+  searchResolved.value = false
+
+  try {
+    const response = await api.get<ProductListResponse>('/v1/products/search/', {
+      params: { q: query },
+      skipAuth: true
+    })
+
+    if (requestId !== searchRequestId) {
+      return
+    }
+
+    searchResults.value = response.data.results ?? []
+  } catch (error: unknown) {
+    if (requestId !== searchRequestId) {
+      return
+    }
+
+    searchResults.value = []
+    searchError.value = 'Не удалось выполнить поиск'
+    console.error('Search request failed:', error)
+  } finally {
+    if (requestId === searchRequestId) {
+      searchPending.value = false
+      searchResolved.value = true
+    }
+  }
+}
+
+function handleSearchSubmit() {
+  if (searchResults.value.length > 0) {
+    selectSearchResult(searchResults.value[0].slug)
+  }
+}
+
+function selectSearchResult(slug: string) {
+  desktopSearchFocused.value = false
+  mobileMenu.value.searchOpen = false
+  navigateTo(`/products/${slug}`)
 }
 
 // Используем useAsyncData для реактивности и кэширования Nuxt
@@ -769,6 +992,24 @@ onMounted(async () => {
   fetchCategories()
 })
 
+watch(searchQuery, (value) => {
+  const query = value.trim()
+
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+
+  if (query.length < 2) {
+    searchRequestId += 1
+    resetSearchState()
+    return
+  }
+
+  searchDebounceTimer = window.setTimeout(() => {
+    fetchSearchResults(query)
+  }, 300)
+})
+
 watch(
   () => isAuthenticated.value,
   async () => {
@@ -783,6 +1024,12 @@ watch(
     }
   }
 )
+
+onBeforeUnmount(() => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+})
 </script>
 
 <style scoped>
@@ -918,6 +1165,96 @@ watch(
 
 .es-categories__item:hover {
     color: #ffffff;
+}
+
+.es-search-results {
+    border: 1px solid rgb(229 231 235 / 0.12);
+    border-radius: 1rem;
+    background: rgb(15 23 42 / 0.96);
+    box-shadow: 0 24px 48px rgb(15 23 42 / 0.28);
+    overflow: hidden;
+}
+
+.es-search-results_desktop {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    z-index: 30;
+}
+
+.es-search-results__list {
+    display: flex;
+    flex-direction: column;
+}
+
+.es-search-results__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    color: #e5e7eb;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgb(148 163 184 / 0.12);
+    transition: background-color 0.2s ease;
+}
+
+.es-search-results__item:last-child {
+    border-bottom: 0;
+}
+
+.es-search-results__item:hover {
+    background: rgb(30 41 59 / 0.92);
+}
+
+.es-search-results__main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.2rem;
+}
+
+.es-search-results__name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.es-search-results__category {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.2;
+}
+
+.es-search-results__price {
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #7dd3fc;
+    white-space: nowrap;
+}
+
+.es-search-results__state {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+.es-search-results__state_error {
+    color: #fda4af;
+}
+
+.es-search-results__hint {
+    padding: 0.8rem 0.1rem 0;
+    font-size: 0.85rem;
+    color: #94a3b8;
 }
 
 /* Адаптив */
