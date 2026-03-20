@@ -176,13 +176,13 @@
       class="block md:hidden mdflex flex-row items-center border-b border-surface-900 bg-bg-900 h-14"
     >
       <div
-        class="es-mobile-shortcuts es-container max-w-7xl flex items-center gap-2 overflow-x-auto py-2"
+        class="es-mobile-shortcuts es-container max-w-7xl flex h-full items-center gap-2 py-0"
       >
         <!-- Бургер только на мобильных -->
         <USlideover
           v-model:open="mobileMenu.open"
           title="Каталог"
-          class="md:hidden pl-8"
+          class="md:hidden"
           :close="{
             color: 'primary',
             variant: 'outline',
@@ -314,19 +314,21 @@
           </template>
         </USlideover>
 
-        <NuxtLink
-          v-for="link in appleQuickLinks"
-          :key="link.slug"
-          :to="`/categories/${link.slug}`"
-          class="es-mobile-shortcuts__item"
-          :aria-label="link.label"
-        >
-          <UIcon
-            :name="link.icon"
-            class="w-4 h-4"
-          />
-          <span>{{ link.shortLabel }}</span>
-        </NuxtLink>
+        <div class="es-mobile-shortcuts__scroll">
+          <NuxtLink
+            v-for="link in appleQuickLinks"
+            :key="link.slug"
+            :to="`/categories/${link.slug}`"
+            class="es-mobile-shortcuts__item"
+            :aria-label="link.label"
+          >
+            <UIcon
+              :name="link.icon"
+              class="w-4 h-4"
+            />
+            <span>{{ link.shortLabel }}</span>
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
@@ -942,27 +944,53 @@ watch(
 }
 
 .es-mobile-shortcuts {
+    align-items: center;
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.es-mobile-shortcuts__scroll {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0.1rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.es-mobile-shortcuts__scroll::-webkit-scrollbar {
+    display: none;
 }
 
 .es-mobile-shortcuts__item {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    justify-content: center;
+    gap: 0.28rem;
     flex: 0 0 auto;
-    padding: 0.45rem 0.7rem;
+    min-height: 1.9rem;
+    padding: 0.35rem 0.58rem;
     border: 1px solid rgb(42 48 60);
     border-radius: 9999px;
     color: #e5e7eb;
     background: rgba(17, 24, 39, 0.65);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    font-weight: 500;
     line-height: 1;
     white-space: nowrap;
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease;
+}
+
+.es-mobile-shortcuts__item :deep(.iconify) {
+    width: 0.82rem;
+    height: 0.82rem;
 }
 
 .es-mobile-shortcuts__item:hover {
