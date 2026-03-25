@@ -109,7 +109,7 @@ watch(
                         disabled
                         color="neutral"
                         variant="soft"
-                        class="bg-accent-950 text-text-100"
+                        class="bg-surface-900 text-text-100"
                     />
                 </UFormGroup>
 
@@ -213,7 +213,7 @@ watch(
 
                 <!-- Кнопки (улучшенный дизайн) -->
                 <div
-                    class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-accent-800 bg-accent-950/50 p-6 rounded-xl"
+                    class="flex flex-col sm:flex-row gap-4 pt-8 border-t border-accent-800 bg-surface-900/50 p-6 rounded-xl"
                 >
                     <UButton
                         to="/profile"

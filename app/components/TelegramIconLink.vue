@@ -52,10 +52,10 @@ const sizeClasses = {
 }
 
 const colorClasses = {
-  primary: 'text-[#26A4D9] hover:text-[#1c8dbd] transition-colors',
-  secondary: 'text-blue-500 hover:text-blue-600 transition-colors',
+  primary: 'text-accent-400 hover:text-accent-300 transition-colors',
+  secondary: 'text-text-400 hover:text-text-100 transition-colors',
   white: 'text-white hover:text-opacity-80',
-  dark: 'text-gray-800 hover:text-gray-900',
+  dark: 'text-text-100 hover:text-accent-300 transition-colors',
   custom: '' // используй wrapperClass для кастомизации
 }
 </script>

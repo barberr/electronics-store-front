@@ -85,8 +85,8 @@ const messengers = ['TG', 'WA', 'MAX'];
     margin-top: auto;
     border-top: 1px solid color-mix(in srgb, var(--color-surface-700) 70%, transparent);
     background:
-        radial-gradient(circle at top left, rgb(41 78 84 / 0.22), transparent 35%),
-        linear-gradient(180deg, var(--color-bg-950) 0%, #071116 100%);
+        radial-gradient(circle at top left, rgb(233 204 2 / 0.12), transparent 35%),
+        linear-gradient(180deg, var(--color-bg-950) 0%, color-mix(in srgb, var(--color-bg-950) 70%, var(--color-surface-900)) 100%);
 }
 
 .footer-shell {
@@ -108,7 +108,7 @@ const messengers = ['TG', 'WA', 'MAX'];
     font-size: 0.8rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--color-primary-400);
+    color: var(--color-accent-400);
 }
 
 .footer-title {
@@ -164,7 +164,7 @@ const messengers = ['TG', 'WA', 'MAX'];
 }
 
 .footer-link:hover {
-    color: var(--color-primary-300);
+    color: var(--color-accent-300);
 }
 
 .footer-bottom {

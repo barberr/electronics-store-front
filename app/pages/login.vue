@@ -65,15 +65,15 @@
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            class="text-red-600"
+            class="text-red-400"
             :title="error"
           />
 
           <UButton
             v-if="requiresVerification"
             :to="verificationLink"
-            color="warning"
-            variant="soft"
+            color="primary"
+            variant="outline"
             block
           >
             Подтвердить email
@@ -168,7 +168,7 @@ const handleLogin = async () => {
     background: linear-gradient(
         135deg,
         var(--color-bg-950) 0%,
-        var(--color-surface-900) 100%
+        color-mix(in srgb, var(--color-bg-950) 68%, var(--color-surface-900)) 100%
     );
 }
 </style>

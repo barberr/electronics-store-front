@@ -176,7 +176,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
         <div v-if="pending" class="flex justify-center py-20">
             <div class="text-center">
                 <!-- <ULoader size="xl" color="primary" class="mx-auto mb-4" /> -->
-                <p class="text-gray-500 dark:text-gray-400">
+                <p class="text-text-400">
                     Загружаем товар...
                 </p>
             </div>
@@ -186,14 +186,14 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
         <div v-else-if="error" class="text-center py-20">
             <UIcon
                 name="i-heroicons-exclamation-triangle"
-                class="w-16 h-16 text-red-400 mx-auto mb-4"
+                class="w-16 h-16 text-accent-400 mx-auto mb-4"
             />
             <h2
-                class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2"
+                class="text-2xl font-bold text-text-100 mb-2"
             >
                 Товар не найден
             </h2>
-            <p class="text-gray-500 mb-6">
+            <p class="text-text-400 mb-6">
                 Возможно, товар удален или slug изменился
             </p>
             <UButton @click="fetchProduct" color="primary"
@@ -202,21 +202,21 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
         </div>
 
         <!-- Товар найден -->
-        <div v-else-if="product" class="grid lg:grid-cols-2 gap-12 items-start">
+        <div v-else-if="product" class="grid lg:grid-cols-2 gap-6 md:gap-8 xl:gap-12 items-start">
             <!-- Изображения -->
-            <div class="space-y-6">
+            <div class="space-y-4 md:space-y-6 lg:sticky lg:top-8">
                 <!-- Главное изображение -->
-                <UCard class="overflow-hidden">
+                <UCard class="overflow-hidden border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_28%,transparent)_0%,transparent_100%)] shadow-xl md:shadow-2xl rounded-[1.5rem] md:rounded-[2rem]">
                     <div
                         v-if="!galleryImages.length"
-                        class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center"
+                        class="w-full h-[18rem] md:h-96 bg-gradient-to-br from-surface-900 to-surface-700 flex items-center justify-center"
                     >
                         <div class="text-center">
                             <UIcon
                                 name="i-heroicons-camera"
-                                class="w-20 h-20 text-gray-400 mx-auto mb-2"
+                                class="w-20 h-20 text-text-400 mx-auto mb-2"
                             />
-                            <p class="text-gray-500">
+                            <p class="text-text-400">
                                 Изображение появится позже
                             </p>
                         </div>
@@ -225,7 +225,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         v-else
                         :src="galleryImages[currentImageIndex]?.image"
                         :alt="product.name"
-                        class="w-full h-96 object-contain hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        class="w-full h-[18rem] md:h-96 object-contain p-4 md:p-6 hover:scale-105 transition-transform duration-300 cursor-pointer"
                         sizes="500px"
                         @click="
                             currentImageIndex =
@@ -237,22 +237,24 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                 <!-- Галерея миниатюр -->
                 <div
                     v-if="galleryImages.length > 1"
-                    class="grid grid-cols-5 gap-3"
+                    class="flex gap-2 overflow-x-auto pb-1 md:grid md:grid-cols-5 md:gap-3"
                 >
                     <UCard
                         v-for="(img, index) in galleryImages.slice(0, 5)"
                         :key="img.id"
-                        class="overflow-hidden cursor-pointer p-0 hover:shadow-md transition-all border-2"
+                        class="overflow-hidden cursor-pointer p-0 hover:shadow-md transition-all border-2 bg-[color:color-mix(in_srgb,var(--color-bg-950)_84%,var(--color-surface-900))] shrink-0 w-16 md:w-auto rounded-2xl"
                         :class="{
-                            'ring-2 ring-primary-500 border-primary-500':
+                            'ring-2 ring-accent-400 border-accent-400':
                                 currentImageIndex === index,
+                            'border-surface-900':
+                                currentImageIndex !== index,
                         }"
                         @click="currentImageIndex = index"
                     >
                         <NuxtImg
                             :src="img.image"
                             :alt="`${product.name} - изображение ${index + 1}`"
-                            class="w-full h-20 object-contain"
+                            class="w-full h-16 md:h-20 object-contain p-1"
                             sizes="100px"
                         />
                     </UCard>
@@ -260,18 +262,18 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
             </div>
 
             <!-- Информация о товаре -->
-            <div class="space-y-8">
+            <div class="space-y-5 md:space-y-8">
                 <!-- Заголовок и бренд -->
-                <div class="space-y-3">
-                    <div class="flex items-start justify-between gap-4 mb-4">
+                <div class="space-y-3 rounded-[1.5rem] md:rounded-[1.75rem] border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_20%,transparent)_0%,transparent_100%)] p-4 md:p-6 shadow-xl">
+                    <div class="flex items-start justify-between gap-3 md:gap-4 mb-2 md:mb-4">
                         <div>
                             <h1
-                                class="text-3xl lg:text-4xl font-bold text-text-900 leading-tight"
+                                class="text-2xl md:text-3xl lg:text-4xl font-bold text-text-900 leading-tight"
                             >
                                 {{ product.name }}
                             </h1>
                             <div
-                                class="flex items-center gap-3 mt-3 text-sm text-text-100"
+                                class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-3 text-xs md:text-sm text-text-100"
                             >
                                 <NuxtLink
                                     v-if="product.brand"
@@ -296,7 +298,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         <NuxtLink
                             v-if="product.brand?.logo"
                             :to="`/brands/${product.brand.slug}`"
-                            class="w-16 h-16 p-3 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shrink-0"
+                            class="w-12 h-12 md:w-16 md:h-16 p-2 md:p-3 bg-surface-900 rounded-2xl hover:bg-surface-700 transition-colors shrink-0 border border-surface-700"
                         >
                             <NuxtImg
                                 :src="product.brand.logo!"
@@ -308,29 +310,29 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                 </div>
 
                 <!-- Цена, варианты, кнопки -->
-                <UCard class="p-6">
-                    <div class="space-y-6">
+                <UCard class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_22%,transparent)_0%,transparent_100%)] shadow-2xl rounded-[1.5rem] md:rounded-[1.75rem]">
+                    <div class="space-y-5 md:space-y-6">
                         <!-- Цена (динамическая для выбранного варианта) -->
                         <div class="space-y-2">
                             <span
-                                class="text-sm font-medium text-gray-500 uppercase tracking-wide"
+                                class="text-sm font-medium text-text-400 uppercase tracking-wide"
                             >
                                 Цена
                             </span>
                             <div class="space-y-1">
                                 <div v-if="selectedVariant" 
-                                    class="text-4xl lg:text-5xl font-bold text-primary-600 dark:text-primary-400">
+                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-accent-400">
                                     {{ formatPrice(parseFloat(selectedVariant.price)) }}
                                 </div>
                                 <div
                                     v-else-if="minPrice"
-                                    class="text-4xl lg:text-5xl font-bold text-primary-600 dark:text-primary-400"
+                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-accent-400"
                                 >
                                     {{ formatPrice(minPrice) }}
                                 </div>
                                 <div
                                     v-if="selectedVariant?.old_price"
-                                    class="text-xl text-gray-400 dark:text-gray-500 line-through"
+                                    class="text-lg md:text-xl text-text-400 line-through"
                                 >
                                     {{
                                         formatPrice(
@@ -346,41 +348,54 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         <!-- Выбор вариантов -->
                         <div 
                             v-if="product.variants.length > 1"
-                            class="space-y-4"
+                            class="space-y-4 md:space-y-5"
                         >
                             <!-- Атрибуты (цвет, память) -->
                             <div
                                 v-if="Object.keys(availableAttributes).length"
-                                class="space-y-3"
+                                class="space-y-4 rounded-[1.25rem] border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_20%,transparent)_0%,transparent_100%)] p-4 md:p-5"
                             >
-                                <h3
-                                    class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2"
-                                >
-                                    <UIcon
-                                        name="i-heroicons-cog-6-tooth"
-                                        class="w-5 h-5"
-                                    />
-                                    Выберите характеристики
-                                </h3>
+                                <div class="flex flex-col gap-1 md:flex-row md:items-start md:justify-between">
+                                    <div>
+                                        <h3
+                                            class="text-base md:text-lg font-semibold text-text-100 flex items-center gap-2"
+                                        >
+                                            <UIcon
+                                                name="i-heroicons-cog-6-tooth"
+                                                class="w-5 h-5 text-accent-400"
+                                            />
+                                            Выберите характеристики
+                                        </h3>
+                                        <p class="mt-1 text-xs md:text-sm text-text-400">
+                                            Сначала выберите нужные параметры, затем подтвердите вариант ниже.
+                                        </p>
+                                    </div>
+                                    <div class="hidden md:flex items-center rounded-full border border-surface-700 bg-bg-950/70 px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-text-400">
+                                        Шаг 1
+                                    </div>
+                                </div>
 
                                 <!-- Группы атрибутов -->
-                                <div class="space-y-3">
+                                <div class="space-y-3 md:space-y-4">
                                     <div
                                         v-for="(values, attrName) in availableAttributes"
                                         :key="attrName"
-                                        class="space-y-2"
+                                        class="space-y-2.5"
                                     >
-                                        <label
-                                            class="text-sm font-medium text-gray-700 dark:text-gray-300 capitalize block mb-1"
-                                        >
-                                            {{
-                                                attrName === 'color'
-                                                    ? 'Цвет'
-                                                    : attrName === 'memory'
-                                                    ? 'Память'
-                                                    : attrName
-                                            }}
-                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <span class="inline-flex h-2 w-2 rounded-full bg-accent-400" />
+                                            <label
+                                                class="text-sm font-medium text-text-100 capitalize block"
+                                            >
+                                                {{
+                                                    attrName === 'color'
+                                                        ? 'Цвет'
+                                                        : attrName === 'memory'
+                                                        ? 'Память'
+                                                        : attrName
+                                                }}
+                                            </label>
+                                        </div>
                                         <div class="flex flex-wrap gap-2">
                                             <UButton
                                                 v-for="value in values"
@@ -388,10 +403,10 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 size="sm"
                                                 color="neutral"
                                                 variant="soft"
-                                                class="capitalize"
+                                                class="capitalize rounded-full px-3 min-h-9 border border-surface-700/80"
                                                 @click="selectAttribute(attrName, value)"
                                                 :class="{
-                                                    'ring-2 ring-primary-500 bg-primary-100 text-primary-700':
+                                                    'ring-2 ring-accent-400 border-accent-400 bg-accent-400/12 text-accent-200 shadow-[0_8px_24px_rgb(233_204_2_/_0.08)]':
                                                         selectedAttributes[attrName] === value,
                                                 }"
                                             >
@@ -404,11 +419,9 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
 
                             <!-- Список вариантов -->
                             <div>
-                                <div
-                                    class="flex items-center justify-between mb-4"
-                                >
+                                <div class="flex items-center justify-between gap-3 mb-3 md:mb-4">
                                     <h4
-                                        class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+                                        class="text-base md:text-lg font-semibold text-text-100"
                                     >
                                         Доступные варианты ({{ availableVariantsCount }})
                                     </h4>
@@ -435,31 +448,29 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 </div>
 
                                 <!-- Карточки вариантов -->
-                                <div
-                                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
-                                >
+                                <div class="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3 md:gap-3">
                                     <UCard
                                         v-for="variant in variantCards.slice(
                                             0,
                                             expandedVariants ? undefined : 3,
                                         )"
                                         :key="variant.id"
-                                        class="p-4 hover:shadow-md transition-all cursor-pointer border-2 hover:border-primary-200"
+                                        class="h-full hover:shadow-lg transition-all cursor-pointer border-2 border-surface-900 hover:border-accent-300 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_18%,transparent)_0%,transparent_100%)] rounded-2xl md:rounded-[1.25rem]"
                                         :class="{
-                                            'ring-2 ring-primary-500 border-primary-500 bg-primary-50 dark:bg-primary-950/50':
+                                            'ring-2 ring-accent-400 border-accent-400 bg-[linear-gradient(180deg,rgb(233_204_2_/_0.12)_0%,rgb(233_204_2_/_0.03)_100%)] shadow-[0_18px_40px_rgb(233_204_2_/_0.08)]':
                                                 selectedVariant && selectedVariant.id === variant.id,
                                         }"
                                         @click="selectAttributeFromVariant(variant)"
                                     >
-                                        <div class="space-y-2">
+                                        <div class="flex h-full flex-col gap-2.5">
                                             <!-- Атрибуты -->
                                             <div
-                                                class="flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400"
+                                                class="flex flex-wrap gap-1.5 text-[11px] md:text-xs text-text-400 min-h-[2rem]"
                                             >
                                                 <span
                                                     v-for="(value, key) in variant.attributes"
                                                     :key="key"
-                                                    class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full"
+                                                    class="px-2 py-1 bg-surface-900 rounded-2xl md:rounded-[1.25rem] border border-surface-700"
                                                 >
                                                     {{ key }}: {{ value }}
                                                 </span>
@@ -467,39 +478,27 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
 
                                             <!-- Цена -->
                                             <div
-                                                class="flex items-center justify-between"
+                                                class="flex items-start justify-between gap-2 pt-0.5"
                                             >
-                                                <span
-                                                    class="text-lg font-bold text-gray-900 dark:text-gray-100"
-                                                >
-                                                    {{
-                                                        formatPrice(
-                                                            parseFloat(
-                                                                variant.price,
-                                                            ),
-                                                        )
-                                                    }}
-                                                </span>
-                                                <UBadge
-                                                    :color="
-                                                        variant.stock &&
-                                                        variant.stock > 0
-                                                            ? 'success'
-                                                            : 'neutral'
-                                                    "
-                                                    size="sm"
-                                                >
-                                                    {{ variant.stock || 0 }}
-                                                    шт.
-                                                </UBadge>
-                                            </div>
-
-                                            <!-- Артикул -->
-                                            <div
-                                                v-if="variant.sku"
-                                                class="text-xs text-gray-500 dark:text-gray-400"
-                                            >
-                                                Арт.: {{ variant.sku }}
+                                                <div class="flex min-w-0 flex-col gap-1">
+                                                    <span
+                                                        class="text-[15px] md:text-base lg:text-[0.95rem] font-bold text-text-100 leading-tight break-words"
+                                                    >
+                                                        {{
+                                                            formatPrice(
+                                                                parseFloat(
+                                                                    variant.price,
+                                                                ),
+                                                            )
+                                                        }}
+                                                    </span>
+                                                    <div
+                                                        v-if="variant.sku"
+                                                        class="text-[11px] md:text-xs text-text-400"
+                                                    >
+                                                        Арт.: {{ variant.sku }}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </UCard>
@@ -508,12 +507,12 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         </div>
 
                         <!-- Кнопки покупки -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                             <UButton
                                 size="xl"
                                 color="primary"
                                 :disabled="!isAvailable || !selectedVariant"
-                                class="text-lg font-semibold h-14"
+                                class="text-base md:text-lg font-semibold h-12 md:h-14 rounded-2xl order-1"
                                 @click="addToCartHandler"
                             >
                                 <UIcon
@@ -526,7 +525,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 size="xl"
                                 color="neutral"
                                 variant="outline"
-                                class="text-lg font-semibold h-14"
+                                class="text-base md:text-lg font-semibold h-12 md:h-14 rounded-2xl order-2"
                             >
                                 <UIcon
                                     name="i-heroicons-heart"
@@ -539,75 +538,75 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                 </UCard>
 
                 <!-- Краткое описание -->
-                <UCard v-if="product.short_description" class="p-6">
+                <UCard v-if="product.short_description" class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">
                     <h2
-                        class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4"
+                        class="text-lg md:text-xl font-semibold text-text-100 mb-3 md:mb-4"
                     >
                         {{ product.short_description }}
                     </h2>
                 </UCard>
 
                 <!-- Полное описание -->
-                <UCard v-if="product.description" class="p-6">
+                <UCard v-if="product.description" class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">
                     <h2
-                        class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
+                        class="text-lg md:text-xl font-semibold text-text-100 mb-3 md:mb-4 flex items-center gap-2"
                     >
                         <UIcon
                             name="i-heroicons-document-text"
-                            class="w-6 h-6 text-gray-500"
+                            class="w-6 h-6 text-text-400"
                         />
                         Описание
                     </h2>
-                    <div class="prose prose-sm max-w-none dark:prose-invert">
+                    <div class="prose prose-sm prose-invert max-w-none">
                         <div v-html="product.description" />
                     </div>
                 </UCard>
 
                 <!-- Дополнительная информация -->
-                <UCard class="p-6">
+                <UCard class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">
                     <h3
-                        class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6"
+                        class="text-lg md:text-xl font-semibold text-text-100 mb-4 md:mb-6"
                     >
                         Характеристики
                     </h3>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm">
                         <div>
                             <dt
-                                class="font-medium text-gray-500 dark:text-gray-400 mb-1"
+                                class="font-medium text-text-400 mb-1"
                             >
                                 Категория
                             </dt>
-                            <dd class="text-gray-900 dark:text-gray-100">
+                            <dd class="text-text-100">
                                 {{ product.category?.name }}
                             </dd>
                         </div>
                         <div>
                             <dt
-                                class="font-medium text-gray-500 dark:text-gray-400 mb-1"
+                                class="font-medium text-text-400 mb-1"
                             >
                                 Бренд
                             </dt>
-                            <dd class="text-gray-900 dark:text-gray-100">
+                            <dd class="text-text-100">
                                 {{ product.brand?.name }}
                             </dd>
                         </div>
                         <div>
                             <dt
-                                class="font-medium text-gray-500 dark:text-gray-400 mb-1"
+                                class="font-medium text-text-400 mb-1"
                             >
                                 Гарантия
                             </dt>
-                            <dd class="text-gray-900 dark:text-gray-100">
+                            <dd class="text-text-100">
                                 {{ product.warranty_months }} месяцев
                             </dd>
                         </div>
                         <div>
                             <dt
-                                class="font-medium text-gray-500 dark:text-gray-400 mb-1"
+                                class="font-medium text-text-400 mb-1"
                             >
                                 Создан
                             </dt>
-                            <dd class="text-gray-900 dark:text-gray-100">
+                            <dd class="text-text-100">
                                 {{
                                     new Date(
                                         product.created_at,
@@ -619,17 +618,17 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                 </UCard>
 
                 <!-- Доставка -->
-                <UCard v-if="product.delivery_text" class="p-6">
+                <UCard v-if="product.delivery_text" class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">
                     <h3
-                        class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
+                        class="text-lg md:text-xl font-semibold text-text-100 mb-3 md:mb-4 flex items-center gap-2"
                     >
                         <UIcon
                             name="i-heroicons-truck"
-                            class="w-6 h-6 text-gray-500"
+                            class="w-6 h-6 text-text-400"
                         />
                         Доставка
                     </h3>
-                    <p class="text-gray-700 dark:text-gray-300">
+                    <p class="text-text-400">
                         {{ product.delivery_text }}
                     </p>
                 </UCard>

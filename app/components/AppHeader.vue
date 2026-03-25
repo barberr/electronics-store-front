@@ -2,25 +2,19 @@
   <header class="es-header border-b border-surface-900 bg-bg-900">
     <!-- Основной ряд: mobile first -->
     <div
-      class="es-container max-w-7xl flex items-center justify-between h-14 border-b border-surface-900"
+      class="es-container flex items-center justify-between h-14 border-b border-surface-900"
     >
       <!-- Левая зона: бургер + логотип -->
       <div class="flex items-center gap-1">
-        <!-- Логотип + текст -->
         <NuxtLink
           to="/"
-          class="flex items-center gap-2"
+          class="flex items-center"
         >
           <img
-            src="/logo-electronics-store.svg"
+            src="/logo-blue-izi.svg"
             alt="Izistor"
-            class="es-logo__img w-8 h-8"
+            class="es-logo__img h-8 w-auto"
           >
-          <span
-            class="es-logo__title text-text-100 font-semibold tracking-wide uppercase"
-          >
-            Izistor
-          </span>
         </NuxtLink>
       </div>
 
@@ -220,7 +214,7 @@
         >
           <span
             v-if="cartItemsCount > 0"
-            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+            class="absolute -top-1 -right-1 bg-accent-400 text-bg-950 text-xs rounded-full h-5 w-5 flex items-center justify-center"
           >
             {{ cartItemsCount }}
           </span>
@@ -320,7 +314,7 @@
       class="block md:hidden mdflex flex-row items-center border-b border-surface-900 bg-bg-900 h-14"
     >
       <div
-        class="es-mobile-shortcuts es-container max-w-7xl flex h-full items-center gap-2 py-0"
+        class="es-mobile-shortcuts es-container flex h-full items-center gap-2 py-0"
       >
         <!-- Бургер только на мобильных -->
         <USlideover
@@ -357,13 +351,13 @@
                   <!-- Заголовок категории (кликабельный) -->
                   <UButton
                     variant="link"
-                    class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full flex justify-between items-center"
+                    class="font-semibold text-text-100 text-left px-1 py-1 -ml-1 hover:bg-surface-900 rounded w-full flex justify-between items-center"
                     @click="toggleCategory(group.slug)"
                   >
                     <div class="flex items-center">
                       <UIcon
                         :name="getCategoryIcon(group.slug)"
-                        class="mr-2 text-gray-500 dark:text-gray-400"
+                        class="mr-2 text-text-400"
                         size="16"
                       />
                       {{ group.name }}
@@ -375,7 +369,7 @@
                           ? 'i-heroicons-chevron-up'
                           : 'i-heroicons-chevron-down'
                       "
-                      class="text-gray-500 dark:text-gray-400"
+                      class="text-text-400"
                       size="16"
                     />
                   </UButton>
@@ -383,7 +377,7 @@
                   <!-- Товары (показываются только если категория раскрыта) -->
                   <div
                     v-if="expandedCategory === group.slug"
-                    class="mt-2 space-y-1 ml-2 border-l-2 border-gray-200 dark:border-gray-700 pl-2"
+                    class="mt-2 space-y-1 ml-2 border-l-2 border-surface-900 pl-2"
                   >
                     <NuxtLink
                       v-for="product in group.products.slice(
@@ -392,7 +386,7 @@
                       )"
                       :key="product.id"
                       :to="`/products/${product.slug}`"
-                      class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      class="block px-2 py-1.5 text-sm text-text-100 rounded hover:bg-surface-900 transition-colors"
                       @click="closeSlideover"
                     >
                       <div
@@ -404,9 +398,9 @@
                         <span
                           class="font-medium whitespace-nowrap ml-2"
                           :class="{
-                            'text-green-600 dark:text-green-400':
+                            'text-success':
                               product.is_active,
-                            'text-gray-400 line-through':
+                            'text-text-400 line-through':
                               !product.is_active
                           }"
                         >
@@ -422,7 +416,7 @@
                       </div>
                       <div
                         v-if="product.brand?.name"
-                        class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                        class="text-xs text-text-400 mt-0.5"
                       >
                         {{ product.brand.name }}
                       </div>
@@ -480,7 +474,7 @@
     <div
       class="hidden md:block es-header__bottom py-2 border-b border-surface-900 bg-bg-900"
     >
-      <div class="es-container max-w-7xl  flex items-center gap-4 py-2">
+      <div class="es-container flex items-center gap-4 py-2">
         <UPopover
           v-model:open="catalogOpen"
           modal
@@ -493,7 +487,7 @@
           }"
           :ui="{
             content:
-              'w-full p-0 shadow-2xl border-0 bg-white rounded-lg overflow-hidden max-h-[calc(100vh-100px)]'
+              'w-full p-0 shadow-2xl border border-surface-900 bg-bg-900 rounded-lg overflow-hidden max-h-[calc(100vh-100px)]'
           }"
         >
           <!-- Триггер -->
@@ -513,7 +507,7 @@
           <template #content="{ close }">
             <ClientOnly>
               <div
-                class="p-3 w-full max-h-[calc(100vh-100px)] overflow-y-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800"
+                class="p-3 w-full max-h-[calc(100vh-100px)] overflow-y-auto bg-bg-900 rounded-lg shadow-lg border border-surface-900"
               >
                 <!-- Загрузка -->
                 <div
@@ -545,7 +539,7 @@
                     <!-- Заголовок категории -->
                     <UButton
                       variant="link"
-                      class="font-semibold text-gray-900 dark:text-white text-left px-1 py-1 -ml-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded w-full"
+                      class="font-semibold text-text-100 text-left px-1 py-1 -ml-1 hover:bg-surface-900 rounded w-full"
                       :to="`/categories/${group.slug}`"
                       @click="close"
                     >
@@ -553,7 +547,7 @@
                         :name="
                           getCategoryIcon(group.slug)
                         "
-                        class="mr-2 text-gray-500 dark:text-gray-400"
+                        class="mr-2 text-text-400"
                         size="16"
                       />
                       {{ group.name }}
@@ -568,7 +562,7 @@
                         )"
                         :key="product.id"
                         :to="`/products/${product.slug}`"
-                        class="block px-2 py-1.5 text-sm text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        class="block px-2 py-1.5 text-sm text-text-100 rounded hover:bg-surface-900 transition-colors"
                         @click="close"
                       >
                         <div
@@ -580,9 +574,9 @@
                           <span
                             class="font-medium whitespace-nowrap ml-2"
                             :class="{
-                              'text-green-600 dark:text-green-400':
+                              'text-success':
                                 product.is_active,
-                              'text-gray-400 line-through':
+                              'text-text-400 line-through':
                                 !product.is_active
                             }"
                           >
@@ -598,7 +592,7 @@
                         </div>
                         <div
                           v-if="product.brand?.name"
-                          class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                          class="text-xs text-text-400 mt-0.5"
                         >
                           {{ product.brand.name }}
                         </div>
@@ -624,10 +618,10 @@
                 <!-- Бренды (опционально внизу) -->
                 <div
                   v-if="data?.brands && data.brands.length"
-                  class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800"
+                  class="mt-4 pt-4 border-t border-surface-900"
                 >
                   <h4
-                    class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2"
+                    class="text-xs font-medium text-text-400 mb-2"
                   >
                     Популярные бренды
                   </h4>
@@ -639,7 +633,7 @@
                       )"
                       :key="brand.id"
                       :to="`/brand/${brand.slug}`"
-                      class="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-xs font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-900 text-xs font-medium text-text-100 hover:bg-surface-700"
                       @click="close"
                     >
                       <UAvatar
@@ -1045,6 +1039,7 @@ onBeforeUnmount(() => {
 /* Общий контейнер */
 .es-container {
     margin: 0 auto;
+    max-width: 1280px;
     padding: 0 1rem;
 }
 
@@ -1070,7 +1065,7 @@ onBeforeUnmount(() => {
 }
 
 .es-logo__img {
-    width: 56px;
+    width: 160px;
     height: auto;
 }
 
@@ -1087,7 +1082,7 @@ onBeforeUnmount(() => {
 .es-logo__subtitle {
     font-size: 0.68rem;
     text-transform: uppercase;
-    color: #6b7280;
+    color: var(--color-text-400);
 }
 
 /* Поиск */
@@ -1116,12 +1111,12 @@ onBeforeUnmount(() => {
 .es-contacts__phone {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--color-text-100);
     text-decoration: none;
 }
 
 .es-contacts__phone:hover {
-    color: #2563eb;
+    color: var(--color-accent-400);
 }
 
 .es-icons {
@@ -1160,21 +1155,21 @@ onBeforeUnmount(() => {
 .es-categories__item {
     border: none;
     background: transparent;
-    color: #e5e7eb;
+    color: var(--color-text-100);
     padding: 0.15rem 0;
     cursor: pointer;
     text-transform: uppercase;
 }
 
 .es-categories__item:hover {
-    color: #ffffff;
+    color: var(--color-accent-300);
 }
 
 .es-search-results {
-    border: 1px solid rgb(229 231 235 / 0.12);
+    border: 1px solid color-mix(in srgb, var(--color-text-100) 12%, transparent);
     border-radius: 1rem;
-    background: rgb(15 23 42 / 0.96);
-    box-shadow: 0 24px 48px rgb(15 23 42 / 0.28);
+    background: color-mix(in srgb, var(--color-bg-950) 88%, var(--color-surface-900));
+    box-shadow: 0 24px 48px rgb(0 0 0 / 0.28);
     overflow: hidden;
 }
 
@@ -1199,10 +1194,10 @@ onBeforeUnmount(() => {
     width: 100%;
     padding: 0.85rem 1rem;
     text-align: left;
-    color: #e5e7eb;
+    color: var(--color-text-100);
     background: transparent;
     border: 0;
-    border-bottom: 1px solid rgb(148 163 184 / 0.12);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-text-400) 14%, transparent);
     transition: background-color 0.2s ease;
 }
 
@@ -1211,7 +1206,7 @@ onBeforeUnmount(() => {
 }
 
 .es-search-results__item:hover {
-    background: rgb(30 41 59 / 0.92);
+    background: color-mix(in srgb, var(--color-surface-900) 72%, transparent);
 }
 
 .es-search-results__main {
@@ -1229,7 +1224,7 @@ onBeforeUnmount(() => {
 
 .es-search-results__category {
     font-size: 0.78rem;
-    color: #94a3b8;
+    color: var(--color-text-400);
     line-height: 1.2;
 }
 
@@ -1237,7 +1232,7 @@ onBeforeUnmount(() => {
     flex: 0 0 auto;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #7dd3fc;
+    color: var(--color-accent-400);
     white-space: nowrap;
 }
 
@@ -1247,17 +1242,17 @@ onBeforeUnmount(() => {
     gap: 0.55rem;
     padding: 1rem;
     font-size: 0.9rem;
-    color: #cbd5e1;
+    color: var(--color-text-100);
 }
 
 .es-search-results__state_error {
-    color: #fda4af;
+    color: #f87171;
 }
 
 .es-search-results__hint {
     padding: 0.8rem 0.1rem 0;
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--color-text-400);
 }
 
 /* Адаптив */
@@ -1314,10 +1309,10 @@ onBeforeUnmount(() => {
     flex: 0 0 auto;
     min-height: 1.9rem;
     padding: 0.35rem 0.58rem;
-    border: 1px solid rgb(42 48 60);
+    border: 1px solid color-mix(in srgb, var(--color-surface-900) 85%, black);
     border-radius: 9999px;
-    color: #e5e7eb;
-    background: rgba(17, 24, 39, 0.65);
+    color: var(--color-text-100);
+    background: color-mix(in srgb, var(--color-bg-950) 80%, var(--color-surface-900));
     font-size: 0.68rem;
     font-weight: 500;
     line-height: 1;
@@ -1334,8 +1329,8 @@ onBeforeUnmount(() => {
 }
 
 .es-mobile-shortcuts__item:hover {
-    color: #fff;
-    border-color: rgb(96 165 250);
-    background: rgba(30, 41, 59, 0.95);
+    color: var(--color-accent-300);
+    border-color: var(--color-accent-400);
+    background: color-mix(in srgb, var(--color-surface-900) 92%, var(--color-bg-950));
 }
 </style>

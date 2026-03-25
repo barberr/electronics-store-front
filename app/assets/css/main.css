@@ -1,7 +1,47 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@font-face {
+  font-family: 'Benzin';
+  src: url('../fonts/BENZIN-MEDIUM.TTF') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Benzin';
+  src: url('../fonts/BENZIN-SEMIBOLD.TTF') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Benzin';
+  src: url('../fonts/BENZIN-BOLD.TTF') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Benzin';
+  src: url('../fonts/BENZIN-EXTRABOLD.TTF') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer components {
+  :root {
+    --ui-bg-elevated: color-mix(in srgb, var(--color-surface-900) 78%, var(--color-bg-950));
+    --ui-bg-muted: color-mix(in srgb, var(--color-surface-900) 58%, var(--color-bg-950));
+    --ui-bg-accented: color-mix(in srgb, var(--color-accent-400) 16%, var(--color-bg-950));
+    --ui-border-accented: color-mix(in srgb, var(--color-accent-400) 45%, var(--color-surface-900));
+    --ui-text-highlighted: var(--color-text-100);
+  }
+
   /* Ссылки видимые на тёмном фоне */
   a {
     @apply text-accent-400 hover:text-accent-200 transition-colors duration-200 underline-offset-2 hover:underline;
@@ -23,60 +63,169 @@
   .dark .prose a {
     @apply text-primary-300 hover:text-primary-200;
   }
+
+  input,
+  textarea,
+  select {
+    background-color: color-mix(in srgb, var(--color-surface-900) 74%, var(--color-bg-950));
+    border: 1px solid color-mix(in srgb, var(--color-text-400) 28%, transparent);
+    color: var(--color-text-100);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: color-mix(in srgb, var(--color-text-400) 88%, transparent);
+    opacity: 1;
+  }
+
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    opacity: 0.72;
+    border-color: color-mix(in srgb, var(--color-text-400) 18%, transparent);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: color-mix(in srgb, var(--color-accent-400) 78%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-400) 60%, transparent);
+    outline: none;
+  }
+
+  button,
+  [role='button'] {
+    color: inherit;
+  }
+
+  button:focus-visible,
+  [role='button']:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-accent-400);
+    outline-offset: 2px;
+  }
+
+  [class*='variant-soft'],
+  [class*='variant-outline'] {
+    border-color: color-mix(in srgb, var(--color-text-400) 26%, transparent);
+  }
+
+  [class*='color-neutral'][class*='variant-soft'],
+  [class*='color-neutral'][class*='variant-outline'] {
+    background-color: color-mix(in srgb, var(--color-surface-900) 70%, var(--color-bg-950));
+    color: var(--color-text-100);
+  }
+
+  [class*='color-neutral'][class*='variant-ghost'] {
+    color: var(--color-text-100);
+  }
+
+  [class*='color-primary'][class*='variant-solid'] {
+    color: var(--color-bg-950);
+    box-shadow: 0 10px 24px rgb(233 204 2 / 0.2);
+  }
+
+  [class*='color-primary'][class*='variant-outline'] {
+    border-color: color-mix(in srgb, var(--color-accent-400) 56%, var(--color-surface-900));
+    color: var(--color-accent-300);
+  }
+
+  [class*='color-error'][class*='variant-soft'] {
+    background-color: rgb(127 29 29 / 0.18);
+    border-color: rgb(248 113 113 / 0.34);
+    color: #fecaca;
+  }
+
+  [class*='color-success'][class*='variant-soft'] {
+    background-color: rgb(20 83 45 / 0.2);
+    border-color: rgb(74 222 128 / 0.28);
+    color: #dcfce7;
+  }
+
+  [class*='rounded'],
+  [class*='shadow'] {
+    border-color: color-mix(in srgb, var(--color-text-400) 16%, transparent);
+  }
 }
 
 @theme {
-	--font-sans: 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
+  --font-sans: 'Benzin', 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
+  --font-display: 'Benzin', 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
   /* Фон и поверхности */
   --color-bg-950: #0E0F12;
-  --color-bg-900: #15171C;
-  --color-surface-900: #1F2127;
-  --color-surface-950: #17181C;
+  --color-bg-900: #0E0F12;
+  --color-surface-700: #464646;
+  --color-surface-900: #464646;
+  --color-surface-950: #464646;
 
   --color-shadow-950: #000020;
 
   /* Текст */
   --color-text-100: #FFFFFF;
   --color-text-400: #A6A8AD;
-  --color-text-900: #F5F6F7;
+  --color-text-500: #A6A8AD;
+  --color-text-900: #FFFFFF;
 
   /* Акцент (основной цвет UI) */
-  --color-accent-50: #F5F6F7;
-  --color-accent-100: #E9EAED;
-  --color-accent-200: #D3D6DD;
-  --color-accent-300: #BFC3CC;
-  --color-accent-400: #AAB0BA;
-  --color-accent-500: #949BA7;
-  --color-accent-600: #7A8190;
-  --color-accent-700: #606673;
-  --color-accent-800: #484C57;
-  --color-accent-900: #30313A;
-  --color-accent-950: #1C1D23;
+  --color-accent-50: #FFFCE8;
+  --color-accent-100: #FAF2B8;
+  --color-accent-200: #F5E988;
+  --color-accent-300: #F0DF58;
+  --color-accent-400: #E9CC02;
+  --color-accent-500: #E9CC02;
+  --color-accent-600: #C7AE02;
+  --color-accent-700: #9E8A01;
+  --color-accent-800: #756601;
+  --color-accent-900: #4D4300;
+  --color-accent-950: #2A2400;
 }
 
 /* Базовый фон и текст */
 :root {
   --ui-bg: #0E0F12;
-  --ui-border: #15171C;
+  --ui-border: #464646;
   --ui-text: #FFFFFF;
   --ui-muted: #A6A8AD;
-  --ui-primary: var(--color-accent-500);
-  
+  --ui-primary: #E9CC02;
 }
 
 
 body {
-	
-	font-family: var(--font-sans);
-	font-size: 16px;
-	line-height: 1.5;
+  background-color: var(--color-bg-950);
+  color: var(--color-text-100);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 .app {
   @apply bg-bg-950 min-h-screen flex flex-col;
 }
 
-h1 { font-size: clamp(2.75rem, 5vw, 3rem); font-weight: 600; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+}
+
+h1 {
+  font-size: clamp(2.75rem, 5vw, 3rem);
+  font-weight: 700;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
 
 .main-content {
   @apply relative z-10 max-w-full mx-auto py-8;

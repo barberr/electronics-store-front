@@ -10,7 +10,7 @@
                 class="border p-4 rounded-lg text-center"
             >
                 <UIcon :name="`i-heroicons-${icon}`" class="w-6 h-6 mx-auto" />
-                <div class="mt-2 text-sm text-gray-600">{{ icon }}</div>
+                <div class="mt-2 text-sm text-text-400">{{ icon }}</div>
             </div>
         </div>
     </div>

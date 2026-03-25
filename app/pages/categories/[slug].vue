@@ -91,7 +91,7 @@ const addToCart = async (product: Product) => {
         toast.add({
             title: 'Нет в наличии',
             description: 'У товара сейчас нет доступных вариантов',
-            color: 'warning',
+            color: 'primary',
             icon: 'i-heroicons-exclamation-triangle'
         });
         return;
@@ -136,7 +136,7 @@ useSeoMeta({
                     class="w-24 h-2 mb-4"
                     color="primary"
                 />
-                <p class="text-gray-500 dark:text-gray-400 text-lg">
+                <p class="text-text-400 text-lg">
                     Загружаем товары...
                 </p>
             </div>
@@ -162,7 +162,7 @@ useSeoMeta({
                     <h1 class="category-title text-3xl font-bold color-text-100 mb-2">
                         {{ category.name }}
                     </h1>
-                    <p v-if="category.description" class="text-gray-600 max-w-3xl">
+                    <p v-if="category.description" class="text-text-400 max-w-3xl">
                         {{ category.description }}
                     </p>
                 </div>
@@ -185,18 +185,18 @@ useSeoMeta({
                 <!-- Пустой список -->
                 <div
                     v-else
-                    class="text-center py-20 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-slate-900/50 rounded-2xl"
+                    class="text-center py-20 bg-gradient-to-r from-surface-900/40 to-accent-950/50 rounded-2xl border border-surface-900"
                 >
                     <UIcon
                         name="i-heroicons-shopping-bag-open"
-                        class="w-20 h-20 text-gray-400 dark:text-gray-500 mx-auto mb-4"
+                        class="w-20 h-20 text-text-400 mx-auto mb-4"
                     />
                     <h3
-                        class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+                        class="text-xl font-semibold text-text-100 mb-2"
                     >
                         Товары в этой категории скоро появятся
                     </h3>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                    <p class="text-text-400 max-w-md mx-auto">
                         Следите за обновлениями ассортимента
                     </p>
                 </div>

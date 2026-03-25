@@ -33,7 +33,7 @@
               :disabled="loading"
               required
             />
-            <p v-if="fieldErrors.username" class="mt-1 text-sm text-red-500">
+            <p v-if="fieldErrors.username" class="mt-1 text-sm text-red-400">
               {{ fieldErrors.username[0] }}
             </p>
           </div>
@@ -57,7 +57,7 @@
               :disabled="loading"
               required
             />
-            <p v-if="fieldErrors.email" class="mt-1 text-sm text-red-500">
+            <p v-if="fieldErrors.email" class="mt-1 text-sm text-red-400">
               {{ fieldErrors.email[0] }}
             </p>
           </div>
@@ -81,7 +81,7 @@
               :disabled="loading"
               required
             />
-            <p v-if="fieldErrors.password" class="mt-1 text-sm text-red-500">
+            <p v-if="fieldErrors.password" class="mt-1 text-sm text-red-400">
               {{ Array.isArray(fieldErrors.password) ? fieldErrors.password.join(', ') : fieldErrors.password }}
             </p>
           </div>
@@ -105,7 +105,7 @@
               :disabled="loading"
               required
             />
-            <p v-if="passwordMismatch" class="mt-1 text-sm text-red-500">
+            <p v-if="passwordMismatch" class="mt-1 text-sm text-red-400">
               Пароли не совпадают
             </p>
           </div>
@@ -152,7 +152,7 @@
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            class="text-red-600"
+            class="text-red-400"
             :title="errorMessage"
           />
 
@@ -173,7 +173,7 @@
         </form>
 
         <!-- Вход -->
-        <div class="text-center space-y-4 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div class="text-center space-y-4 pt-6 border-t border-surface-900">
           <p class="text-text-400 text-sm">Уже есть аккаунт?</p>
           <UButton
             to="/login"
@@ -293,7 +293,7 @@ const handleRegister = async () => {
   background: linear-gradient(
     135deg,
     var(--color-bg-950) 0%,
-    var(--color-surface-900) 100%
+    color-mix(in srgb, var(--color-bg-950) 68%, var(--color-surface-900)) 100%
   );
 }
 </style>

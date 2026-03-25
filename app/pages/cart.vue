@@ -16,7 +16,7 @@
       <!-- Основное содержимое -->
       <div v-if="loading" class="flex justify-center py-12">
         <div class="text-center">
-          <div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div class="w-12 h-12 border-4 border-accent-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p class="text-text-400">Загрузка корзины...</p>
         </div>
       </div>
@@ -26,7 +26,7 @@
           icon="i-heroicons-exclamation-triangle"
           color="error"
           variant="soft"
-          class="text-red-600"
+          class="text-red-400"
           :title="error"
           @close="fetchCartData"
         >
@@ -45,7 +45,7 @@
 
       <div v-else-if="!cart || cart.items.length === 0" class="max-w-3xl mx-auto text-center py-16">
         <div class="mb-8">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-200 dark:bg-surface-800 mx-auto">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-900 mx-auto">
             <UIcon name="i-heroicons-shopping-bag" class="text-3xl text-text-400" />
           </div>
         </div>
@@ -79,7 +79,7 @@
               <div class="flex-shrink-0 w-24 h-24">
                 <div
                   v-if="item.variant_image"
-                  class="w-full h-full bg-surface-200 dark:bg-surface-800 rounded-lg overflow-hidden flex items-center justify-center"
+                  class="w-full h-full bg-surface-900 rounded-lg overflow-hidden flex items-center justify-center"
                 >
                   <img
                     :src="item.variant_image"
@@ -90,7 +90,7 @@
                 </div>
                 <div
                   v-else
-                  class="w-full h-full bg-surface-200 dark:bg-surface-800 rounded-lg flex items-center justify-center"
+                  class="w-full h-full bg-surface-900 rounded-lg flex items-center justify-center"
                 >
                   <UIcon name="i-heroicons-photo" class="text-3xl text-text-400" />
                 </div>
@@ -185,7 +185,7 @@
                 <span>Доставка&nbsp;</span>
                 <span class="text-text-400"> Рассчитывается при оформлении</span>
               </div>
-              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 flex justify-between font-bold text-text-100 text-lg">
+              <div class="border-t border-surface-900 pt-4 flex justify-between font-bold text-text-100 text-lg">
                 <span>Итого</span>
                 <span>{{ formatCurrency(cartTotalPrice) }}</span>
               </div>
@@ -202,7 +202,7 @@
               {{ loading ? 'Оформляем...' : 'Оформить заказ' }}
             </UButton>
 
-            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-text-400 text-sm">
+            <div class="mt-6 pt-6 border-t border-surface-900 text-center text-text-400 text-sm">
               <p class="mb-2">Все цены включают НДС</p>
               <p>Оплата при получении или онлайн</p>
             </div>
@@ -310,7 +310,7 @@ const handleClearCart = async () => {
       title: 'Корзина очищена',
       description: 'Все товары удалены из корзины',
       icon: 'i-heroicons-trash',
-      color: 'warning'
+      color: 'primary'
     });
   }
 };
@@ -322,7 +322,7 @@ const handleCheckout = async () => {
       title: 'Пустая корзина',
       description: 'Добавьте товары в корзину перед оформлением заказа',
       icon: 'i-heroicons-exclamation-triangle',
-      color: 'warning'
+      color: 'primary'
     });
     return;
   }
@@ -360,7 +360,7 @@ const handleCheckout = async () => {
   background: linear-gradient(
     135deg,
     var(--color-bg-950) 0%,
-    var(--color-surface-900) 100%
+    color-mix(in srgb, var(--color-bg-950) 68%, var(--color-surface-900)) 100%
   );
 }
 </style>

@@ -7,7 +7,7 @@
             :ui="{ padding: '' }"
         >
             <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                <h2 class="text-3xl font-bold text-text-100">
                     Популярные товары
                 </h2>
             </div>

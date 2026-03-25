@@ -3,7 +3,7 @@
 <template>
   <section
     v-if="hero"
-    class="relative w-full overflow-hidden bg-gray-900"
+    class="relative w-full overflow-hidden bg-bg-950"
   >
     <!-- Видео-фон -->
     <video
@@ -24,20 +24,20 @@
     ></div>
 
     <!-- Градиентный оверлей для читаемости текста -->
-    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 z-10"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-bg-950/70 via-bg-950/45 to-bg-950/90 z-10"></div>
 
     <!-- Контент поверх фона -->
     <UContainer class="relative z-20 py-16 md:py-24 flex items-center justify-center min-h-[70vh]">
       <div class="text-center max-w-3xl px-4">
         <h1
-          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4"
+          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-text-100 mb-4"
         >
           {{ hero.title }}
         </h1>
 
         <p
           v-if="hero.subtitle"
-          class="text-lg md:text-xl text-gray-200 mb-6"
+          class="text-lg md:text-xl text-text-100/80 mb-6"
         >
           {{ hero.subtitle }}
         </p>
@@ -46,7 +46,7 @@
         <template v-if="isDesktopOrTablet">
           <p
             v-if="hero.description"
-            class="text-base md:text-lg text-gray-300 mb-8 max-w-2xl mx-auto"
+            class="text-base md:text-lg text-text-400 mb-8 max-w-2xl mx-auto"
           >
             {{ hero.description }}
           </p>

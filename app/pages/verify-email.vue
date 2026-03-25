@@ -70,7 +70,7 @@
           </UButton>
         </form>
 
-        <div class="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div class="space-y-4 pt-6 border-t border-surface-900">
           <UButton
             color="neutral"
             variant="soft"
@@ -183,7 +183,7 @@ const handleResend = async () => {
   background: linear-gradient(
     135deg,
     var(--color-bg-950) 0%,
-    var(--color-surface-900) 100%
+    color-mix(in srgb, var(--color-bg-950) 68%, var(--color-surface-900)) 100%
   );
 }
 </style>
