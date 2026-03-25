@@ -90,7 +90,7 @@ watch(
                     icon="i-heroicons-arrow-left"
                     variant="ghost"
                     color="neutral"
-                    class="text-text-100 hover:text-accent-200 hidden sm:inline-flex"
+                    class="text-text-100 hover:text-text-400 hidden sm:inline-flex"
                 />
                 <h1 class="text-3xl font-bold text-text-100 flex-1">
                     Редактирование профиля
@@ -222,7 +222,7 @@ watch(
                         block
                         sm:flex-none
                         :disabled="saving"
-                        class="text-text-100 hover:text-accent-200"
+                        class="text-text-100 hover:text-text-400"
                     >
                         <UIcon name="i-heroicons-arrow-left" class="mr-2" />
                         Отмена

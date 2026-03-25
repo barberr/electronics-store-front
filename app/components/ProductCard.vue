@@ -48,7 +48,7 @@ onMounted(() => {
         class="group block h-full focus:outline-none "
     >
         <UCard
-            class="w-72 md:w-80 h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-surface-900 bg-[color:color-mix(in_srgb,var(--color-bg-950)_76%,var(--color-surface-900))] ring-0 hover:ring-accent-400/30"
+            class="w-72 md:w-80 h-full flex flex-col overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border border-surface-900 bg-[color:color-mix(in_srgb,var(--color-bg-950)_76%,var(--color-surface-900))] ring-0 hover:ring-surface-700/50"
             :ui="{ body: 'p-0' }"
         >
             <!-- Изображение -->
@@ -69,7 +69,7 @@ onMounted(() => {
                 >
                     <UIcon
                         name="i-heroicons-photo"
-                        class="w-12 h-12 text-accent-400"
+                        class="w-12 h-12 text-text-400"
                     />
                 </div>
 
@@ -99,7 +99,7 @@ onMounted(() => {
                     color="info"
                     variant="outline"
                     size="xs"
-                    class="absolute bottom-3 right-3 z-20 shadow-lg backdrop-blur-sm border-accent-400/40 text-accent-200"
+                    class="absolute bottom-3 right-3 z-20 shadow-lg backdrop-blur-sm border-surface-700 text-text-100"
                 >
                     {{ availableVariantsCount }}+ вар.
                 </UBadge>
@@ -111,11 +111,11 @@ onMounted(() => {
                 <div class="flex items-center gap-2 flex-wrap">
                     <span
                         v-if="product.brand?.name"
-                        class="px-3 py-1 rounded-full text-xs font-semibold bg-accent-900/80 text-accent-200 backdrop-blur-sm shadow-sm"
+                        class="px-3 py-1 rounded-full text-xs font-semibold bg-surface-900 text-text-100 backdrop-blur-sm shadow-sm"
                     >
                         {{ product.brand.name }}
                     </span>
-                    <span class="text-accent-400 text-xs"
+                    <span class="text-text-400 text-xs"
                         >•</span
                     >
                     <span class="text-xs text-text-400">
@@ -125,7 +125,7 @@ onMounted(() => {
 
                 <!-- Название -->
                 <h3
-                    class="font-bold text-text-100 text-lg leading-tight line-clamp-2 group-hover:text-accent-300 transition-colors"
+                    class="font-bold text-text-100 text-lg leading-tight line-clamp-2 group-hover:text-text-400 transition-colors"
                 >
                     {{ product.name }}
                 </h3>
@@ -143,7 +143,7 @@ onMounted(() => {
                         </div>
                         <div
                             v-if="product.variants.some((v) => v.old_price)"
-                            class="text-sm text-accent-500 line-through font-medium"
+                            class="text-sm text-text-400 line-through font-medium"
                         >
                             {{
                                 formatPrice(

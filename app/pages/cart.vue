@@ -16,7 +16,7 @@
       <!-- Основное содержимое -->
       <div v-if="loading" class="flex justify-center py-12">
         <div class="text-center">
-          <div class="w-12 h-12 border-4 border-accent-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div class="w-12 h-12 border-4 border-text-100 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p class="text-text-400">Загрузка корзины...</p>
         </div>
       </div>
@@ -195,6 +195,7 @@
               color="primary"
               size="xl"
               block
+              class="buy-cta"
               :disabled="loading || cartItemsCount === 0"
               @click="handleCheckout"
               trailing-icon="i-heroicons-arrow-right"

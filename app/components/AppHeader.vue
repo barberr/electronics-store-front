@@ -208,13 +208,13 @@
           variant="ghost"
           color="neutral"
           class="relative"
-          :class="cartItemsCount > 0 ? 'text-accent-300' : 'text-text-400'"
+          :class="cartItemsCount > 0 ? 'text-text-100' : 'text-text-400'"
           aria-label="Корзина"
           @click="goToCart"
         >
           <span
             v-if="cartItemsCount > 0"
-            class="absolute -top-1 -right-1 bg-accent-400 text-bg-950 text-xs rounded-full h-5 w-5 flex items-center justify-center"
+            class="absolute -top-1 -right-1 bg-text-100 text-bg-950 text-xs rounded-full h-5 w-5 flex items-center justify-center"
           >
             {{ cartItemsCount }}
           </span>
@@ -223,7 +223,7 @@
         <div class="hidden lg:flex flex-col items-end mr-3">
           <a
             href="tel:+78129426246"
-            class="text-xs font-medium text-text-100 hover:text-accent-300"
+            class="text-xs font-medium text-text-100 hover:text-text-400"
           >
             +7 (812) 111-11-11
           </a>
@@ -494,7 +494,7 @@
           <UButton
             color="primary"
             icon="i-heroicons-bars-3"
-            class="es-catalog-btn min-w-[150px]"
+            class="es-catalog-btn min-w-[150px] !bg-surface-900 !text-text-100 !border !border-surface-700 hover:!bg-surface-700"
           >
             Каталог
             <UIcon
@@ -671,7 +671,7 @@
             v-for="category in categories"
             :key="category.id"
             :to="`/categories/${category.slug}`"
-            class="es-categories__item text-text-100 hover:text-accent-200 whitespace-nowrap text-sm"
+            class="es-categories__item text-text-100 hover:text-text-400 whitespace-nowrap text-sm"
           >
             {{ category.name }}
           </NuxtLink>

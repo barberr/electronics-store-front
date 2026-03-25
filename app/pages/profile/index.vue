@@ -115,7 +115,7 @@ const reloadPage = () => {
                 <UCard
                     class="text-center p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
                 >
-                    <div class="text-4xl font-bold text-accent-400 mb-3">
+                    <div class="text-4xl font-bold text-text-100 mb-3">
                         {{ user.id }}
                     </div>
                     <div
@@ -240,7 +240,7 @@ const reloadPage = () => {
 
             <!-- Выход -->
             <UCard
-                class="text-center p-12 border-2 border-accent-800 hover:border-accent-400"
+                class="text-center p-12 border-2 border-surface-700 hover:border-text-100"
             >
                 <UButton
                     @click="handleLogout"
@@ -262,7 +262,7 @@ const reloadPage = () => {
             <div class="text-center max-w-md">
                 <UIcon
                     name="i-heroicons-exclamation-circle"
-                    class="w-20 h-20 text-accent-400 mx-auto mb-6"
+                    class="w-20 h-20 text-text-400 mx-auto mb-6"
                 />
                 <h2 class="text-2xl font-bold text-text-100 mb-4">
                     Ошибка загрузки профиля

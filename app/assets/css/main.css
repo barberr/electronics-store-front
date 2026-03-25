@@ -1,38 +1,6 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-@font-face {
-  font-family: 'Benzin';
-  src: url('../fonts/BENZIN-MEDIUM.TTF') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Benzin';
-  src: url('../fonts/BENZIN-SEMIBOLD.TTF') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Benzin';
-  src: url('../fonts/BENZIN-BOLD.TTF') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Benzin';
-  src: url('../fonts/BENZIN-EXTRABOLD.TTF') format('truetype');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer components {
   :root {
     --ui-bg-elevated: color-mix(in srgb, var(--color-surface-900) 78%, var(--color-bg-950));
@@ -44,12 +12,12 @@
 
   /* Ссылки видимые на тёмном фоне */
   a {
-    @apply text-accent-400 hover:text-accent-200 transition-colors duration-200 underline-offset-2 hover:underline;
+    @apply text-text-100 hover:text-text-400 transition-colors duration-200 underline-offset-2 hover:underline;
   }
 
   /* В темной теме */
   .dark a {
-    @apply text-accent-300 hover:text-accent-100;
+    @apply text-text-100 hover:text-text-400;
   }
 
   /* Ссылки в карточках/блоках */
@@ -124,13 +92,32 @@
   }
 
   [class*='color-primary'][class*='variant-solid'] {
-    color: var(--color-bg-950);
-    box-shadow: 0 10px 24px rgb(233 204 2 / 0.2);
+    color: var(--color-text-100);
+    box-shadow: 0 10px 24px rgb(21 23 28 / 0.22);
   }
 
   [class*='color-primary'][class*='variant-outline'] {
     border-color: color-mix(in srgb, var(--color-accent-400) 56%, var(--color-surface-900));
-    color: var(--color-accent-300);
+    color: var(--color-text-100);
+  }
+
+  .buy-cta {
+    background: #E9CC02 !important;
+    border-color: #E9CC02 !important;
+    color: #0E0F12 !important;
+    box-shadow: 0 10px 24px rgb(233 204 2 / 0.2) !important;
+  }
+
+  .buy-cta:hover {
+    background: #f0df58 !important;
+    border-color: #f0df58 !important;
+  }
+
+  .buy-cta:disabled {
+    background: color-mix(in srgb, #E9CC02 50%, transparent) !important;
+    border-color: color-mix(in srgb, #E9CC02 50%, transparent) !important;
+    color: rgb(14 15 18 / 0.7) !important;
+    box-shadow: none !important;
   }
 
   [class*='color-error'][class*='variant-soft'] {
@@ -165,22 +152,22 @@
 
   /* Текст */
   --color-text-100: #FFFFFF;
-  --color-text-400: #A6A8AD;
-  --color-text-500: #A6A8AD;
+  --color-text-400: #B2B5BB;
+  --color-text-500: #B2B5BB;
   --color-text-900: #FFFFFF;
 
   /* Акцент (основной цвет UI) */
-  --color-accent-50: #FFFCE8;
-  --color-accent-100: #FAF2B8;
-  --color-accent-200: #F5E988;
-  --color-accent-300: #F0DF58;
-  --color-accent-400: #E9CC02;
-  --color-accent-500: #E9CC02;
-  --color-accent-600: #C7AE02;
-  --color-accent-700: #9E8A01;
-  --color-accent-800: #756601;
-  --color-accent-900: #4D4300;
-  --color-accent-950: #2A2400;
+  --color-accent-50: #15171C;
+  --color-accent-100: #15171C;
+  --color-accent-200: #15171C;
+  --color-accent-300: #15171C;
+  --color-accent-400: #15171C;
+  --color-accent-500: #15171C;
+  --color-accent-600: #15171C;
+  --color-accent-700: #15171C;
+  --color-accent-800: #15171C;
+  --color-accent-900: #15171C;
+  --color-accent-950: #15171C;
 }
 
 /* Базовый фон и текст */
@@ -188,8 +175,8 @@
   --ui-bg: #0E0F12;
   --ui-border: #464646;
   --ui-text: #FFFFFF;
-  --ui-muted: #A6A8AD;
-  --ui-primary: #E9CC02;
+  --ui-muted: #B2B5BB;
+  --ui-primary: #15171C;
 }
 
 

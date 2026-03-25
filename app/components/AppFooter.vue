@@ -85,7 +85,7 @@ const messengers = ['TG', 'WA', 'MAX'];
     margin-top: auto;
     border-top: 1px solid color-mix(in srgb, var(--color-surface-700) 70%, transparent);
     background:
-        radial-gradient(circle at top left, rgb(233 204 2 / 0.12), transparent 35%),
+        radial-gradient(circle at top left, rgb(21 23 28 / 0.32), transparent 35%),
         linear-gradient(180deg, var(--color-bg-950) 0%, color-mix(in srgb, var(--color-bg-950) 70%, var(--color-surface-900)) 100%);
 }
 

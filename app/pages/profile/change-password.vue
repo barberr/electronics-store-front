@@ -8,7 +8,7 @@
                     icon="i-heroicons-arrow-left"
                     variant="ghost"
                     color="neutral"
-                    class="text-text-100 hover:text-accent-200 hidden sm:inline-flex"
+                    class="text-text-100 hover:text-text-400 hidden sm:inline-flex"
                 />
                 <h1 class="text-3xl font-bold text-text-100 flex-1">
                     Смена пароля
@@ -51,7 +51,7 @@
                         variant="ghost"
                         color="neutral"
                         block
-                        class="text-text-100 hover:text-accent-200"
+                        class="text-text-100 hover:text-text-400"
                     >
                         Отмена
                     </UButton>

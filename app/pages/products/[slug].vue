@@ -186,7 +186,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
         <div v-else-if="error" class="text-center py-20">
             <UIcon
                 name="i-heroicons-exclamation-triangle"
-                class="w-16 h-16 text-accent-400 mx-auto mb-4"
+                class="w-16 h-16 text-text-400 mx-auto mb-4"
             />
             <h2
                 class="text-2xl font-bold text-text-100 mb-2"
@@ -244,7 +244,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         :key="img.id"
                         class="overflow-hidden cursor-pointer p-0 hover:shadow-md transition-all border-2 bg-[color:color-mix(in_srgb,var(--color-bg-950)_84%,var(--color-surface-900))] shrink-0 w-16 md:w-auto rounded-2xl"
                         :class="{
-                            'ring-2 ring-accent-400 border-accent-400':
+                            'ring-2 ring-text-100 border-text-100':
                                 currentImageIndex === index,
                             'border-surface-900':
                                 currentImageIndex !== index,
@@ -321,12 +321,12 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                             </span>
                             <div class="space-y-1">
                                 <div v-if="selectedVariant" 
-                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-accent-400">
+                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-100">
                                     {{ formatPrice(parseFloat(selectedVariant.price)) }}
                                 </div>
                                 <div
                                     v-else-if="minPrice"
-                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-accent-400"
+                                    class="text-3xl md:text-4xl lg:text-5xl font-bold text-text-100"
                                 >
                                     {{ formatPrice(minPrice) }}
                                 </div>
@@ -362,7 +362,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                         >
                                             <UIcon
                                                 name="i-heroicons-cog-6-tooth"
-                                                class="w-5 h-5 text-accent-400"
+                                                class="w-5 h-5 text-text-400"
                                             />
                                             Выберите характеристики
                                         </h3>
@@ -383,7 +383,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                         class="space-y-2.5"
                                     >
                                         <div class="flex items-center gap-2">
-                                            <span class="inline-flex h-2 w-2 rounded-full bg-accent-400" />
+                                            <span class="inline-flex h-2 w-2 rounded-full bg-text-400" />
                                             <label
                                                 class="text-sm font-medium text-text-100 capitalize block"
                                             >
@@ -406,7 +406,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 class="capitalize rounded-full px-3 min-h-9 border border-surface-700/80"
                                                 @click="selectAttribute(attrName, value)"
                                                 :class="{
-                                                    'ring-2 ring-accent-400 border-accent-400 bg-accent-400/12 text-accent-200 shadow-[0_8px_24px_rgb(233_204_2_/_0.08)]':
+                                                    'ring-2 ring-text-100 border-text-100 bg-surface-900 text-text-100 shadow-[0_8px_24px_rgb(0_0_0_/_0.18)]':
                                                         selectedAttributes[attrName] === value,
                                                 }"
                                             >
@@ -455,9 +455,9 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                             expandedVariants ? undefined : 3,
                                         )"
                                         :key="variant.id"
-                                        class="h-full hover:shadow-lg transition-all cursor-pointer border-2 border-surface-900 hover:border-accent-300 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_18%,transparent)_0%,transparent_100%)] rounded-2xl md:rounded-[1.25rem]"
+                                        class="h-full hover:shadow-lg transition-all cursor-pointer border-2 border-surface-900 hover:border-surface-700 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_18%,transparent)_0%,transparent_100%)] rounded-2xl md:rounded-[1.25rem]"
                                         :class="{
-                                            'ring-2 ring-accent-400 border-accent-400 bg-[linear-gradient(180deg,rgb(233_204_2_/_0.12)_0%,rgb(233_204_2_/_0.03)_100%)] shadow-[0_18px_40px_rgb(233_204_2_/_0.08)]':
+                                            'ring-2 ring-text-100 border-text-100 bg-[linear-gradient(180deg,rgb(70_70_70_/_0.38)_0%,rgb(70_70_70_/_0.16)_100%)] shadow-[0_18px_40px_rgb(0_0_0_/_0.2)]':
                                                 selectedVariant && selectedVariant.id === variant.id,
                                         }"
                                         @click="selectAttributeFromVariant(variant)"
@@ -512,7 +512,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 size="xl"
                                 color="primary"
                                 :disabled="!isAvailable || !selectedVariant"
-                                class="text-base md:text-lg font-semibold h-12 md:h-14 rounded-2xl order-1"
+                                class="buy-cta text-base md:text-lg font-semibold h-12 md:h-14 rounded-2xl order-1"
                                 @click="addToCartHandler"
                             >
                                 <UIcon
