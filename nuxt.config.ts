@@ -1,5 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    app: {
+        head: {
+            link: [
+                { rel: 'icon', type: 'image/svg+xml', href: '/Clip_path_group.svg' }
+            ]
+        }
+    },
+
     devServer: {
         host: '0.0.0.0', // слушать все IP-адреса
         port: 3000, // порт, который вы выбрали
