@@ -152,8 +152,8 @@
 }
 
 @theme {
-  --font-sans: 'Benzin', 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
-  --font-display: 'Benzin', 'Inter', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
+  --font-sans: 'Inter', 'SF Pro Text', 'SF Pro Display', 'Manrope', system-ui, sans-serif;
+  --font-display: 'Inter', 'SF Pro Display', 'SF Pro Text', 'Manrope', system-ui, sans-serif;
   /* Фон и поверхности */
   --color-bg-950: #0E0F12;
   --color-bg-900: #0E0F12;
