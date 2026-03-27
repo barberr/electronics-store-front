@@ -234,7 +234,6 @@ const {
   updateCartItem,
   removeCartItem,
   clearCart,
-  checkout
 } = cartStore;
 
 // Инициализация тостов
@@ -328,31 +327,7 @@ const handleCheckout = async () => {
     return;
   }
 
-  try {
-    const result = await checkout();
-    if (result?.order_id) {
-      toast.add({
-        title: 'Заказ оформлен',
-        description: `Ваш заказ #${result.order_id} успешно создан`,
-        icon: 'i-heroicons-check-circle',
-        color: 'success'
-      });
-      
-      // Перенаправляем на страницу заказа
-      await navigateTo(`/orders/${result.order_id}`);
-    } else if (result?.next_step) {
-      // Если бэкенд вернул URL для следующего шага
-      window.location.href = result.next_step;
-    }
-  } catch (err) {
-    console.error('Checkout error:', err);
-    toast.add({
-      title: 'Ошибка оформления',
-      description: 'Не удалось оформить заказ. Попробуйте позже.',
-      icon: 'i-heroicons-exclamation-triangle',
-      color: 'error'
-    });
-  }
+  await navigateTo('/checkout');
 };
 </script>
 

@@ -222,16 +222,16 @@
         <!-- Телефоны только на lg+ -->
         <div class="hidden lg:flex flex-col items-end mr-3">
           <a
-            href="tel:+78129426246"
+            href="tel:+79517505749"
             class="es-header__phone-primary text-xs font-medium text-text-100"
           >
-            +7 (812) 111-11-11
+            +7 (951) 750-57-49
           </a>
           <a
-            href="tel:+78129359083"
+            href="tel:+79113625699"
             class="text-xs text-text-400"
           >
-            +7 (812) 222-22-22
+            +7 (911) 362-56-99
           </a>
         </div>
         <!-- Если НЕ авторизован -->

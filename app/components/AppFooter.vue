@@ -95,7 +95,7 @@
 
             <div class="footer-bottom">
                 <div class="footer-socials">
-                    <span class="footer-social-label">Мессенджеры</span>
+                    <span class="footer-social-label">Соцсети и мессенджеры</span>
                     <div class="footer-social-list">
                         <a
                             v-for="messenger in messengers"
@@ -109,7 +109,10 @@
                             <UIcon
                                 v-if="messenger.icon"
                                 :name="messenger.icon"
-                                class="footer-social-icon footer-social-icon_telegram"
+                                :class="[
+                                    'footer-social-icon',
+                                    messenger.iconClass,
+                                ]"
                             />
                             <span v-else>{{ messenger.label }}</span>
                         </a>
@@ -131,8 +134,14 @@ const messengers = [
         label: 'Telegram',
         href: 'https://t.me/izistore_price',
         icon: 'i-simple-icons-telegram',
+        iconClass: 'footer-social-icon_telegram',
     },
-    { label: 'WA', href: 'https://wa.me/79517505749' },
+    {
+        label: 'VK',
+        href: 'https://vk.ru/izistore_psk',
+        icon: 'i-simple-icons-vk',
+        iconClass: 'footer-social-icon_vk',
+    },
     { label: 'MAX', href: '#' },
 ];
 </script>
@@ -282,6 +291,10 @@ const messengers = [
 
 .footer-social-icon_telegram {
     color: #229ed9;
+}
+
+.footer-social-icon_vk {
+    color: #0077ff;
 }
 
 .footer-copy {
