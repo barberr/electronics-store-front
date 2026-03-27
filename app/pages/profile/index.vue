@@ -180,6 +180,7 @@ const reloadPage = () => {
                             variant="outline"
                             size="lg"
                             icon="i-heroicons-pencil-square"
+                            class="app-btn-secondary"
                         >
                             Редактировать
                         </UButton>
@@ -204,6 +205,7 @@ const reloadPage = () => {
                             variant="outline"
                             size="lg"
                             icon="i-heroicons-key"
+                            class="app-btn-secondary"
                         >
                             Пароль
                         </UButton>
@@ -215,7 +217,12 @@ const reloadPage = () => {
             <UCard>
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-2xl font-bold text-text-100">Мои заказы</h3>
-                    <UButton to="/profile/orders" size="lg" variant="outline">
+                    <UButton
+                        to="/profile/orders"
+                        size="lg"
+                        variant="outline"
+                        class="app-btn-secondary"
+                    >
                         Все заказы
                     </UButton>
                 </div>
@@ -246,7 +253,7 @@ const reloadPage = () => {
                     @click="handleLogout"
                     color="primary"
                     size="xl"
-                    class="px-16 font-semibold text-xl"
+                    class="app-btn-primary px-16 text-xl"
                     icon="i-heroicons-arrow-right-end-on-rectangle"
                 >
                     Выйти из аккаунта
@@ -271,10 +278,17 @@ const reloadPage = () => {
                     Не удалось загрузить данные. Попробуйте войти заново.
                 </p>
                 <div class="space-x-3">
-                    <UButton to="/login" color="primary"> Войти снова </UButton>
+                    <UButton
+                        to="/login"
+                        color="primary"
+                        class="app-btn-primary"
+                    >
+                        Войти снова
+                    </UButton>
                     <UButton
                         color="neutral"
                         variant="outline"
+                        class="app-btn-secondary"
                         @click="reloadPage"
                     >
                         Обновить

@@ -85,12 +85,10 @@
             color="primary"
             size="xl"
             block
+            class="app-btn-primary min-h-14"
             :loading="loading"
             :disabled="loading"
           >
-            <template #leading>
-              <UIcon name="i-heroicons-arrow-right" />
-            </template>
             {{ loading ? 'Входим...' : 'Войти' }}
           </UButton>
         </form>
@@ -106,6 +104,7 @@
             variant="soft"
             block
             size="lg"
+            class="app-btn-secondary min-h-13"
           >
             Создать аккаунт
           </UButton>
@@ -163,7 +162,6 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-/* Кастомные стили только если нужны */
 .login-container {
     background: linear-gradient(
         135deg,

@@ -15,6 +15,11 @@
     @apply text-text-100 hover:text-text-400 transition-colors duration-200 underline-offset-2 hover:underline;
   }
 
+  a[class*='variant-'][class*='color-'],
+  a[class*='variant-'][class*='color-']:hover {
+    text-decoration: none;
+  }
+
   /* В темной теме */
   .dark a {
     @apply text-text-100 hover:text-text-400;
@@ -64,6 +69,12 @@
   button,
   [role='button'] {
     color: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role='button'][aria-disabled='true'] {
+    cursor: not-allowed;
   }
 
   button:focus-visible,
@@ -85,20 +96,140 @@
   [class*='color-neutral'][class*='variant-outline'] {
     background-color: color-mix(in srgb, var(--color-surface-900) 70%, var(--color-bg-950));
     color: var(--color-text-100);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   [class*='color-neutral'][class*='variant-ghost'] {
     color: var(--color-text-100);
+    transition: color 0.2s ease, background-color 0.2s ease;
   }
 
   [class*='color-primary'][class*='variant-solid'] {
-    color: var(--color-text-100);
-    box-shadow: 0 10px 24px rgb(21 23 28 / 0.22);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-700) 82%, white) 0%,
+      color-mix(in srgb, var(--color-surface-900) 92%, black) 100%
+    );
+    border-color: color-mix(in srgb, white 12%, var(--color-surface-700));
+    color: var(--color-text-100) !important;
+    font-weight: 600;
+    box-shadow:
+      0 12px 28px rgb(0 0 0 / 0.28),
+      0 0 0 1px rgb(255 255 255 / 0.08) inset;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  [class*='color-primary'][class*='variant-solid']:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-700) 88%, white) 0%,
+      color-mix(in srgb, var(--color-surface-900) 84%, white 10%) 100%
+    );
+    border-color: color-mix(in srgb, white 18%, var(--color-surface-700));
+    box-shadow:
+      0 16px 32px rgb(0 0 0 / 0.32),
+      0 0 0 1px rgb(255 255 255 / 0.1) inset;
+  }
+
+  [class*='color-primary'][class*='variant-solid']:disabled {
+    box-shadow: none;
   }
 
   [class*='color-primary'][class*='variant-outline'] {
     border-color: color-mix(in srgb, var(--color-accent-400) 56%, var(--color-surface-900));
     color: var(--color-text-100);
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  [class*='color-primary'][class*='variant-outline']:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-surface-900) 52%, var(--color-bg-950));
+  }
+
+  [class*='color-primary'][class*='variant-solid'] :where(span, svg),
+  [class*='color-primary'][class*='variant-outline'] :where(span, svg),
+  [class*='color-neutral'][class*='variant-soft'] :where(span, svg),
+  [class*='color-neutral'][class*='variant-outline'] :where(span, svg),
+  [class*='color-neutral'][class*='variant-ghost'] :where(span, svg) {
+    color: inherit !important;
+  }
+
+  .app-btn-primary,
+  a.app-btn-primary,
+  button.app-btn-primary,
+  [role='button'].app-btn-primary {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-700) 88%, white 12%) 0%,
+      color-mix(in srgb, var(--color-surface-900) 70%, black 30%) 100%
+    ) !important;
+    border-color: color-mix(in srgb, white 18%, var(--color-surface-700)) !important;
+    color: var(--color-text-100) !important;
+    font-weight: 600;
+    box-shadow:
+      0 12px 28px rgb(0 0 0 / 0.28),
+      0 0 0 1px rgb(255 255 255 / 0.08) inset !important;
+  }
+
+  .app-btn-primary:hover:not(:disabled),
+  a.app-btn-primary:hover,
+  button.app-btn-primary:hover:not(:disabled),
+  [role='button'].app-btn-primary:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-700) 78%, white 22%) 0%,
+      color-mix(in srgb, var(--color-surface-900) 62%, white 10%) 100%
+    ) !important;
+    border-color: color-mix(in srgb, white 28%, var(--color-surface-700)) !important;
+    box-shadow:
+      0 16px 32px rgb(0 0 0 / 0.34),
+      0 0 0 1px rgb(255 255 255 / 0.12) inset !important;
+  }
+
+  .app-btn-secondary,
+  a.app-btn-secondary,
+  button.app-btn-secondary,
+  [role='button'].app-btn-secondary {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-900) 74%, var(--color-bg-950)) 0%,
+      color-mix(in srgb, var(--color-surface-900) 58%, black 42%) 100%
+    ) !important;
+    border-color: color-mix(in srgb, white 12%, var(--color-surface-700)) !important;
+    color: var(--color-text-100) !important;
+    font-weight: 600;
+    box-shadow:
+      0 10px 22px rgb(0 0 0 / 0.22),
+      0 0 0 1px rgb(255 255 255 / 0.05) inset !important;
+  }
+
+  .app-btn-secondary:hover:not(:disabled),
+  a.app-btn-secondary:hover,
+  button.app-btn-secondary:hover:not(:disabled),
+  [role='button'].app-btn-secondary:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-surface-700) 72%, white 10%) 0%,
+      color-mix(in srgb, var(--color-surface-900) 60%, white 6%) 100%
+    ) !important;
+    border-color: color-mix(in srgb, white 20%, var(--color-surface-700)) !important;
+  }
+
+  .app-btn-primary :where(span, svg),
+  .app-btn-secondary :where(span, svg) {
+    color: inherit !important;
   }
 
   .buy-cta {

@@ -223,7 +223,7 @@
         <div class="hidden lg:flex flex-col items-end mr-3">
           <a
             href="tel:+78129426246"
-            class="text-xs font-medium text-text-100 hover:text-text-400"
+            class="es-header__phone-primary text-xs font-medium text-text-100"
           >
             +7 (812) 111-11-11
           </a>
@@ -671,7 +671,7 @@
             v-for="category in categories"
             :key="category.id"
             :to="`/categories/${category.slug}`"
-            class="es-categories__item text-text-100 hover:text-text-400 whitespace-nowrap text-sm"
+            class="es-categories__item text-text-100 whitespace-nowrap text-sm"
           >
             {{ category.name }}
           </NuxtLink>
@@ -1085,6 +1085,14 @@ onBeforeUnmount(() => {
     color: var(--color-text-400);
 }
 
+.es-header__phone-primary {
+    transition: color 0.2s ease;
+}
+
+.es-header__phone-primary:hover {
+    color: var(--color-text-400);
+}
+
 /* Поиск */
 .es-search {
     flex: 1 1 auto;
@@ -1159,10 +1167,11 @@ onBeforeUnmount(() => {
     padding: 0.15rem 0;
     cursor: pointer;
     text-transform: uppercase;
+    transition: color 0.2s ease;
 }
 
 .es-categories__item:hover {
-    color: var(--color-accent-300);
+    color: var(--color-text-400);
 }
 
 .es-search-results {

@@ -3,40 +3,66 @@
         <div class="footer-shell">
             <div class="footer-head">
                 <div>
-                    <p class="footer-kicker">izistor</p>
-                    <h2 class="footer-title">
-                        Техника, покупка и поддержка в одном месте.
-                    </h2>
+                    <img
+                        src="/logo-blue-izi.svg"
+                        alt="Izistor"
+                        class="footer-logo"
+                    >
                 </div>
                 <p class="footer-note">
-                    Часть разделов пока оформлена как рабочие плейсхолдеры. Тексты и
-                    файлы заменим по мере готовности материалов.
+                    Мы подбираем и настраиваем устройства под ваши задачи. Без лишних
+                    решений. С полной поддержкой после покупки.
                 </p>
             </div>
 
             <div class="footer-grid">
                 <section class="footer-card">
-                    <h3>Гарантия</h3>
-                    <ul class="footer-list">
-                        <li>Гарантия: внутри будет отдельный файл.</li>
-                        <li>Подключим ссылку сразу после получения финального документа.</li>
-                    </ul>
-                </section>
-
-                <section class="footer-card">
                     <h3>О нас</h3>
                     <ul class="footer-list">
-                        <li>Блок с описанием компании добавим отдельно.</li>
-                        <li>Текст для этого раздела ещё придёт позже.</li>
+                        <li>Нам доверяют более 1000 клиентов.</li>
+                        <li>
+                            Только оригинальная техника, проверенные поставщики и
+                            команда, которая закрывает вопросы быстро и по делу — от
+                            базовой настройки до сложных сценариев использования.
+                        </li>
                     </ul>
                 </section>
 
                 <section class="footer-card">
-                    <h3>Покупка и доставка</h3>
+                    <h3>Что вы получаете при покупке</h3>
                     <ul class="footer-list">
-                        <li>Файл согласия подключим отдельным пунктом.</li>
-                        <li>Здесь появится структура покупки по шагам.</li>
-                        <li>Здесь же оформим информацию о доставке.</li>
+                        <li>
+                            <strong>iPhone</strong> — перенос данных, установка
+                            приложений, профессиональная наклейка стекла, точная
+                            настройка камеры, оптимизация батареи, настройка AirPods и
+                            кешбэк 1000 ₽ на следующую покупку.
+                        </li>
+                        <li>
+                            <strong>MacBook</strong> — под ключ: гравировка клавиатуры
+                            и евро-адаптер.
+                        </li>
+                        <li>
+                            <strong>iPad</strong> — с бонусом: кешбэк 1000 ₽ и
+                            евро-адаптер.
+                        </li>
+                        <li>
+                            Дополнительно: персональный подарок в день рождения,
+                            поддержка после покупки и консультации без ограничений.
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="footer-card">
+                    <h3>Оплата и гарантии</h3>
+                    <ul class="footer-list">
+                        <li>
+                            Оплата: наличные, безналичный расчет, QR, кредит,
+                            рассрочка 6 / 12 месяцев, онлайн-оплата и работа с юр.
+                            лицами.
+                        </li>
+                        <li>Оригинальная техника Apple.</li>
+                        <li>Гарантия 1 год.</li>
+                        <li>Чек и полный комплект документов.</li>
                     </ul>
                 </section>
 
@@ -44,11 +70,25 @@
                     <h3>Контакты</h3>
                     <ul class="footer-list">
                         <li>
-                            <a class="footer-link" href="tel:+79117770645">
-                                8 911 777 06 45
+                            <a class="footer-link" href="tel:+79517505749">
+                                +7 (951) 750-57-49
                             </a>
                         </li>
-                        <li>Финальный состав контактного блока уточним отдельно.</li>
+                        <li>
+                            <a class="footer-link" href="tel:+79113625699">
+                                +7 (911) 362-56-99
+                            </a>
+                        </li>
+                        <li>
+                            <a class="footer-link" href="tel:+79117770645">
+                                +7 (911) 777-06-45
+                            </a>
+                        </li>
+                        <li>Неофициальный поставщик техники Apple.</li>
+                        <li>
+                            Цены на сайте указаны с учетом скидки при оплате
+                            наличными.
+                        </li>
                     </ul>
                 </section>
             </div>
@@ -57,18 +97,27 @@
                 <div class="footer-socials">
                     <span class="footer-social-label">Мессенджеры</span>
                     <div class="footer-social-list">
-                        <span
+                        <a
                             v-for="messenger in messengers"
-                            :key="messenger"
+                            :key="messenger.label"
                             class="footer-social-chip"
+                            :href="messenger.href"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            :aria-label="messenger.label"
                         >
-                            {{ messenger }}
-                        </span>
+                            <UIcon
+                                v-if="messenger.icon"
+                                :name="messenger.icon"
+                                class="footer-social-icon footer-social-icon_telegram"
+                            />
+                            <span v-else>{{ messenger.label }}</span>
+                        </a>
                     </div>
                 </div>
 
                 <p class="footer-copy">
-                    © {{ currentYear }} izistor. Материалы footer обновляются по ТЗ.
+                    © {{ currentYear }} izistor. Все права защищены.
                 </p>
             </div>
         </div>
@@ -77,7 +126,15 @@
 
 <script setup lang="ts">
 const currentYear = new Date().getFullYear();
-const messengers = ['TG', 'WA', 'MAX'];
+const messengers = [
+    {
+        label: 'Telegram',
+        href: 'https://t.me/izistore_price',
+        icon: 'i-simple-icons-telegram',
+    },
+    { label: 'WA', href: 'https://wa.me/79517505749' },
+    { label: 'MAX', href: '#' },
+];
 </script>
 
 <style scoped>
@@ -103,20 +160,10 @@ const messengers = ['TG', 'WA', 'MAX'];
     margin-bottom: 2rem;
 }
 
-.footer-kicker {
-    margin: 0 0 0.75rem;
-    font-size: 0.8rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-accent-400);
-}
-
-.footer-title {
-    margin: 0;
-    max-width: 12ch;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    line-height: 0.95;
-    color: var(--color-text-100);
+.footer-logo {
+    display: block;
+    width: auto;
+    height: clamp(2.5rem, 5vw, 3.5rem);
 }
 
 .footer-note {
@@ -156,6 +203,11 @@ const messengers = ['TG', 'WA', 'MAX'];
     list-style: none;
     color: var(--color-text-400);
     line-height: 1.55;
+}
+
+.footer-list strong {
+    color: var(--color-text-100);
+    font-weight: 600;
 }
 
 .footer-link {
@@ -210,6 +262,26 @@ const messengers = ['TG', 'WA', 'MAX'];
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.04em;
+    text-decoration: none;
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.footer-social-chip:hover {
+    color: var(--color-accent-300);
+    border-color: rgb(255 255 255 / 0.2);
+    background: rgb(255 255 255 / 0.07);
+}
+
+.footer-social-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.footer-social-icon_telegram {
+    color: #229ed9;
 }
 
 .footer-copy {

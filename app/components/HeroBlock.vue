@@ -67,7 +67,7 @@
               :to="`/products/${hero.product_slug}`"
               size="xl"
               color="neutral"
-              class="px-8 py-4 text-lg font-semibold hover:scale-105 transition-transform"
+              class="px-8 py-4 text-lg font-semibold hover:scale-105 transition-transform !bg-[#E9CC02] !border-[#E9CC02] !text-[#0E0F12] hover:!bg-[#f0df58] hover:!border-[#f0df58]"
               variant="outline"
             >
               Подробнее
