@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, onBeforeUnmount } from 'vue';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 
 
@@ -25,7 +25,7 @@ onMounted(() => {
 const minPrice = computed(() => {
     const activeVariants =
         product.value?.variants.filter(
-            (v) => v.is_active && v.stock !== null,
+            (v) => v.is_active,
         ) || [];
     return activeVariants.length > 0
         ? Math.min(...activeVariants.map((v) => parseFloat(v.price)))
@@ -39,7 +39,7 @@ const isAvailable = computed(() => {
 const availableVariantsCount = computed(() => {
     return (
         product.value?.variants.filter(
-            (v) => v.is_active && v.stock !== null,
+            (v) => v.is_active,
         ).length || 0
     );
 });
@@ -131,9 +131,7 @@ const variantGroups = computed(() => {
         groups[key].push(variant);
     });
 
-    return Object.values(groups).filter((g) =>
-        g.some((v) => v.stock !== null),
-    );
+    return Object.values(groups);
 });
 
 const variantCards = computed(() => {
@@ -170,8 +168,49 @@ const selectAttribute = (attrName: string, value: string) => {
 };
 
 const currentImageIndex = ref(0);
+const isMediaModalOpen = ref(false);
+const activeMedia = computed(() => {
+    const variantMedia = selectedVariant.value?.media;
+
+    if (variantMedia?.length) {
+        return variantMedia;
+    }
+
+    return product.value?.images || [];
+});
+
 const galleryImages = computed(() => {
-    return [...(product.value?.images || [])].sort((a, b) => a.order - b.order);
+    return [...activeMedia.value]
+        .map((item) => ({
+            ...item,
+            media_type: item.media_type ?? 'image',
+        }))
+        .sort((a, b) => a.order - b.order);
+});
+
+const currentMedia = computed(() => galleryImages.value[currentImageIndex.value] || null);
+
+const openMediaModal = (index: number) => {
+    currentImageIndex.value = index;
+    isMediaModalOpen.value = true;
+};
+
+const closeMediaModal = () => {
+    isMediaModalOpen.value = false;
+};
+
+const handleEscapeKey = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isMediaModalOpen.value) {
+        closeMediaModal();
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('keydown', handleEscapeKey);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleEscapeKey);
 });
 
 // Загрузка товара - ИСПРАВЛЕНО!
@@ -182,11 +221,13 @@ const fetchProduct = async () => {
         
         // Устанавливаем начальные атрибуты первого доступного варианта
         const firstAvailable = product.value?.variants.find(
-            (v) => v.is_active && v.stock !== null,
+            (v) => v.is_active,
         );
         if (firstAvailable) {
             selectedAttributes.value = { ...firstAvailable.attributes };
         }
+
+        currentImageIndex.value = 0;
     } catch (err: any) {
         error.value = err.response?.data || err;
     } finally {
@@ -199,6 +240,13 @@ watch(slug, (newSlug, oldSlug) => {
     fetchProduct();
   }
 }, { immediate: true });
+
+watch(
+    () => selectedVariant.value?.id,
+    () => {
+        currentImageIndex.value = 0;
+    },
+);
 
 useSeoMeta({
     title: () => product.value?.seo_title || product.value?.name || 'Товар',
@@ -272,16 +320,24 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                             </p>
                         </div>
                     </div>
+                    <video
+                        v-else-if="currentMedia?.media_type === 'video'"
+                        :src="currentMedia.image"
+                        :aria-label="currentMedia.alt_text || product.name"
+                        class="w-full h-[18rem] md:h-96 object-contain p-4 md:p-6"
+                        autoplay
+                        controls
+                        loop
+                        playsinline
+                        preload="metadata"
+                    />
                     <NuxtImg
                         v-else
-                        :src="galleryImages[currentImageIndex]?.image"
-                        :alt="product.name"
+                        :src="currentMedia?.image"
+                        :alt="currentMedia?.alt_text || product.name"
                         class="w-full h-[18rem] md:h-96 object-contain p-4 md:p-6 hover:scale-105 transition-transform duration-300 cursor-pointer"
                         sizes="500px"
-                        @click="
-                            currentImageIndex =
-                                (currentImageIndex + 1) % galleryImages.length
-                        "
+                        @click="openMediaModal(currentImageIndex)"
                     />
                 </UCard>
 
@@ -302,12 +358,26 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         }"
                         @click="currentImageIndex = index"
                     >
-                        <NuxtImg
-                            :src="img.image"
-                            :alt="`${product.name} - изображение ${index + 1}`"
-                            class="w-full h-16 md:h-20 object-contain p-1"
-                            sizes="100px"
-                        />
+                        <div class="relative">
+                            <video
+                                v-if="img.media_type === 'video'"
+                                :src="img.image"
+                                :aria-label="img.alt_text || `${product.name} - видео ${index + 1}`"
+                                class="w-full h-16 md:h-20 object-contain p-1"
+                                autoplay
+                                loop
+                                muted
+                                playsinline
+                                preload="metadata"
+                            />
+                            <NuxtImg
+                                v-else
+                                :src="img.image"
+                                :alt="img.alt_text || `${product.name} - изображение ${index + 1}`"
+                                class="w-full h-16 md:h-20 object-contain p-1"
+                                sizes="100px"
+                            />
+                        </div>
                     </UCard>
                 </div>
             </div>
@@ -645,16 +715,6 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 {{ product.warranty_months }} месяцев
                             </dd>
                         </div>
-                        <div v-if="productSpecifications.length">
-                            <dt
-                                class="font-medium text-text-400 mb-1"
-                            >
-                                Характеристик
-                            </dt>
-                            <dd class="text-text-100">
-                                {{ productSpecifications.length }}
-                            </dd>
-                        </div>
                         <div>
                             <dt
                                 class="font-medium text-text-400 mb-1"
@@ -704,5 +764,44 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                 </UCard>
             </div>
         </div>
+
+        <Teleport to="body">
+            <div
+                v-if="isMediaModalOpen && currentMedia"
+                class="fixed inset-0 z-[100] bg-black/95"
+                @click.self="closeMediaModal"
+            >
+                <button
+                    type="button"
+                    class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                    aria-label="Закрыть медиа"
+                    @click="closeMediaModal"
+                >
+                    <UIcon
+                        name="i-heroicons-x-mark"
+                        class="h-6 w-6"
+                    />
+                </button>
+
+                <div class="flex min-h-screen w-screen items-center justify-center px-0 py-8 md:px-8">
+                    <video
+                        v-if="currentMedia.media_type === 'video'"
+                        :src="currentMedia.image"
+                        :aria-label="currentMedia.alt_text || product.name"
+                        class="max-h-[100vh] w-screen object-contain"
+                        autoplay
+                        controls
+                        loop
+                        playsinline
+                    />
+                    <img
+                        v-else
+                        :src="currentMedia.image"
+                        :alt="currentMedia.alt_text || product.name"
+                        class="max-h-[100vh] w-screen object-contain"
+                    >
+                </div>
+            </div>
+        </Teleport>
     </UContainer>
 </template>

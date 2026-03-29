@@ -22,7 +22,9 @@ export interface Category {
 export interface ProductImage {
     id: number;
     image: string;
+    media_type?: 'image' | 'video';
     alt_text: string;
+    color_value?: string | null;
     order: number;
 }
 
@@ -31,6 +33,7 @@ export interface ProductVariant {
     sku: string | null;
     attributes: Record<string, string>;
     attribute_values?: ProductPropertyValue[];
+    media?: ProductImage[];
     price: string;
     old_price: string | null;
     is_active: boolean;

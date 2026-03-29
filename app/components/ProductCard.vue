@@ -11,7 +11,7 @@ const { formatPrice } = useFormatPrice();
 // Минимальная цена
 const minPrice = computed(() => {
     const activeVariants = props.product.variants.filter(
-        (v) => v.is_active && v.stock !== null && v.stock > 0,
+        (v) => v.is_active,
     );
     return activeVariants.length
         ? Math.min(...activeVariants.map((v) => parseFloat(v.price)))
@@ -21,13 +21,20 @@ const minPrice = computed(() => {
 // Доступность
 const isAvailable = computed(() => props.product.is_active); //&& !!minPrice.value);
 
-// Первое изображение
-const firstImage = computed(() => props.product.images[0]?.image || null);
+const firstMedia = computed(() => {
+    const [media] = [...props.product.images].sort((a, b) => a.order - b.order);
+    if (!media) return null;
+
+    return {
+        ...media,
+        media_type: media.media_type ?? 'image',
+    };
+});
 
 // Вариантов в наличии
 const availableVariantsCount = computed(() => {
     return props.product.variants.filter(
-        (v) => v.is_active && v.stock !== null && v.stock > 0,
+        (v) => v.is_active,
     ).length;
 });
 
@@ -55,10 +62,21 @@ onMounted(() => {
             <div
                 class="aspect-[4/3] overflow-hidden bg-[radial-gradient(circle_at_top,_rgb(233_204_2_/_0.08),_transparent_45%),linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_82%,var(--color-bg-950))_0%,color-mix(in_srgb,var(--color-bg-950)_88%,black)_100%)] relative group-hover:brightness-110 transition-all duration-500"
             >
+                <video
+                    v-if="firstMedia?.media_type === 'video'"
+                    :src="firstMedia.image"
+                    :aria-label="firstMedia.alt_text || product.name"
+                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="metadata"
+                />
                 <NuxtImg
-                    v-if="firstImage"
-                    :src="firstImage"
-                    :alt="product.name"
+                    v-else-if="firstMedia"
+                    :src="firstMedia.image"
+                    :alt="firstMedia.alt_text || product.name"
                     class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
                     sizes="(max-width: 640px) 150px, (max-width: 1024px) 200px, 250px"
                     loading="lazy"
@@ -102,6 +120,16 @@ onMounted(() => {
                     class="absolute bottom-3 right-3 z-20 shadow-lg backdrop-blur-sm border-surface-700 text-text-100"
                 >
                     {{ availableVariantsCount }}+ вар.
+                </UBadge>
+
+                <UBadge
+                    v-if="firstMedia?.media_type === 'video'"
+                    color="neutral"
+                    variant="solid"
+                    size="xs"
+                    class="absolute bottom-3 left-3 z-20 shadow-lg"
+                >
+                    Видео
                 </UBadge>
             </div>
 
