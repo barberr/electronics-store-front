@@ -30,10 +30,23 @@ export interface ProductVariant {
     id: number;
     sku: string | null;
     attributes: Record<string, string>;
+    attribute_values?: ProductPropertyValue[];
     price: string;
     old_price: string | null;
     is_active: boolean;
     stock: number | null;
+}
+
+export interface ProductPropertyValue {
+    id: number;
+    name: string;
+    slug: string;
+    type: string;
+    applies_to: 'product' | 'variant';
+    is_required: boolean;
+    unit: string;
+    group_name: string;
+    value: string;
 }
 
 // =============== ОСНОВНОЙ ТИП ТОВАРА ===============
@@ -54,6 +67,8 @@ export interface Product {
     is_preorder: boolean;
     delivery_text: string;
     warranty_months: number;
+    specifications?: ProductPropertyValue[];
+    specifications_map?: Record<string, string>;
 
     created_at: string; // ISO дата
     updated_at: string; // ISO дата

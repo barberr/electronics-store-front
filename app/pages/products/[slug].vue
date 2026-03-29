@@ -47,6 +47,57 @@ const availableVariantsCount = computed(() => {
 const selectedAttributes = ref<Record<string, string>>({});
 const expandedVariants = ref(false);
 
+const fallbackAttributeLabels: Record<string, string> = {
+    color: 'Цвет',
+    memory: 'Память',
+    storage: 'Память',
+};
+
+const attributeMeta = computed(() => {
+    const meta: Record<string, { name: string; unit?: string }> = {};
+
+    product.value?.variants.forEach((variant) => {
+        variant.attribute_values?.forEach((attribute) => {
+            meta[attribute.slug] = {
+                name: attribute.name,
+                unit: attribute.unit || undefined,
+            };
+        });
+    });
+
+    return meta;
+});
+
+const productSpecifications = computed(() => product.value?.specifications || []);
+
+const getAttributeLabel = (slug: string) => {
+    return attributeMeta.value[slug]?.name || fallbackAttributeLabels[slug] || slug;
+};
+
+const formatPropertyValue = (value: string | number | null | undefined, unit?: string) => {
+    if (value === null || value === undefined || value === '') return 'Не указано';
+    if (!unit) return String(value);
+
+    const normalizedValue = String(value);
+    return normalizedValue.endsWith(unit) ? normalizedValue : `${normalizedValue} ${unit}`;
+};
+
+const getVariantDisplayAttributes = (variant: ProductVariant) => {
+    if (variant.attribute_values?.length) {
+        return variant.attribute_values.map(attribute => ({
+            key: attribute.slug,
+            label: attribute.name,
+            value: formatPropertyValue(attribute.value, attribute.unit),
+        }));
+    }
+
+    return Object.entries(variant.attributes).map(([key, value]) => ({
+        key,
+        label: getAttributeLabel(key),
+        value,
+    }));
+};
+
 // Вычисляемый выбранный вариант
 const selectedVariant = computed(() => {
     if (!product.value?.variants.length) return null;
@@ -387,13 +438,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                             <label
                                                 class="text-sm font-medium text-text-100 capitalize block"
                                             >
-                                                {{
-                                                    attrName === 'color'
-                                                        ? 'Цвет'
-                                                        : attrName === 'memory'
-                                                        ? 'Память'
-                                                        : attrName
-                                                }}
+                                                {{ getAttributeLabel(attrName) }}
                                             </label>
                                         </div>
                                         <div class="flex flex-wrap gap-2">
@@ -468,11 +513,11 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 class="flex flex-wrap gap-1.5 text-[11px] md:text-xs text-text-400 min-h-[2rem]"
                                             >
                                                 <span
-                                                    v-for="(value, key) in variant.attributes"
-                                                    :key="key"
+                                                    v-for="attribute in getVariantDisplayAttributes(variant)"
+                                                    :key="attribute.key"
                                                     class="px-2 py-1 bg-surface-900 rounded-2xl md:rounded-[1.25rem] border border-surface-700"
                                                 >
-                                                    {{ key }}: {{ value }}
+                                                    {{ attribute.label }}: {{ attribute.value }}
                                                 </span>
                                             </div>
 
@@ -600,6 +645,16 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 {{ product.warranty_months }} месяцев
                             </dd>
                         </div>
+                        <div v-if="productSpecifications.length">
+                            <dt
+                                class="font-medium text-text-400 mb-1"
+                            >
+                                Характеристик
+                            </dt>
+                            <dd class="text-text-100">
+                                {{ productSpecifications.length }}
+                            </dd>
+                        </div>
                         <div>
                             <dt
                                 class="font-medium text-text-400 mb-1"
@@ -614,6 +669,21 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                 }}
                             </dd>
                         </div>
+                        <template
+                            v-for="specification in productSpecifications"
+                            :key="specification.id"
+                        >
+                            <div>
+                                <dt
+                                    class="font-medium text-text-400 mb-1"
+                                >
+                                    {{ specification.name }}
+                                </dt>
+                                <dd class="text-text-100">
+                                    {{ formatPropertyValue(specification.value, specification.unit) }}
+                                </dd>
+                            </div>
+                        </template>
                     </dl>
                 </UCard>
 
