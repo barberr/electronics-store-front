@@ -207,6 +207,6 @@ useSeoMeta({
 
 <style scoped>
     .category-title {
-        text-transform: uppercase;
+        text-transform: none;
     }
 </style>

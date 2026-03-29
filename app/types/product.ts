@@ -90,6 +90,9 @@ export interface BrandResponse {
     name: string;
     slug: string;
     logo: string | null;
+    created_at?: string;
+    updated_at?: string;
+    products?: Product[];
 }
 
 export interface HeroBlock {

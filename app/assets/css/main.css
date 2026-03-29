@@ -3,6 +3,7 @@
 
 @layer components {
   :root {
+    color-scheme: dark;
     --ui-bg-elevated: color-mix(in srgb, var(--color-surface-900) 78%, var(--color-bg-950));
     --ui-bg-muted: color-mix(in srgb, var(--color-surface-900) 58%, var(--color-bg-950));
     --ui-bg-accented: color-mix(in srgb, var(--color-accent-400) 16%, var(--color-bg-950));
@@ -20,20 +21,10 @@
     text-decoration: none;
   }
 
-  /* В темной теме */
-  .dark a {
-    @apply text-text-100 hover:text-text-400;
-  }
-
   /* Ссылки в карточках/блоках */
   .card a,
   [role="article"] a,
   .prose a {
-    @apply text-primary-400 hover:text-primary-300;
-  }
-
-  .dark .card a,
-  .dark .prose a {
     @apply text-primary-300 hover:text-primary-200;
   }
 
@@ -303,6 +294,7 @@
 
 /* Базовый фон и текст */
 :root {
+  color-scheme: dark;
   --ui-bg: #0E0F12;
   --ui-border: #464646;
   --ui-text: #FFFFFF;
@@ -311,6 +303,7 @@
 }
 
 
+html,
 body {
   background-color: var(--color-bg-950);
   color: var(--color-text-100);

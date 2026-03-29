@@ -2,6 +2,12 @@
 export default defineNuxtConfig({
     app: {
         head: {
+            htmlAttrs: {
+                class: 'dark'
+            },
+            meta: [
+                { name: 'color-scheme', content: 'dark' }
+            ],
             link: [
                 { rel: 'icon', type: 'image/svg+xml', href: '/Clip_path_group.svg' }
             ]
@@ -21,6 +27,12 @@ export default defineNuxtConfig({
 
     ui: {
         fonts: false,
+    },
+
+    colorMode: {
+        preference: 'dark',
+        fallback: 'dark',
+        classSuffix: ''
     },
 
     icon: {

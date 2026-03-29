@@ -171,10 +171,14 @@ onMounted(() => {
                     <!-- Кнопка -->
                     <UButton
                         size="lg"
-                        color="primary"
-                        :variant="isAvailable ? 'solid' : 'soft'"
+                        :color="isAvailable ? 'neutral' : 'neutral'"
+                        :variant="isAvailable ? 'outline' : 'soft'"
                         :disabled="!isAvailable"
-                        class="rounded-xl px-4 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all font-semibold min-w-[3rem]"
+                        :class="
+                            isAvailable
+                                ? 'w-full justify-center rounded-xl px-4 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all font-semibold min-h-12 !bg-[#E9CC02] !border-[#E9CC02] !text-[#0E0F12] hover:!bg-[#f0df58] hover:!border-[#f0df58]'
+                                : 'w-full justify-center rounded-xl px-4 shadow-lg transition-all font-semibold min-h-12'
+                        "
                         @click.stop="handleAddToCart"
                     >
                         Подробнее

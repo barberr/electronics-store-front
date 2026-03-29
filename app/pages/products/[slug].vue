@@ -277,7 +277,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                             >
                                 <NuxtLink
                                     v-if="product.brand"
-                                    :to="`/brands/${product.brand.slug}`"
+                                    :to="`/brand/${product.brand.slug}`"
                                     class="font-medium hover:text-text-400 transition-colors"
                                 >
                                     {{ product.brand.name }}
@@ -297,7 +297,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                         </div>
                         <NuxtLink
                             v-if="product.brand?.logo"
-                            :to="`/brands/${product.brand.slug}`"
+                            :to="`/brand/${product.brand.slug}`"
                             class="w-12 h-12 md:w-16 md:h-16 p-2 md:p-3 bg-surface-900 rounded-2xl hover:bg-surface-700 transition-colors shrink-0 border border-surface-700"
                         >
                             <NuxtImg

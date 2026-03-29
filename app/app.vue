@@ -9,7 +9,7 @@ onMounted(() => {});
 </script>
 
 <template>
-    <UApp>
+    <UApp class="dark">
         <div class="app min-h-screen flex flex-col bg-bg-950 text-white">
             <!-- Header -->
             <AppHeader />

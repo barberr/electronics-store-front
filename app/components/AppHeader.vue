@@ -26,9 +26,9 @@
           title="Поиск по каталогу"
           class="md:hidden"
           :close="{
-            color: 'primary',
+            color: 'neutral',
             variant: 'outline',
-            class: 'rounded-full'
+            class: 'rounded-full !border-surface-700 !bg-surface-900 !text-text-100 hover:!bg-surface-700'
           }"
         >
           <UButton
@@ -322,9 +322,9 @@
           title="Каталог"
           class="md:hidden"
           :close="{
-            color: 'primary',
+            color: 'neutral',
             variant: 'outline',
-            class: 'rounded-full'
+            class: 'rounded-full !border-surface-700 !bg-surface-900 !text-text-100 hover:!bg-surface-700'
           }"
         >
           <UButton
@@ -673,6 +673,10 @@
             :to="`/categories/${category.slug}`"
             class="es-categories__item text-text-100 whitespace-nowrap text-sm"
           >
+            <UIcon
+              :name="getCategoryIcon(category.slug)"
+              class="es-categories__icon"
+            />
             {{ category.name }}
           </NuxtLink>
         </nav>
@@ -1161,6 +1165,9 @@ onBeforeUnmount(() => {
 }
 
 .es-categories__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     border: none;
     background: transparent;
     color: var(--color-text-100);
@@ -1172,6 +1179,13 @@ onBeforeUnmount(() => {
 
 .es-categories__item:hover {
     color: var(--color-text-400);
+}
+
+.es-categories__icon {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+    color: currentColor;
 }
 
 .es-search-results {
