@@ -1062,6 +1062,7 @@ onBeforeUnmount(() => {
 
 .es-catalog-group {
     position: relative;
+    padding-bottom: 0.45rem;
 }
 
 .es-catalog-parent {
@@ -1083,7 +1084,7 @@ onBeforeUnmount(() => {
 
 .es-catalog-submenu {
     position: absolute;
-    top: calc(100% + 0.35rem);
+    top: calc(100% - 0.1rem);
     right: 0;
     display: block;
     min-width: 15rem;
@@ -1109,6 +1110,16 @@ onBeforeUnmount(() => {
         opacity 0.18s ease,
         transform 0.18s ease,
         visibility 0.18s ease;
+    transition-delay: 0s;
+}
+
+.es-catalog-group::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    height: 0.75rem;
 }
 
 .es-catalog-group:hover .es-catalog-submenu,
@@ -1117,6 +1128,7 @@ onBeforeUnmount(() => {
     visibility: visible;
     transform: translate(-0.75rem, 0);
     pointer-events: auto;
+    transition-delay: 0.14s;
 }
 
 .es-catalog-submenu__item {
