@@ -125,7 +125,7 @@ useSeoMeta({
         class="max-w-full py-16 px-0"
         :ui="{ padding: '' }"
     >
-
+        <div class="category-page-container">
             <!-- Загрузка -->
             <div
                 v-if="pending"
@@ -171,14 +171,18 @@ useSeoMeta({
                 <div v-if="products.length">
                     <!-- Карточки товаров -->
                     <div
-                        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-6 justify-items-center sm:justify-items-stretch"
+                        class="grid grid-cols-1 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4"
                     >
-                        <ProductCard
+                        <div
                             v-for="product in products"
                             :key="product.id"
-                            :product="product"
-                            @add-to-cart="addToCart"
-                        />
+                            class="flex justify-center px-3 lg:px-4"
+                        >
+                            <ProductCard
+                                :product="product"
+                                @add-to-cart="addToCart"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -201,12 +205,19 @@ useSeoMeta({
                     </p>
                 </div>
             </div>
-        </UContainer>
+        </div>
+    </UContainer>
     
 </template>
 
 <style scoped>
     .category-title {
         text-transform: none;
+    }
+
+    .category-page-container {
+        margin: 0 auto;
+        max-width: 1280px;
+        padding: 0 1rem;
     }
 </style>

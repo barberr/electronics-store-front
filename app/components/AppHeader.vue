@@ -1083,21 +1083,40 @@ onBeforeUnmount(() => {
 
 .es-catalog-submenu {
     position: absolute;
-    top: 0;
-    left: calc(100% + 0.6rem);
-    display: none;
+    top: calc(100% + 0.35rem);
+    right: 0;
+    display: block;
     min-width: 15rem;
-    padding: 0.45rem;
-    border: 1px solid color-mix(in srgb, var(--color-text-100) 10%, transparent);
-    border-radius: 0.9rem;
-    background: color-mix(in srgb, var(--color-bg-950) 96%, var(--color-surface-900));
-    box-shadow: 0 20px 40px rgb(0 0 0 / 0.3);
+    padding: 0.55rem;
+    border: 1px solid color-mix(in srgb, var(--color-accent-400) 28%, var(--color-surface-700));
+    border-radius: 1rem;
+    background:
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--color-surface-900) 92%, white 6%) 0%,
+            color-mix(in srgb, var(--color-bg-950) 92%, var(--color-surface-900)) 100%
+        );
+    box-shadow:
+        0 24px 48px rgb(0 0 0 / 0.34),
+        0 0 0 1px rgb(255 255 255 / 0.04) inset,
+        0 0 28px color-mix(in srgb, var(--color-accent-400) 10%, transparent);
     z-index: 20;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-0.75rem, -0.25rem);
+    pointer-events: none;
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
 }
 
 .es-catalog-group:hover .es-catalog-submenu,
 .es-catalog-group:focus-within .es-catalog-submenu {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-0.75rem, 0);
+    pointer-events: auto;
 }
 
 .es-catalog-submenu__item {
@@ -1105,15 +1124,20 @@ onBeforeUnmount(() => {
     padding: 0.7rem 0.85rem;
     border-radius: 0.75rem;
     color: var(--color-text-100);
+    border: 1px solid transparent;
     white-space: nowrap;
     transition:
         background-color 0.2s ease,
-        color 0.2s ease;
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .es-catalog-submenu__item:hover {
-    background: color-mix(in srgb, var(--color-surface-900) 88%, transparent);
+    background: color-mix(in srgb, var(--color-surface-700) 42%, var(--color-surface-900));
+    border-color: color-mix(in srgb, var(--color-accent-400) 32%, transparent);
     color: var(--color-accent-300);
+    transform: translateX(-2px);
 }
 
 /* Категории */
