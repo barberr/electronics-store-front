@@ -41,7 +41,6 @@
                 <!-- Слайдер популярных товаров -->
                  <UCarousel
                     v-slot="{ item }"
-                    loop
                     dots
                     arrows
                     :items="popularProducts"
@@ -178,7 +177,6 @@ const fetchPopularProducts = async () => {
             skipAuth: true,
         });
         popularProducts.value = response.data || [];
-        console.log('popularProducts -',popularProducts);
     } catch (err: any) {
         console.warn('Не удалось загрузить популярные товары:', err);
         // Не показываем ошибку пользователю — блок просто не отобразится
