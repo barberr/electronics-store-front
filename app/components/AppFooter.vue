@@ -19,7 +19,7 @@
                 <section class="footer-card">
                     <h3>О нас</h3>
                     <ul class="footer-list">
-                        <li>Нам доверяют более 1000 клиентов.</li>
+                        <li>Нам доверяют более 3 000 клиентов.</li>
                         <li>
                             Только оригинальная техника, проверенные поставщики и
                             команда, которая закрывает вопросы быстро и по делу — от
@@ -30,26 +30,47 @@
 
                 <section class="footer-card">
                     <h3>Что вы получаете при покупке</h3>
-                    <ul class="footer-list">
-                        <li>
-                            <strong>iPhone</strong> — перенос данных, установка
-                            приложений, профессиональная наклейка стекла, точная
-                            настройка камеры, оптимизация батареи, настройка AirPods и
-                            кешбэк 1000 ₽ на следующую покупку.
+                    <ul class="footer-list footer-list_compact">
+                        <li class="footer-benefit">
+                            <strong>iPhone</strong> — техническая поддержка при
+                            переносе данных, техническая поддержка оптимизации
+                            батареи, техническая поддержка точной настройки камеры,
+                            техническая помощь в синхронизации с AirPods, 1 000
+                            рублей cashback на следующую покупку.
                         </li>
-                        <li>
+                        <li class="footer-benefit">
                             <strong>MacBook</strong> — под ключ: гравировка клавиатуры
-                            и евро-адаптер.
+                            и евро-адаптер в подарок.
                         </li>
-                        <li>
+                        <li class="footer-benefit footer-benefit_note">
+                            Гравировка наносится на вскрытое устройство и бережно
+                            упаковывается обратно, активация не требуется.
+                        </li>
+                        <li class="footer-benefit">
                             <strong>iPad</strong> — с бонусом: кешбэк 1000 ₽ и
-                            евро-адаптер.
+                            евро-адаптер в подарок.
                         </li>
-                        <li>
-                            Дополнительно: персональный подарок в день рождения,
-                            поддержка после покупки и консультации без ограничений.
+                        <li class="footer-benefit">
+                            Дополнительно: персональный подарок в день рождения*,
+                            поддержка после покупки и консультации без ограничений в
+                            течении гарантийного срока.
+                        </li>
+                        <li class="footer-benefit">
+                            Постгарантийное обслуживание**.
                         </li>
                     </ul>
+                    <div class="footer-footnotes">
+                        <p class="footer-footnote">
+                            * При условии физического посещения наших магазинов.
+                            Наклейка защитного стекла, приобретенного у нас,
+                            бесплатно.
+                        </p>
+                        <p class="footer-footnote">
+                            ** Постгарантийное обслуживание не включает в себя
+                            сложных технических ремонтов, более подробная информация
+                            у менеджеров.
+                        </p>
+                    </div>
                 </section>
 
                 <section class="footer-card">
@@ -120,8 +141,16 @@
                 </div>
 
                 <p class="footer-copy">
-                    © {{ currentYear }} izistor. Все права защищены.
+                    © {{ currentYear }} Изистор. Все права защищены.
                 </p>
+                <a
+                    class="footer-copy footer-copy_link"
+                    href="https://t.me/kachsss"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Разработчик в Telegram: @kachsss
+                </a>
             </div>
         </div>
     </footer>
@@ -214,9 +243,44 @@ const messengers = [
     line-height: 1.55;
 }
 
+.footer-list_compact {
+    gap: 0.85rem;
+}
+
+.footer-benefit {
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.footer-benefit:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.footer-benefit_note {
+    margin-top: -0.25rem;
+    font-size: 0.92rem;
+    color: var(--color-text-500);
+}
+
 .footer-list strong {
     color: var(--color-text-100);
     font-weight: 600;
+}
+
+.footer-footnotes {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.footer-footnote {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: var(--color-text-500);
 }
 
 .footer-link {
@@ -236,6 +300,20 @@ const messengers = [
     margin-top: 1.5rem;
     padding-top: 1.25rem;
     border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.footer-copy {
+    margin: 0;
+    color: var(--color-text-500);
+}
+
+.footer-copy_link {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-copy_link:hover {
+    color: var(--color-text-100);
 }
 
 .footer-socials {

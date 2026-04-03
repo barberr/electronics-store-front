@@ -1,34 +1,59 @@
 <template>
     <div>
         <HeroBlock v-if="heroBlock" :hero="heroBlock" />
+        <UContainer
+            class="max-w-full px-0 py-8 md:py-10"
+            :ui="{ padding: '' }"
+        >
+            <section class="mx-auto max-w-7xl px-4">
+                <div
+                    class="rounded-[2rem] border border-surface-700 bg-gradient-to-r from-bg-950 via-surface-900 to-bg-950 px-6 py-8 shadow-[0_24px_80px_rgba(0,0,0,0.24)] md:px-10 md:py-10"
+                >
+                    <div class="max-w-4xl">
+                        <span
+                            class="mb-4 inline-flex rounded-full border border-surface-700 bg-surface-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-text-400"
+                        >
+                            Финансовое преимущество
+                        </span>
+                        <h2 class="text-2xl font-bold leading-tight text-text-100 md:text-4xl">
+                            Беспроцентная рассрочка
+                        </h2>
+                        <p class="mt-4 text-base leading-relaxed text-text-400 md:text-lg">
+                            Уникальное предложение на рынке. Подари себе уверенность и статус,
+                            не переплачивая.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </UContainer>
         <UContainer 
             v-if="popularProducts.length > 0"
             class="max-w-full py-12 px-0"
             :ui="{ padding: '' }"
         >
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-text-100">
-                    Популярные товары
-                </h2>
-            </div>
+            <section class="mx-auto max-w-7xl px-4">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-text-100">
+                        Популярные товары
+                    </h2>
+                </div>
 
-            <!-- Слайдер популярных товаров -->
-             <UCarousel
-                v-slot="{ item }"
-                loop
-                dots
-                arrows
-                
-                class="max-w-7xl mx-auto"
-                :items="popularProducts"
-                :ui="{ item: 'basis-full sm:basis-1/2 lg:basis-1/3 flex justify-center' }"
-            >
-                <ProductCard 
-                    class="rounded-lg"
-                    :product="item"
-                />
-                <!-- <img :src="item" width="234" height="234" class="rounded-lg"> -->
-            </UCarousel>
+                <!-- Слайдер популярных товаров -->
+                 <UCarousel
+                    v-slot="{ item }"
+                    loop
+                    dots
+                    arrows
+                    :items="popularProducts"
+                    :ui="{ item: 'basis-full sm:basis-1/2 lg:basis-1/3 flex justify-center' }"
+                >
+                    <ProductCard 
+                        class="rounded-lg"
+                        :product="item"
+                    />
+                    <!-- <img :src="item" width="234" height="234" class="rounded-lg"> -->
+                </UCarousel>
+            </section>
         </UContainer>
         
     </div>

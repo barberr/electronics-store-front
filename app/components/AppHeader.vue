@@ -188,6 +188,7 @@
 
       <!-- Правая зона: иконки -->
       <div class="flex items-center gap-1">
+        <!--
         <UButton
           icon="i-lucide-heart"
           variant="ghost"
@@ -202,6 +203,7 @@
           square
           class="hidden sm:inline-flex"
         />
+        -->
         <!-- КОРЗИНА - НОВАЯ КНОПКА -->
         <UButton
           icon="i-lucide-shopping-cart"
@@ -475,6 +477,23 @@
       class="hidden md:block es-header__bottom py-2 border-b border-surface-900 bg-bg-900"
     >
       <div class="es-container flex items-center gap-4 py-2">
+        <!-- Горизонтальное меню категорий -->
+        <nav
+          class="es-categories flex-1 flex items-center gap-4 overflow-x-auto"
+        >
+          <NuxtLink
+            v-for="category in categories"
+            :key="category.id"
+            :to="`/categories/${category.slug}`"
+            class="es-categories__item text-text-100 whitespace-nowrap text-sm"
+          >
+            <UIcon
+              :name="getCategoryIcon(category.slug)"
+              class="es-categories__icon"
+            />
+            {{ category.name }}
+          </NuxtLink>
+        </nav>
         <UPopover
           v-model:open="catalogOpen"
           modal
@@ -663,23 +682,6 @@
             </ClientOnly>
           </template>
         </UPopover>
-        <!-- Горизонтальное меню категорий -->
-        <nav
-          class="es-categories flex-1 flex items-center gap-4 overflow-x-auto"
-        >
-          <NuxtLink
-            v-for="category in categories"
-            :key="category.id"
-            :to="`/categories/${category.slug}`"
-            class="es-categories__item text-text-100 whitespace-nowrap text-sm"
-          >
-            <UIcon
-              :name="getCategoryIcon(category.slug)"
-              class="es-categories__icon"
-            />
-            {{ category.name }}
-          </NuxtLink>
-        </nav>
       </div>
     </div>
   </header>
