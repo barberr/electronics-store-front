@@ -342,32 +342,30 @@
           <template #body>
             <ClientOnly>
               <div
-                v-if="data?.catalog"
+                v-if="parentCategories.length"
                 class="px-4 py-2 space-y-4 max-h-[calc(100vh-120px)] overflow-y-auto"
               >
                 <div
-                  v-for="group in data.catalog"
-                  :key="group.slug"
+                  v-for="parentCategory in parentCategories"
+                  :key="parentCategory.id"
                   class="min-w-0"
                 >
-                  <!-- Заголовок категории (кликабельный) -->
                   <UButton
                     variant="link"
                     class="font-semibold text-text-100 text-left px-1 py-1 -ml-1 hover:bg-surface-900 rounded w-full flex justify-between items-center"
-                    @click="toggleCategory(group.slug)"
+                    @click="toggleCategory(parentCategory.slug)"
                   >
                     <div class="flex items-center">
                       <UIcon
-                        :name="getCategoryIcon(group.slug)"
+                        :name="getCategoryIcon(parentCategory.slug)"
                         class="mr-2 text-text-400"
                         size="16"
                       />
-                      {{ group.name }}
+                      {{ parentCategory.name }}
                     </div>
-                    <!-- Иконка стрелки вниз/вверх -->
                     <UIcon
                       :name="
-                        expandedCategory === group.slug
+                        expandedCategory === parentCategory.slug
                           ? 'i-heroicons-chevron-up'
                           : 'i-heroicons-chevron-down'
                       "
@@ -376,67 +374,26 @@
                     />
                   </UButton>
 
-                  <!-- Товары (показываются только если категория раскрыта) -->
                   <div
-                    v-if="expandedCategory === group.slug"
+                    v-if="expandedCategory === parentCategory.slug"
                     class="mt-2 space-y-1 ml-2 border-l-2 border-surface-900 pl-2"
                   >
                     <NuxtLink
-                      v-for="product in group.products.slice(
-                        0,
-                        4
-                      )"
-                      :key="product.id"
-                      :to="`/products/${product.slug}`"
+                      :to="`/categories/${parentCategory.slug}`"
+                      class="block px-2 py-1.5 text-sm font-medium text-text-100 rounded hover:bg-surface-900 transition-colors"
+                      @click="closeSlideover"
+                    >
+                      Смотреть всю категорию
+                    </NuxtLink>
+                    <NuxtLink
+                      v-for="childCategory in childCategoriesMap[parentCategory.id] || []"
+                      :key="childCategory.id"
+                      :to="`/categories/${childCategory.slug}`"
                       class="block px-2 py-1.5 text-sm text-text-100 rounded hover:bg-surface-900 transition-colors"
                       @click="closeSlideover"
                     >
-                      <div
-                        class="flex justify-between items-start"
-                      >
-                        <span class="truncate">{{
-                          product.name
-                        }}</span>
-                        <span
-                          class="font-medium whitespace-nowrap ml-2"
-                          :class="{
-                            'text-success':
-                              product.is_active,
-                            'text-text-400 line-through':
-                              !product.is_active
-                          }"
-                        >
-                          от
-                          {{
-                            formatPrice(
-                              getMinPrice(
-                                product.variants
-                              )
-                            )
-                          }}
-                        </span>
-                      </div>
-                      <div
-                        v-if="product.brand?.name"
-                        class="text-xs text-text-400 mt-0.5"
-                      >
-                        {{ product.brand.name }}
-                      </div>
+                      {{ childCategory.name }}
                     </NuxtLink>
-
-                    <!-- "Показать все" если товаров >4 -->
-                    <UButton
-                      v-if="group.products.length > 4"
-                      variant="link"
-                      size="xs"
-                      class="px-2 py-1 mt-0.5 text-xs"
-                      :to="`/categories/${group.slug}`"
-                      @click="closeSlideover"
-                    >
-                      Показать все ({{
-                        group.products.length
-                      }})
-                    </UButton>
                   </div>
                 </div>
               </div>
@@ -456,17 +413,17 @@
 
         <div class="es-mobile-shortcuts__scroll">
           <NuxtLink
-            v-for="link in appleQuickLinks"
+            v-for="link in parentCategories"
             :key="link.slug"
             :to="`/categories/${link.slug}`"
             class="es-mobile-shortcuts__item"
-            :aria-label="link.label"
+            :aria-label="link.name"
           >
             <UIcon
-              :name="link.icon"
+              :name="getCategoryIcon(link.slug)"
               class="w-4 h-4"
             />
-            <span>{{ link.shortLabel }}</span>
+            <span>{{ link.name }}</span>
           </NuxtLink>
         </div>
       </div>
@@ -548,88 +505,44 @@
                 <!-- Контент -->
                 <div
                   v-else
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2"
+                  class="es-catalog-grid"
                 >
                   <div
-                    v-for="group in data?.catalog || []"
-                    :key="group.slug"
-                    class="min-w-0"
+                    v-for="parentCategory in parentCategories"
+                    :key="parentCategory.id"
+                    class="es-catalog-group"
                   >
-                    <!-- Заголовок категории -->
-                    <UButton
-                      variant="link"
-                      class="font-semibold text-text-100 text-left px-1 py-1 -ml-1 hover:bg-surface-900 rounded w-full"
-                      :to="`/categories/${group.slug}`"
+                    <NuxtLink
+                      :to="`/categories/${parentCategory.slug}`"
+                      class="es-catalog-parent"
                       @click="close"
                     >
                       <UIcon
-                        :name="
-                          getCategoryIcon(group.slug)
-                        "
-                        class="mr-2 text-text-400"
+                        :name="getCategoryIcon(parentCategory.slug)"
+                        class="mr-2 text-text-400 shrink-0"
                         size="16"
                       />
-                      {{ group.name }}
-                    </UButton>
+                      <span class="truncate">{{ parentCategory.name }}</span>
+                      <UIcon
+                        v-if="childCategoriesMap[parentCategory.id]?.length"
+                        name="i-heroicons-chevron-right-20-solid"
+                        class="ml-auto h-4 w-4 text-text-400 shrink-0"
+                      />
+                    </NuxtLink>
 
-                    <!-- Список товаров -->
-                    <div class="mt-1 space-y-1">
+                    <div
+                      v-if="childCategoriesMap[parentCategory.id]?.length"
+                      class="es-catalog-submenu"
+                    >
                       <NuxtLink
-                        v-for="product in group.products.slice(
-                          0,
-                          4
-                        )"
-                        :key="product.id"
-                        :to="`/products/${product.slug}`"
-                        class="block px-2 py-1.5 text-sm text-text-100 rounded hover:bg-surface-900 transition-colors"
+                        v-for="childCategory in childCategoriesMap[parentCategory.id]"
+                        :key="childCategory.id"
+                        :to="`/categories/${childCategory.slug}`"
+                        class="es-catalog-submenu__item"
                         @click="close"
                       >
-                        <div
-                          class="flex justify-between items-start"
-                        >
-                          <span class="truncate">{{
-                            product.name
-                          }}</span>
-                          <span
-                            class="font-medium whitespace-nowrap ml-2"
-                            :class="{
-                              'text-success':
-                                product.is_active,
-                              'text-text-400 line-through':
-                                !product.is_active
-                            }"
-                          >
-                            от
-                            {{
-                              formatPrice(
-                                getMinPrice(
-                                  product.variants
-                                )
-                              )
-                            }}
-                          </span>
-                        </div>
-                        <div
-                          v-if="product.brand?.name"
-                          class="text-xs text-text-400 mt-0.5"
-                        >
-                          {{ product.brand.name }}
-                        </div>
+                        {{ childCategory.name }}
                       </NuxtLink>
-
-                      <!-- "Показать все" если товаров >4 -->
-                      <UButton
-                        v-if="group.products.length > 4"
-                        variant="link"
-                        size="xs"
-                        class="px-2 py-1 mt-0.5 text-xs"
-                        :to="`/categories/${group.slug}`"
-                        @click="close"
-                      >
-                        Показать все ({{
-                          group.products.length
-                        }})
-                      </UButton>
                     </div>
                   </div>
                 </div>
@@ -788,6 +701,27 @@ const shouldShowSearchState = computed(() =>
 const shouldShowDesktopSearchResults = computed(() =>
   desktopSearchFocused.value && shouldShowSearchState.value
 )
+const parentCategories = computed(() =>
+  categories.value.filter(category => category.parent === null)
+)
+const childCategoriesMap = computed<Record<number, Category[]>>(() => {
+  const map: Record<number, Category[]> = {}
+
+  for (const category of categories.value) {
+    if (category.parent === null) {
+      continue
+    }
+
+    const parentId = category.parent
+    if (!map[parentId]) {
+      map[parentId] = []
+    }
+
+    map[parentId].push(category)
+  }
+
+  return map
+})
 
 // Реактивное состояние для раскрытой категории
 const expandedCategory = ref<string | null>(null)
@@ -851,8 +785,9 @@ async function fetchSearchResults(query: string) {
 }
 
 function handleSearchSubmit() {
-  if (searchResults.value.length > 0) {
-    selectSearchResult(searchResults.value[0].slug)
+  const firstResult = searchResults.value[0]
+  if (firstResult) {
+    selectSearchResult(firstResult.slug)
   }
 }
 
@@ -902,57 +837,6 @@ const getCategoryIcon = (slug: string): string => {
   }
   return icons[slug] ?? 'i-heroicons-cube'
 }
-
-const appleQuickLinks = [
-  {
-    slug: 'iphone',
-    label: 'iPhone',
-    shortLabel: 'iPhone',
-    icon: 'i-lucide-smartphone'
-  },
-  {
-    slug: 'ipad',
-    label: 'iPad',
-    shortLabel: 'iPad',
-    icon: 'i-lucide-tablet'
-  },
-  {
-    slug: 'mac',
-    label: 'Mac',
-    shortLabel: 'Mac',
-    icon: 'i-lucide-monitor'
-  },
-  {
-    slug: 'macbook',
-    label: 'MacBook',
-    shortLabel: 'Book',
-    icon: 'i-lucide-laptop'
-  },
-  {
-    slug: 'apple-watch',
-    label: 'Apple Watch',
-    shortLabel: 'Watch',
-    icon: 'i-lucide-watch'
-  },
-  {
-    slug: 'airpods',
-    label: 'AirPods',
-    shortLabel: 'Pods',
-    icon: 'i-lucide-headphones'
-  },
-  {
-    slug: 'apple-tv',
-    label: 'Apple TV',
-    shortLabel: 'TV',
-    icon: 'i-lucide-tv'
-  },
-  {
-    slug: 'mac-studio',
-    label: 'Mac Studio',
-    shortLabel: 'Studio',
-    icon: 'i-lucide-cpu'
-  }
-]
 
 const fetchCategories = async () => {
   try {
@@ -1155,6 +1039,68 @@ onBeforeUnmount(() => {
 /* Кнопка каталога */
 .es-catalog-btn {
     min-width: 150px;
+}
+
+.es-catalog-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.es-catalog-group {
+    position: relative;
+}
+
+.es-catalog-parent {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 16rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 0.9rem;
+    color: var(--color-text-100);
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.es-catalog-parent:hover {
+    background: color-mix(in srgb, var(--color-surface-900) 88%, transparent);
+}
+
+.es-catalog-submenu {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.6rem);
+    display: none;
+    min-width: 15rem;
+    padding: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--color-text-100) 10%, transparent);
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, var(--color-bg-950) 96%, var(--color-surface-900));
+    box-shadow: 0 20px 40px rgb(0 0 0 / 0.3);
+    z-index: 20;
+}
+
+.es-catalog-group:hover .es-catalog-submenu,
+.es-catalog-group:focus-within .es-catalog-submenu {
+    display: block;
+}
+
+.es-catalog-submenu__item {
+    display: block;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.75rem;
+    color: var(--color-text-100);
+    white-space: nowrap;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.es-catalog-submenu__item:hover {
+    background: color-mix(in srgb, var(--color-surface-900) 88%, transparent);
+    color: var(--color-accent-300);
 }
 
 /* Категории */
