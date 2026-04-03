@@ -342,11 +342,11 @@
           <template #body>
             <ClientOnly>
               <div
-                v-if="parentCategories.length"
+                v-if="catalogParentCategories.length"
                 class="px-4 py-2 space-y-4 max-h-[calc(100vh-120px)] overflow-y-auto"
               >
                 <div
-                  v-for="parentCategory in parentCategories"
+                  v-for="parentCategory in catalogParentCategories"
                   :key="parentCategory.id"
                   class="min-w-0"
                 >
@@ -386,7 +386,7 @@
                       Смотреть всю категорию
                     </NuxtLink>
                     <NuxtLink
-                      v-for="childCategory in childCategoriesMap[parentCategory.id] || []"
+                      v-for="childCategory in catalogChildCategoriesMap[parentCategory.id] || []"
                       :key="childCategory.id"
                       :to="`/categories/${childCategory.slug}`"
                       class="block px-2 py-1.5 text-sm text-text-100 rounded hover:bg-surface-900 transition-colors"
@@ -413,7 +413,7 @@
 
         <div class="es-mobile-shortcuts__scroll">
           <NuxtLink
-            v-for="link in parentCategories"
+            v-for="link in menuCategories"
             :key="link.slug"
             :to="`/categories/${link.slug}`"
             class="es-mobile-shortcuts__item"
@@ -439,7 +439,7 @@
           class="es-categories flex-1 flex items-center gap-4 overflow-x-auto"
         >
           <NuxtLink
-            v-for="category in categories"
+            v-for="category in menuCategories"
             :key="category.id"
             :to="`/categories/${category.slug}`"
             class="es-categories__item text-text-100 whitespace-nowrap text-sm"
@@ -508,7 +508,7 @@
                   class="es-catalog-grid"
                 >
                   <div
-                    v-for="parentCategory in parentCategories"
+                    v-for="parentCategory in catalogParentCategories"
                     :key="parentCategory.id"
                     class="es-catalog-group"
                   >
@@ -524,18 +524,18 @@
                       />
                       <span class="truncate">{{ parentCategory.name }}</span>
                       <UIcon
-                        v-if="childCategoriesMap[parentCategory.id]?.length"
+                        v-if="catalogChildCategoriesMap[parentCategory.id]?.length"
                         name="i-heroicons-chevron-right-20-solid"
                         class="ml-auto h-4 w-4 text-text-400 shrink-0"
                       />
                     </NuxtLink>
 
                     <div
-                      v-if="childCategoriesMap[parentCategory.id]?.length"
+                      v-if="catalogChildCategoriesMap[parentCategory.id]?.length"
                       class="es-catalog-submenu"
                     >
                       <NuxtLink
-                        v-for="childCategory in childCategoriesMap[parentCategory.id]"
+                        v-for="childCategory in catalogChildCategoriesMap[parentCategory.id]"
                         :key="childCategory.id"
                         :to="`/categories/${childCategory.slug}`"
                         class="es-catalog-submenu__item"
@@ -642,7 +642,8 @@ const handleLogout = async () => {
 
 const { formatPrice } = useFormatPrice()
 
-const categories = ref<Category[]>([])
+const menuCategories = ref<Category[]>([])
+const catalogCategories = ref<Category[]>([])
 const searchQuery = ref('')
 const searchResults = ref<Product[]>([])
 const searchPending = ref(false)
@@ -701,13 +702,13 @@ const shouldShowSearchState = computed(() =>
 const shouldShowDesktopSearchResults = computed(() =>
   desktopSearchFocused.value && shouldShowSearchState.value
 )
-const parentCategories = computed(() =>
-  categories.value.filter(category => category.parent === null)
+const catalogParentCategories = computed(() =>
+  catalogCategories.value.filter(category => category.parent === null)
 )
-const childCategoriesMap = computed<Record<number, Category[]>>(() => {
+const catalogChildCategoriesMap = computed<Record<number, Category[]>>(() => {
   const map: Record<number, Category[]> = {}
 
-  for (const category of categories.value) {
+  for (const category of catalogCategories.value) {
     if (category.parent === null) {
       continue
     }
@@ -843,11 +844,22 @@ const fetchCategories = async () => {
     const response = await api.get('/v1/categories/header-menu/', {
       skipAuth: true // 👈 Добавили флаг
     })
-    // console.log('response -', response);
-    categories.value = response.data as Category[]
+    menuCategories.value = response.data as Category[]
   } catch (err: unknown) {
     const errorResponse = (err as { response?: { data?: unknown } })?.response?.data
     console.error('Failed to fetch categories:', errorResponse || err)
+  }
+}
+
+const fetchCatalogCategories = async () => {
+  try {
+    const response = await api.get('/v1/categories/', {
+      skipAuth: true
+    })
+    catalogCategories.value = (response.data.results || response.data) as Category[]
+  } catch (err: unknown) {
+    const errorResponse = (err as { response?: { data?: unknown } })?.response?.data
+    console.error('Failed to fetch catalog categories:', errorResponse || err)
   }
 }
 
@@ -877,6 +889,7 @@ onMounted(async () => {
     console.warn('Не удалось загрузить корзину:', err)
   }
   fetchCategories()
+  fetchCatalogCategories()
 })
 
 watch(searchQuery, (value) => {
