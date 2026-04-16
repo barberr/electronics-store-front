@@ -518,7 +518,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                                 size="sm"
                                                 color="neutral"
                                                 variant="soft"
-                                                class="capitalize rounded-full px-3 min-h-9 border border-surface-700/80"
+                                                class="capitalize rounded-full px-3 min-h-9 border border-surface-700/80 !bg-[color:color-mix(in_srgb,var(--color-surface-900)_70%,var(--color-bg-950))] !text-text-100 hover:!bg-surface-700"
                                                 @click="selectAttribute(attrName, value)"
                                                 :class="{
                                                     'ring-2 ring-text-100 border-text-100 bg-surface-900 text-text-100 shadow-[0_8px_24px_rgb(0_0_0_/_0.18)]':
