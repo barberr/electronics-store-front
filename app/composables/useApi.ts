@@ -34,7 +34,7 @@ function getApiBase() {
   return config.public.apiBase || (
     import.meta.dev
       ? 'http://127.0.0.1:8000/api/'
-      : 'https://izistore.info/api/'
+      : 'https://izistor.ru/api/'
   );
 }
 
