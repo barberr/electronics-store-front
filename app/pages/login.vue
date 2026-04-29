@@ -148,7 +148,7 @@ const handleLogin = async () => {
     })
 
     if (result.success) {
-      await navigateTo('/profile')
+      await navigateTo('/cart')
     } else {
       error.value = result.error || 'Ошибка входа'
     }

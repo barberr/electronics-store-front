@@ -10,6 +10,7 @@ const { formatPrice } = useFormatPrice();
 const api = useApi();
 const cart = useCart();
 const toast = useToast();
+const { isAuthenticated } = useAuth();
 
 // // --- Интерфейсы ---
 // interface Product {
@@ -83,6 +84,14 @@ const refreshCategory = () => {
 };
 
 const addToCart = async (product: Product) => {
+    if (!isAuthenticated.value) {
+        await navigateTo({
+            path: '/login',
+            query: { redirect: route.fullPath },
+        });
+        return;
+    }
+
     const availableVariant = product.variants.find(
         variant => variant.is_active && (variant.stock === null || variant.stock > 0)
     );

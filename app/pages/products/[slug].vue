@@ -13,6 +13,7 @@ const error = ref<Error | null>(null);
 const api = useApi();
 const cart = useCart();
 const { formatPrice } = useFormatPrice();
+const { isAuthenticated } = useAuth();
 
 onMounted(() => {
   if (!cart.cart.value) {
@@ -257,6 +258,14 @@ useSeoMeta({
 });
 
 const addToCartHandler = async () => {
+    if (!isAuthenticated.value) {
+        await navigateTo({
+            path: '/login',
+            query: { redirect: route.fullPath },
+        });
+        return;
+    }
+
     if (!selectedVariant.value) {
         console.warn('Нет выбранного варианта');
         return;
@@ -634,7 +643,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                                     name="i-heroicons-shopping-bag"
                                     class="w-5 h-5 mr-2"
                                 />
-                                В корзину
+                                Купить
                             </UButton>
                             <UButton
                                 size="xl"
@@ -787,7 +796,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                     <video
                         v-if="currentMedia.media_type === 'video'"
                         :src="currentMedia.image"
-                        :aria-label="currentMedia.alt_text || product.name"
+                        :aria-label="currentMedia.alt_text || product?.name || 'Товар'"
                         class="max-h-[100vh] w-screen object-contain"
                         autoplay
                         controls
@@ -797,7 +806,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                     <img
                         v-else
                         :src="currentMedia.image"
-                        :alt="currentMedia.alt_text || product.name"
+                        :alt="currentMedia.alt_text || product?.name || 'Товар'"
                         class="max-h-[100vh] w-screen object-contain"
                     >
                 </div>

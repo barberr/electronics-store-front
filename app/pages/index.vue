@@ -49,6 +49,7 @@
                     <ProductCard 
                         class="rounded-lg"
                         :product="item"
+                        @add-to-cart="addToCart"
                     />
                     <!-- <img :src="item" width="234" height="234" class="rounded-lg"> -->
                 </UCarousel>
@@ -64,6 +65,10 @@ const products = ref<Product[]>([]);
 const popularProducts = ref<Product[]>([]);
 const pending = ref<boolean>(true);
 const error = ref<Error | null>(null);
+const route = useRoute();
+const cart = useCart();
+const toast = useToast();
+const { isAuthenticated } = useAuth();
 
 const sortBy = ref<'name' | 'price' | '-price' | 'stock' | '-stock'>('name');
 const sortOptions = [
@@ -152,6 +157,32 @@ const getMainImage = (images: any[]) => {
     // Ищем первое изображение с is_main: true
     const mainImage = images.find((img) => img.is_main);
     return mainImage ? mainImage.image : null;
+};
+
+const addToCart = async (product: Product) => {
+    if (!isAuthenticated.value) {
+        await navigateTo({
+            path: '/login',
+            query: { redirect: route.fullPath },
+        });
+        return;
+    }
+
+    const availableVariant = product.variants.find(
+        variant => variant.is_active && (variant.stock === null || variant.stock > 0),
+    );
+
+    if (!availableVariant) {
+        toast.add({
+            title: 'Нет в наличии',
+            description: 'У товара сейчас нет доступных вариантов',
+            color: 'primary',
+            icon: 'i-heroicons-exclamation-triangle',
+        });
+        return;
+    }
+
+    await cart.addToCart(availableVariant.id, 1);
 };
 
 const fetchProducts = async () => {

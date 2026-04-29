@@ -4,11 +4,21 @@
 @layer components {
   :root {
     color-scheme: dark;
-    --ui-bg-elevated: color-mix(in srgb, var(--color-surface-900) 78%, var(--color-bg-950));
-    --ui-bg-muted: color-mix(in srgb, var(--color-surface-900) 58%, var(--color-bg-950));
-    --ui-bg-accented: color-mix(in srgb, var(--color-accent-400) 16%, var(--color-bg-950));
-    --ui-border-accented: color-mix(in srgb, var(--color-accent-400) 45%, var(--color-surface-900));
+    --ui-bg-elevated: #232428;
+    --ui-bg-muted: #1a1b1f;
+    --ui-bg-accented: rgb(255 255 255 / 0.08);
+    --ui-border-accented: rgb(255 255 255 / 0.22);
     --ui-text-highlighted: var(--color-text-100);
+    --ui-focus-ring: #E9CC02;
+  }
+
+  @supports (color: color-mix(in srgb, white 50%, black)) {
+    :root {
+      --ui-bg-elevated: color-mix(in srgb, var(--color-surface-900) 78%, var(--color-bg-950));
+      --ui-bg-muted: color-mix(in srgb, var(--color-surface-900) 58%, var(--color-bg-950));
+      --ui-bg-accented: color-mix(in srgb, var(--color-text-100) 10%, var(--color-bg-950));
+      --ui-border-accented: color-mix(in srgb, var(--color-text-100) 22%, var(--color-surface-900));
+    }
   }
 
   /* Ссылки видимые на тёмном фоне */
@@ -38,6 +48,7 @@
 
   input::placeholder,
   textarea::placeholder {
+    color: rgb(178 181 187 / 0.92);
     color: color-mix(in srgb, var(--color-text-400) 88%, transparent);
     opacity: 1;
   }
@@ -52,8 +63,8 @@
   input:focus,
   textarea:focus,
   select:focus {
-    border-color: color-mix(in srgb, var(--color-accent-400) 78%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-400) 60%, transparent);
+    border-color: var(--ui-focus-ring);
+    box-shadow: 0 0 0 1px rgb(233 204 2 / 0.55);
     outline: none;
   }
 
@@ -74,7 +85,7 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid var(--color-accent-400);
+    outline: 2px solid var(--ui-focus-ring);
     outline-offset: 2px;
   }
 
@@ -136,7 +147,7 @@
   }
 
   [class*='color-primary'][class*='variant-outline'] {
-    border-color: color-mix(in srgb, var(--color-accent-400) 56%, var(--color-surface-900));
+    border-color: var(--ui-border-accented);
     color: var(--color-text-100);
     transition:
       background-color 0.2s ease,
@@ -311,6 +322,9 @@ body {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .app {

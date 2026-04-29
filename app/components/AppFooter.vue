@@ -289,7 +289,7 @@ const messengers = [
 }
 
 .footer-link:hover {
-    color: var(--color-accent-300);
+    color: var(--color-text-100);
 }
 
 .footer-bottom {
@@ -357,7 +357,7 @@ const messengers = [
 }
 
 .footer-social-chip:hover {
-    color: var(--color-accent-300);
+    color: var(--color-text-100);
     border-color: rgb(255 255 255 / 0.2);
     background: rgb(255 255 255 / 0.07);
 }

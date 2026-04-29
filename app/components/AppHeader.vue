@@ -1027,7 +1027,7 @@ onBeforeUnmount(() => {
 }
 
 .es-contacts__phone:hover {
-    color: var(--color-accent-400);
+    color: var(--color-text-400);
 }
 
 .es-icons {
@@ -1089,7 +1089,7 @@ onBeforeUnmount(() => {
     display: block;
     min-width: 15rem;
     padding: 0.55rem;
-    border: 1px solid color-mix(in srgb, var(--color-accent-400) 28%, var(--color-surface-700));
+    border: 1px solid color-mix(in srgb, var(--color-text-100) 14%, var(--color-surface-700));
     border-radius: 1rem;
     background:
         linear-gradient(
@@ -1100,7 +1100,7 @@ onBeforeUnmount(() => {
     box-shadow:
         0 24px 48px rgb(0 0 0 / 0.34),
         0 0 0 1px rgb(255 255 255 / 0.04) inset,
-        0 0 28px color-mix(in srgb, var(--color-accent-400) 10%, transparent);
+        0 0 28px color-mix(in srgb, var(--color-text-100) 6%, transparent);
     z-index: 20;
     opacity: 0;
     visibility: hidden;
@@ -1147,8 +1147,8 @@ onBeforeUnmount(() => {
 
 .es-catalog-submenu__item:hover {
     background: color-mix(in srgb, var(--color-surface-700) 42%, var(--color-surface-900));
-    border-color: color-mix(in srgb, var(--color-accent-400) 32%, transparent);
-    color: var(--color-accent-300);
+    border-color: color-mix(in srgb, var(--color-text-100) 22%, transparent);
+    color: var(--color-text-100);
     transform: translateX(-2px);
 }
 
@@ -1252,7 +1252,13 @@ onBeforeUnmount(() => {
     flex: 0 0 auto;
     font-size: 0.82rem;
     font-weight: 600;
-    color: var(--color-accent-400);
+    color: var(--color-text-100);
+    background: color-mix(in srgb, var(--color-text-100) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-text-100) 18%, transparent);
+    border-radius: 9999px;
+    padding: 0.28rem 0.6rem;
+    line-height: 1.1;
+    text-shadow: 0 1px 1px rgb(0 0 0 / 0.35);
     white-space: nowrap;
 }
 
@@ -1349,8 +1355,8 @@ onBeforeUnmount(() => {
 }
 
 .es-mobile-shortcuts__item:hover {
-    color: var(--color-accent-300);
-    border-color: var(--color-accent-400);
+    color: var(--color-text-100);
+    border-color: color-mix(in srgb, var(--color-text-100) 22%, transparent);
     background: color-mix(in srgb, var(--color-surface-900) 92%, var(--color-bg-950));
 }
 </style>

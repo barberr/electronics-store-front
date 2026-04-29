@@ -207,9 +207,9 @@ onMounted(() => {
                                 ? 'w-full justify-center rounded-xl px-4 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all font-semibold min-h-12 !bg-[#E9CC02] !border-[#E9CC02] !text-[#0E0F12] hover:!bg-[#f0df58] hover:!border-[#f0df58]'
                                 : 'w-full justify-center rounded-xl px-4 shadow-lg transition-all font-semibold min-h-12'
                         "
-                        @click.stop="handleAddToCart"
+                        @click.stop.prevent="handleAddToCart"
                     >
-                        Подробнее
+                        Купить
                         <!-- <UIcon
                             name="i-heroicons-shopping-bag"
                             class="w-5 h-5"
