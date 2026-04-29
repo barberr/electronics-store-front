@@ -76,7 +76,7 @@
                     class="app-btn-secondary !bg-[linear-gradient(135deg,rgb(255_255_255_/_0.22)_0%,rgb(196_202_214_/_0.16)_52%,rgb(255_255_255_/_0.1)_100%)] !border-[rgb(255_255_255_/_0.24)] px-8 py-4 text-lg font-semibold hover:scale-105 hover:!bg-[linear-gradient(135deg,rgb(255_255_255_/_0.3)_0%,rgb(210_216_228_/_0.2)_52%,rgb(255_255_255_/_0.14)_100%)] transition-transform"
                     variant="soft"
                   >
-                    Подробнее
+                    Подробнее 
                   </UButton>
                 </div>
               </template>
