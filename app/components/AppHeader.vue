@@ -227,13 +227,13 @@
             href="tel:+79517505749"
             class="es-header__phone-primary text-xs font-medium text-text-100"
           >
-            +7 (951) 750-57-49
+            Псков телефон: +7 (951) 750-57-49
           </a>
           <a
             href="tel:+79113625699"
             class="text-xs text-text-400"
           >
-            +7 (911) 362-56-99
+            СПб телефон: +7 (911) 362-56-99
           </a>
         </div>
         <!-- Если НЕ авторизован -->
