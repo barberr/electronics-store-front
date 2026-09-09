@@ -16,48 +16,41 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
-      - name: Use Node.js 20 with pnpm cache
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'                          # pnpm вместо npm!
+          cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install deps
-        run: pnpm install --frozen-lockfile     # pnpm ci аналог
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm run build                     # без working-directory!
+        run: pnpm run build
 
-      - name: Upload to temp dir
+      - name: Prepare deploy archive
+        run: |
+          tar -czf frontend-deploy.tar.gz \
+            .output \
+            package.json \
+            pnpm-lock.yaml \
+            nitro.json
+
+      - name: Upload build
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key:  ${{ secrets.SSH_KEY }}
-          source: ".output,package.json,pnpm-lock.yaml,nitro.json"
-          target: "/tmp/electronics-store-front-deploy"
-          rm: true
-
-
-      - name: Deploy from temp
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: |
-            set -e
-            sudo rm -rf /var/www/electronics-store-front/.output
-            sudo mv /tmp/electronics-store-front-deploy/.output /var/www/electronics-store-front/.output
-            sudo mv /tmp/electronics-store-front-deploy/package.json /var/www/electronics-store-front/package.json || true
-            sudo mv /tmp/electronics-store-front-deploy/pnpm-lock.yaml /var/www/electronics-store-front/pnpm-lock.yaml || true
-            sudo mv /tmp/electronics-store-front-deploy/nitro.json /var/www/electronics-store-front/nitro.json || true
-            sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_GROUP }} /var/www/electronics-store-front
+          source: frontend-deploy.tar.gz
+          target: /tmp
 
-
-      - name: Restart frontend service
+      - name: Deploy and restart
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -65,6 +58,31 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            cd /var/www/electronics-store-front
-            sudo systemctl daemon-reload
+            set -e
+
+            DEPLOY_DIR=/tmp/electronics-store-front-deploy
+            APP_DIR=/var/www/electronics-store-front
+
+            rm -rf "$DEPLOY_DIR"
+            mkdir -p "$DEPLOY_DIR"
+
+            tar -xzf /tmp/frontend-deploy.tar.gz -C "$DEPLOY_DIR"
+
+            sudo rm -rf "$APP_DIR/.output"
+            sudo mv "$DEPLOY_DIR/.output" "$APP_DIR/.output"
+
+            sudo mv "$DEPLOY_DIR/package.json" "$APP_DIR/package.json"
+            sudo mv "$DEPLOY_DIR/pnpm-lock.yaml" "$APP_DIR/pnpm-lock.yaml"
+            sudo mv "$DEPLOY_DIR/nitro.json" "$APP_DIR/nitro.json"
+
+            sudo chown -R \
+              ${{ secrets.SSH_USER }}:${{ secrets.SSH_GROUP }} \
+              "$APP_DIR"
+
+            rm -rf "$DEPLOY_DIR"
+            rm -f /tmp/frontend-deploy.tar.gz
+
             sudo systemctl restart ${{ secrets.FRONT_SERVICE_NAME }}
+
+            sudo systemctl is-active --quiet \
+              ${{ secrets.FRONT_SERVICE_NAME }}
