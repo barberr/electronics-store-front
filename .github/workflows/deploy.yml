@@ -67,19 +67,17 @@ jobs:
 
             tar -xzf /tmp/frontend-deploy.tar.gz -C "$DEPLOY_DIR"
 
-            sudo rm -rf "$APP_DIR/.output"
-            sudo mv "$DEPLOY_DIR/.output" "$APP_DIR/.output"
+            rm -rf "$APP_DIR/.output"
+            mv "$DEPLOY_DIR/.output" "$APP_DIR/.output"
 
-            sudo mv "$DEPLOY_DIR/package.json" "$APP_DIR/package.json"
-            sudo mv "$DEPLOY_DIR/pnpm-lock.yaml" "$APP_DIR/pnpm-lock.yaml"
-            sudo mv "$DEPLOY_DIR/nitro.json" "$APP_DIR/nitro.json"
+            mv "$DEPLOY_DIR/package.json" "$APP_DIR/package.json"
+            mv "$DEPLOY_DIR/pnpm-lock.yaml" "$APP_DIR/pnpm-lock.yaml"
+            mv "$DEPLOY_DIR/nitro.json" "$APP_DIR/nitro.json"
 
-            sudo chown -R \
-              ${{ secrets.SSH_USER }}:${{ secrets.SSH_GROUP }} \
-              "$APP_DIR"
+            chmod -R g+rX "$APP_DIR"
 
             rm -rf "$DEPLOY_DIR"
             rm -f /tmp/frontend-deploy.tar.gz
 
-            sudo systemctl restart ${{ secrets.FRONT_SERVICE_NAME }}
-            sudo systemctl is-active --quiet ${{ secrets.FRONT_SERVICE_NAME }}
+            sudo -n systemctl restart ${{ secrets.FRONT_SERVICE_NAME }}
+            sudo -n systemctl is-active --quiet ${{ secrets.FRONT_SERVICE_NAME }}
