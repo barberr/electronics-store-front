@@ -54,7 +54,7 @@ jobs:
             sudo mv /tmp/electronics-store-front-deploy/package.json /var/www/electronics-store-front/package.json || true
             sudo mv /tmp/electronics-store-front-deploy/pnpm-lock.yaml /var/www/electronics-store-front/pnpm-lock.yaml || true
             sudo mv /tmp/electronics-store-front-deploy/nitro.json /var/www/electronics-store-front/nitro.json || true
-            sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_USER }} /var/www/electronics-store-front
+            sudo chown -R ${{ secrets.SSH_USER }}:${{ secrets.SSH_GROUP }} /var/www/electronics-store-front
 
 
       - name: Restart frontend service
