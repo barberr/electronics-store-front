@@ -35,7 +35,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          key:  ${{ secrets.SSH_KEY }}
           source: ".output,package.json,pnpm-lock.yaml,nitro.json"
           target: "/tmp/electronics-store-front-deploy"
           rm: true
