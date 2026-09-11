@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, watch, ref, onBeforeUnmount } from 'vue';
+import { formatPropertyValue } from '~/utils/productSpecifications';
 import { useFormatPrice } from '~/composables/useFormatPrice';
 
 
@@ -69,18 +70,8 @@ const attributeMeta = computed(() => {
     return meta;
 });
 
-const productSpecifications = computed(() => product.value?.specifications || []);
-
 const getAttributeLabel = (slug: string) => {
     return attributeMeta.value[slug]?.name || fallbackAttributeLabels[slug] || slug;
-};
-
-const formatPropertyValue = (value: string | number | null | undefined, unit?: string) => {
-    if (value === null || value === undefined || value === '') return 'Не указано';
-    if (!unit) return String(value);
-
-    const normalizedValue = String(value);
-    return normalizedValue.endsWith(unit) ? normalizedValue : `${normalizedValue} ${unit}`;
 };
 
 const getVariantDisplayAttributes = (variant: ProductVariant) => {
@@ -686,75 +677,7 @@ const selectAttributeFromVariant = (variant: ProductVariant) => {
                     </div>
                 </UCard>
 
-                <!-- Дополнительная информация -->
-                <UCard class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">
-                    <h3
-                        class="text-lg md:text-xl font-semibold text-text-100 mb-4 md:mb-6"
-                    >
-                        Характеристики
-                    </h3>
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm">
-                        <div>
-                            <dt
-                                class="font-medium text-text-400 mb-1"
-                            >
-                                Категория
-                            </dt>
-                            <dd class="text-text-100">
-                                {{ product.category?.name }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="font-medium text-text-400 mb-1"
-                            >
-                                Бренд
-                            </dt>
-                            <dd class="text-text-100">
-                                {{ product.brand?.name }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="font-medium text-text-400 mb-1"
-                            >
-                                Гарантия
-                            </dt>
-                            <dd class="text-text-100">
-                                {{ product.warranty_months }} месяцев
-                            </dd>
-                        </div>
-                        <div>
-                            <dt
-                                class="font-medium text-text-400 mb-1"
-                            >
-                                Создан
-                            </dt>
-                            <dd class="text-text-100">
-                                {{
-                                    new Date(
-                                        product.created_at,
-                                    ).toLocaleDateString('ru-RU')
-                                }}
-                            </dd>
-                        </div>
-                        <template
-                            v-for="specification in productSpecifications"
-                            :key="specification.id"
-                        >
-                            <div>
-                                <dt
-                                    class="font-medium text-text-400 mb-1"
-                                >
-                                    {{ specification.name }}
-                                </dt>
-                                <dd class="text-text-100">
-                                    {{ formatPropertyValue(specification.value, specification.unit) }}
-                                </dd>
-                            </div>
-                        </template>
-                    </dl>
-                </UCard>
+                <ProductSpecifications :product="product" />
 
                 <!-- Доставка -->
                 <UCard v-if="product.delivery_text" class="p-4 md:p-6 border border-surface-900 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--color-surface-900)_16%,transparent)_0%,transparent_100%)] rounded-[1.5rem]">

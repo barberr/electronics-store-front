@@ -5,6 +5,8 @@
 .nitro
 .cache
 .codex
+.opencode
+opencode.json
 
 dist
 

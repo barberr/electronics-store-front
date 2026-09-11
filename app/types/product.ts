@@ -41,7 +41,7 @@ export interface ProductVariant {
 }
 
 export interface ProductPropertyValue {
-    id: number;
+    id: number | null;
     name: string;
     slug: string;
     type: string;
@@ -49,7 +49,8 @@ export interface ProductPropertyValue {
     is_required: boolean;
     unit: string;
     group_name: string;
-    value: string;
+    sort_order?: number;
+    value: unknown;
 }
 
 // =============== ОСНОВНОЙ ТИП ТОВАРА ===============
@@ -71,7 +72,7 @@ export interface Product {
     delivery_text: string;
     warranty_months: number;
     specifications?: ProductPropertyValue[];
-    specifications_map?: Record<string, string>;
+    specifications_map?: Record<string, unknown>;
 
     created_at: string; // ISO дата
     updated_at: string; // ISO дата
