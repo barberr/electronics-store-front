@@ -51,8 +51,11 @@ const expandedVariants = ref(false);
 
 const fallbackAttributeLabels: Record<string, string> = {
     color: 'Цвет',
-    memory: 'Память',
-    storage: 'Память',
+    memory: 'Оперативная память',
+    storage: 'Объем памяти',
+    'processor-config': 'Процессор',
+    'connection-type': 'Тип подключения',
+    'watch-case-size': 'Размер корпуса',
 };
 
 const attributeMeta = computed(() => {
